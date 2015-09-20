@@ -1,91 +1,114 @@
-angular.module('starter', ['ionic', 'starter.controllers']).run(function($ionicPlatform) {
-  return $ionicPlatform.ready(function() {
-    if (window.cordova && window.cordova.plugins.Keyboard) {
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services']).run(function($ionicPlatform) {
+  $ionicPlatform.ready(function() {
+    if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      cordova.plugins.Keyboard.disableScroll(true);
     }
     if (window.StatusBar) {
-      return StatusBar.styleDefault();
+      StatusBar.styleLightContent();
     }
   });
 }).config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider.state('app', {
-    url: '/app',
+  $stateProvider.state('tab', {
+    url: '/tab',
     abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
-  }).state('app.search', {
-    url: '/search',
+    templateUrl: 'templates/tabs.html'
+  }).state('tab.dash', {
+    url: '/dash',
     views: {
-      menuContent: {
-        templateUrl: 'templates/search.html'
+      'tab-dash': {
+        templateUrl: 'templates/tab-dash.html',
+        controller: 'DashCtrl'
       }
     }
-  }).state('app.browse', {
-    url: '/browse',
+  }).state('tab.chats', {
+    url: '/chats',
     views: {
-      menuContent: {
-        templateUrl: 'templates/browse.html'
+      'tab-chats': {
+        templateUrl: 'templates/tab-chats.html',
+        controller: 'ChatsCtrl'
       }
     }
-  }).state('app.playlists', {
-    url: '/playlists',
+  }).state('tab.chat-detail', {
+    url: '/chats/:chatId',
     views: {
-      menuContent: {
-        templateUrl: 'templates/playlists.html',
-        controller: 'PlaylistsCtrl'
+      'tab-chats': {
+        templateUrl: 'templates/chat-detail.html',
+        controller: 'ChatDetailCtrl'
       }
     }
-  }).state('app.single', {
-    url: '/playlists/:playlistId',
+  }).state('tab.account', {
+    url: '/account',
     views: {
-      menuContent: {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+      'tab-account': {
+        templateUrl: 'templates/tab-account.html',
+        controller: 'AccountCtrl'
       }
     }
   });
-  return $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/tab/dash');
 });
 
-angular.module('starter.controllers', []).controller('AppCtrl', function($scope, $ionicModal, $timeout) {
-  $scope.loginData = {};
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    return $scope.modal = modal;
-  });
-  $scope.closeLogin = function() {
-    return $scope.modal.hide();
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope) {}).controller('ChatsCtrl', function($scope, Chats) {
+  $scope.chats = Chats.all();
+  $scope.remove = function(chat) {
+    Chats.remove(chat);
   };
-  $scope.login = function() {
-    return $scope.modal.show();
+}).controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
+  $scope.chat = Chats.get($stateParams.chatId);
+}).controller('AccountCtrl', function($scope) {
+  $scope.settings = {
+    enableFriends: true
   };
-  return $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-    return $timeout((function() {
-      return $scope.closeLogin();
-    }), 1000);
-  };
-}).controller('PlaylistsCtrl', function($scope) {
-  return $scope.playlists = [
+});
+
+angular.module('starter.services', []).factory('Chats', function() {
+  var chats;
+  chats = [
     {
-      title: 'Reggae',
-      id: 1
+      id: 0,
+      name: 'Ben Sparrow',
+      lastText: 'You on your way?',
+      face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
     }, {
-      title: 'Chill',
-      id: 2
+      id: 1,
+      name: 'Max Lynx',
+      lastText: 'Hey, it\'s me',
+      face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
     }, {
-      title: 'Dubstep',
-      id: 3
+      id: 2,
+      name: 'Adam Bradleyson',
+      lastText: 'I should buy a boat',
+      face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
     }, {
-      title: 'Indie',
-      id: 4
+      id: 3,
+      name: 'Perry Governor',
+      lastText: 'Look at my mukluks!',
+      face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
     }, {
-      title: 'Rap',
-      id: 5
-    }, {
-      title: 'Cowbell',
-      id: 6
+      id: 4,
+      name: 'Mike Harrington',
+      lastText: 'This is wicked good ice cream.',
+      face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
     }
   ];
-}).controller('PlaylistCtrl', function($scope, $stateParams) {});
+  return {
+    all: function() {
+      return chats;
+    },
+    remove: function(chat) {
+      chats.splice(chats.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < chats.length) {
+        if (chats[i].id === parseInt(chatId)) {
+          return chats[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+});

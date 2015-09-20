@@ -1,3 +1,5 @@
-a {
-  color: blue;
-}
+.tabs {
+  top: 0px !important; }
+
+.view-container .tab-content {
+  top: 47px; }
