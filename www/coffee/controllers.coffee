@@ -1,4 +1,22 @@
-angular.module('starter.controllers', []).controller('DashCtrl', ($scope) -> 
+angular.module('starter.controllers', []).controller('DashCtrl', ($scope,  $log, Renderings, Views, Floorplans, Videos, ActiveBuilding) -> 
+  $scope.factories = {"Rendering":Renderings.all(), "Floor Plan" : Floorplans.all(), "Videos" : Videos.all(), "Views" : Views.all()}
+  $scope.activeBuilding = ActiveBuilding
+  ###
+  # if given group is the selected group, deselect it
+  # else, select the given group
+  ###
+
+
+  $scope.toggleGroup = (group) ->
+    if $scope.isGroupShown(group)
+      $scope.shownGroup = null
+    else
+      $scope.shownGroup = group
+    return
+
+  $scope.isGroupShown = (group) ->
+    $scope.shownGroup == group    
+
 ).controller('ChatsCtrl', ($scope, Chats) ->
   # With the new view caching in Ionic, Controllers are only called
   # when they are recreated or on app start, instead of every page change.
@@ -20,7 +38,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope) ->
 ).controller('AccountCtrl', ($scope) ->
   $scope.settings = enableFriends: true
   return
-).controller('TopMenuCtrl', ($scope) ->
+).controller('TopMenuCtrl', ($scope, Buildings,ActiveBuilding, $log) ->
+  $scope.activeBuilding = ActiveBuilding
+  $scope.buildings = Buildings.all()
+  $scope.setActiveBuilding = (name)->
+    $scope.activeBuilding.name = name
   $scope.toggleTopMenu = ->
     menu = document.getElementsByTagName('ion-top-menu')[0]
     pane = document.getElementsByTagName('ion-view')[0]

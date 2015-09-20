@@ -2,7 +2,7 @@
   top: 0px !important;
 }
 
-
+// SUBHEADER:
 ion-top-menu {
   position: absolute;
   height: 0px;
@@ -14,8 +14,7 @@ ion-top-menu {
   transition: all .5s; }
 ion-view {
   position: absolute;
-  margin-top: 47px;
-  //top: 47px !important;
+  margin-top: 97px;
   transition: all .5s !important; 
 }
 
@@ -23,4 +22,21 @@ ion-top-menu .item {
   background: none;
   border-color: #222;
   color: white;
+}
+
+
+// LIST:
+
+.list .item.item-accordion {
+  line-height: 38px;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition: 0.09s all linear;
+}
+.list .item.item-accordion.ng-hide {
+  line-height: 0px;
+}
+.list .item.item-accordion.ng-hide-add,
+.list .item.item-accordion.ng-hide-remove {
+  display: block !important;
 }

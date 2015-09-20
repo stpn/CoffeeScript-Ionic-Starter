@@ -20,10 +20,10 @@ navigation history that also transitions its views in and out.
 </ion-tabs>
 <ion-top-menu ng-controller="TopMenuCtrl">
     <ion-scroll style="width:100%;height:100%">
-        <div class="list">
-            <div class="item">
-                A few
-            </div>
+        <div class="list" ng-repeat="building in buildings" >
+            <button class="button button-light" ng-click="setActiveBuilding(building.name)">
+                {{building.name}}
+            </button>
         </div>
     </ion-scroll>
     <div class="buttons">

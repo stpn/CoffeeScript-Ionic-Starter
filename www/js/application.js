@@ -1,4 +1,4 @@
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services']).run(function($ionicPlatform) {
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters']).run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -49,7 +49,30 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services']).
   $urlRouterProvider.otherwise('/tab/dash');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope) {}).controller('ChatsCtrl', function($scope, Chats) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $log, Renderings, Views, Floorplans, Videos, ActiveBuilding) {
+  $scope.factories = {
+    "Rendering": Renderings.all(),
+    "Floor Plan": Floorplans.all(),
+    "Videos": Videos.all(),
+    "Views": Views.all()
+  };
+  $scope.activeBuilding = ActiveBuilding;
+
+  /*
+   * if given group is the selected group, deselect it
+   * else, select the given group
+   */
+  $scope.toggleGroup = function(group) {
+    if ($scope.isGroupShown(group)) {
+      $scope.shownGroup = null;
+    } else {
+      $scope.shownGroup = group;
+    }
+  };
+  return $scope.isGroupShown = function(group) {
+    return $scope.shownGroup === group;
+  };
+}).controller('ChatsCtrl', function($scope, Chats) {
   $scope.chats = Chats.all();
   $scope.remove = function(chat) {
     Chats.remove(chat);
@@ -60,7 +83,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.settings = {
     enableFriends: true
   };
-}).controller('TopMenuCtrl', function($scope) {
+}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log) {
+  $scope.activeBuilding = ActiveBuilding;
+  $scope.buildings = Buildings.all();
+  $scope.setActiveBuilding = function(name) {
+    return $scope.activeBuilding.name = name;
+  };
   return $scope.toggleTopMenu = function() {
     var menu, pane;
     menu = document.getElementsByTagName('ion-top-menu')[0];
@@ -68,6 +96,25 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     menu.style.height = pane.style.top = menu.offsetHeight === 0 ? '300px' : '0px';
   };
 });
+
+angular.module('starter.filters', []).filter('buildingFilter', [
+  function() {
+    return function(models, activeBuilding) {
+      var tempClients;
+      if (!angular.isUndefined(models) && !angular.isUndefined(activeBuilding) && activeBuilding.length > 0) {
+        tempClients = [];
+        angular.forEach(models, function(model) {
+          if (angular.equals(model.building_name, activeBuilding)) {
+            return tempClients.push(model);
+          }
+        });
+        return tempClients;
+      } else {
+        return models;
+      }
+    };
+  }
+]);
 
 angular.module('starter.services', []).factory('Chats', function() {
   var chats;
@@ -112,6 +159,187 @@ angular.module('starter.services', []).factory('Chats', function() {
       while (i < chats.length) {
         if (chats[i].id === parseInt(chatId)) {
           return chats[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Buildings', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Mass 200"
+    }, {
+      id: 2,
+      name: "Mass 300"
+    }
+  ];
+  return {
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).service('ActiveBuilding', function() {
+  var name;
+  return name = "Mass 300";
+}).factory('Renderings', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Rend1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Rend2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 300'
+    }
+  ];
+  return {
+    name: function() {
+      return "Rendering";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Views', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "View";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Floorplans', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Floorplan1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Floorplan2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "Floorplan";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Videos', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Video1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Video2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "Video";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
         }
         i++;
       }
