@@ -60,6 +60,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.settings = {
     enableFriends: true
   };
+}).controller('PopoverCtrl', function($scope, $ionicPopover) {
+  return $ionicPopover.fromTemplateUrl('templates/popover.html', {
+    scope: $scope
+  }).then(function(popover) {
+    $scope.popover = popover;
+  });
 });
 
 angular.module('starter.services', []).factory('Chats', function() {

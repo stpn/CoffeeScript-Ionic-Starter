@@ -4,20 +4,49 @@ Each tab's child <ion-nav-view> directive will have its own
 navigation history that also transitions its views in and out.
 -->
 <ion-tabs class="tabs-icon-top tabs-color-active-positive" tabs-style="tabs-icon-top">
-  <h1 class="title">Capitol Crossing</h1>
-  <!-- Dashboard Tab -->
-  <ion-tab title="Status" icon-off="ion-ios-pulse" icon-on="ion-ios-pulse-strong" href="#/tab/dash">
-    <ion-nav-view name="tab-dash"></ion-nav-view>
-  </ion-tab>
-
-  <!-- Chats Tab -->
-  <ion-tab title="Chats" icon-off="ion-ios-chatboxes-outline" icon-on="ion-ios-chatboxes" href="#/tab/chats">
-    <ion-nav-view name="tab-chats"></ion-nav-view>
-  </ion-tab>
-
-  <!-- Account Tab -->
-  <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
-    <ion-nav-view name="tab-account"></ion-nav-view>
-  </ion-tab>
+    <h1 class="title">Capitol Crossing</h1>
+    <!-- Dashboard Tab -->
+    <ion-tab title="Status" icon-off="ion-ios-pulse" icon-on="ion-ios-pulse-strong" href="#/tab/dash">
+        <ion-nav-view name="tab-dash"></ion-nav-view>
+    </ion-tab>
+    <!-- Chats Tab -->
+    <ion-tab title="Chats" icon-off="ion-ios-chatboxes-outline" icon-on="ion-ios-chatboxes" href="#/tab/chats">
+        <ion-nav-view name="tab-chats"></ion-nav-view>
+    </ion-tab>
+    <!-- Account Tab -->
+    <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
+        <ion-nav-view name="tab-account"></ion-nav-view>
+    </ion-tab>
 </ion-tabs>
-<div id ="topPanel">TOP</div>
+<ion-header-bar class="bar bar-subheader" ng-controller="PopoverCtrl">
+    <div class="bar bar-header">
+        <div >
+            <button class="button button-icon ion-more" ng-click="popover.show($event)">
+            </button>
+        </div>
+    </div>
+</ion-header-bar>
+
+    <script id="templates/popover.html" type="text/ng-template">
+      <ion-popover-view>
+        <ion-content>
+          <div class="list">
+            <a class="item" href="http://learn.ionicframework.com/" target="_blank">
+              Learn Ionic
+            </a>
+            <a class="item" href="http://ionicframework.com/docs/" target="_blank">
+              Documentation
+            </a>
+            <a class="item" href="http://showcase.ionicframework.com/" target="_blank">
+              Showcase
+            </a>
+            <a class="item" href="http://ionicframework.com/submit-issue/" target="_blank">
+              Submit an Issue
+            </a>
+            <a class="item" href="https://github.com/driftyco/ionic" target="_blank">
+              Github Repo
+            </a>
+          </div>
+        </ion-content>
+      </ion-popover-view>
+    </script>
