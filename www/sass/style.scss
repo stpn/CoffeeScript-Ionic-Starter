@@ -1,6 +1,26 @@
 .tabs{
   top: 0px !important;
 }
-.view-container .tab-content{
+
+
+ion-top-menu {
+  position: absolute;
+  height: 0px;
+  width: 100%;
+  background: #333;
+  color: white;
+  z-index: 10;
   top: 47px;
+  transition: all .5s; }
+ion-view {
+  position: absolute;
+  margin-top: 47px;
+  //top: 47px !important;
+  transition: all .5s !important; 
+}
+
+ion-top-menu .item {
+  background: none;
+  border-color: #222;
+  color: white;
 }

@@ -60,12 +60,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.settings = {
     enableFriends: true
   };
-}).controller('PopoverCtrl', function($scope, $ionicPopover) {
-  return $ionicPopover.fromTemplateUrl('templates/popover.html', {
-    scope: $scope
-  }).then(function(popover) {
-    $scope.popover = popover;
-  });
+}).controller('TopMenuCtrl', function($scope) {
+  return $scope.toggleTopMenu = function() {
+    var menu, pane;
+    menu = document.getElementsByTagName('ion-top-menu')[0];
+    pane = document.getElementsByTagName('ion-view')[0];
+    menu.style.height = pane.style.top = menu.offsetHeight === 0 ? '300px' : '0px';
+  };
 });
 
 angular.module('starter.services', []).factory('Chats', function() {
