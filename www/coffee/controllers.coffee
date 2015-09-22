@@ -1,5 +1,5 @@
-angular.module('starter.controllers', []).controller('DashCtrl', ($scope,  $log, Renderings, Views, Floorplans, Videos, ActiveBuilding) -> 
-  $scope.factories = {"Rendering":Renderings.all(), "Floor Plan" : Floorplans.all(), "Videos" : Videos.all(), "Views" : Views.all()}
+angular.module('starter.controllers', []).controller('DashCtrl', ($scope,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) -> 
+  $scope.factories = {"Presentations": Presentations.all(), "Videos" : Videos.all(),  "Floor Plans" : Floorplans.all(), "Rendering":Renderings.all(), "Views" : Views.all(),  "Webcams" : Webcams.all(),}
   $scope.activeBuilding = ActiveBuilding
   ###
   # if given group is the selected group, deselect it

@@ -1,91 +1,535 @@
-angular.module('starter', ['ionic', 'starter.controllers']).run(function($ionicPlatform) {
-  return $ionicPlatform.ready(function() {
-    if (window.cordova && window.cordova.plugins.Keyboard) {
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters']).run(function($ionicPlatform) {
+  $ionicPlatform.ready(function() {
+    if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+      cordova.plugins.Keyboard.disableScroll(true);
     }
     if (window.StatusBar) {
-      return StatusBar.styleDefault();
+      StatusBar.styleLightContent();
     }
   });
 }).config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider.state('app', {
-    url: '/app',
+  $stateProvider.state('tab', {
+    url: '/tab',
     abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
-  }).state('app.search', {
-    url: '/search',
+    templateUrl: 'templates/tabs.html'
+  }).state('tab.dash', {
+    url: '/dash',
     views: {
-      menuContent: {
-        templateUrl: 'templates/search.html'
+      'tab-dash': {
+        templateUrl: 'templates/tab-dash.html',
+        controller: 'DashCtrl'
       }
     }
-  }).state('app.browse', {
-    url: '/browse',
+  }).state('tab.chats', {
+    url: '/chats',
     views: {
-      menuContent: {
-        templateUrl: 'templates/browse.html'
+      'tab-chats': {
+        templateUrl: 'templates/tab-chats.html',
+        controller: 'ChatsCtrl'
       }
     }
-  }).state('app.playlists', {
-    url: '/playlists',
+  }).state('tab.chat-detail', {
+    url: '/chats/:chatId',
     views: {
-      menuContent: {
-        templateUrl: 'templates/playlists.html',
-        controller: 'PlaylistsCtrl'
+      'tab-chats': {
+        templateUrl: 'templates/chat-detail.html',
+        controller: 'ChatDetailCtrl'
       }
     }
-  }).state('app.single', {
-    url: '/playlists/:playlistId',
+  }).state('tab.account', {
+    url: '/account',
     views: {
-      menuContent: {
-        templateUrl: 'templates/playlist.html',
-        controller: 'PlaylistCtrl'
+      'tab-account': {
+        templateUrl: 'templates/tab-account.html',
+        controller: 'AccountCtrl'
       }
     }
   });
-  return $urlRouterProvider.otherwise('/app/playlists');
+  $urlRouterProvider.otherwise('/tab/dash');
 });
 
-angular.module('starter.controllers', []).controller('AppCtrl', function($scope, $ionicModal, $timeout) {
-  $scope.loginData = {};
-  $ionicModal.fromTemplateUrl('templates/login.html', {
-    scope: $scope
-  }).then(function(modal) {
-    return $scope.modal = modal;
-  });
-  $scope.closeLogin = function() {
-    return $scope.modal.hide();
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) {
+  $scope.factories = {
+    "Presentations": Presentations.all(),
+    "Videos": Videos.all(),
+    "Floor Plans": Floorplans.all(),
+    "Rendering": Renderings.all(),
+    "Views": Views.all(),
+    "Webcams": Webcams.all()
   };
-  $scope.login = function() {
-    return $scope.modal.show();
+  $scope.activeBuilding = ActiveBuilding;
+
+  /*
+   * if given group is the selected group, deselect it
+   * else, select the given group
+   */
+  $scope.toggleGroup = function(group) {
+    if ($scope.isGroupShown(group)) {
+      $scope.shownGroup = null;
+    } else {
+      $scope.shownGroup = group;
+    }
   };
-  return $scope.doLogin = function() {
-    console.log('Doing login', $scope.loginData);
-    return $timeout((function() {
-      return $scope.closeLogin();
-    }), 1000);
+  return $scope.isGroupShown = function(group) {
+    return $scope.shownGroup === group;
   };
-}).controller('PlaylistsCtrl', function($scope) {
-  return $scope.playlists = [
+}).controller('ChatsCtrl', function($scope, Chats) {
+  $scope.chats = Chats.all();
+  $scope.remove = function(chat) {
+    Chats.remove(chat);
+  };
+}).controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
+  $scope.chat = Chats.get($stateParams.chatId);
+}).controller('AccountCtrl', function($scope) {
+  $scope.settings = {
+    enableFriends: true
+  };
+}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log) {
+  $scope.activeBuilding = ActiveBuilding;
+  $scope.buildings = Buildings.all();
+  $scope.setActiveBuilding = function(name) {
+    return $scope.activeBuilding.name = name;
+  };
+  return $scope.toggleTopMenu = function() {
+    var menu, pane;
+    menu = document.getElementsByTagName('ion-top-menu')[0];
+    pane = document.getElementsByTagName('ion-view')[0];
+    menu.style.height = pane.style.top = menu.offsetHeight === 0 ? '300px' : '0px';
+  };
+});
+
+angular.module('starter.filters', []).filter('buildingFilter', [
+  function() {
+    return function(models, activeBuilding) {
+      var tempClients;
+      if (!angular.isUndefined(models) && !angular.isUndefined(activeBuilding) && activeBuilding.length > 0) {
+        tempClients = [];
+        angular.forEach(models, function(model) {
+          if (angular.equals(model.building_name, activeBuilding)) {
+            return tempClients.push(model);
+          }
+        });
+        return tempClients;
+      } else {
+        return models;
+      }
+    };
+  }
+]);
+
+angular.module('starter.services', []).factory('Chats', function() {
+  var chats;
+  chats = [
     {
-      title: 'Reggae',
-      id: 1
+      id: 0,
+      name: 'Ben Sparrow',
+      lastText: 'You on your way?',
+      face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
     }, {
-      title: 'Chill',
-      id: 2
+      id: 1,
+      name: 'Max Lynx',
+      lastText: 'Hey, it\'s me',
+      face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
     }, {
-      title: 'Dubstep',
-      id: 3
+      id: 2,
+      name: 'Adam Bradleyson',
+      lastText: 'I should buy a boat',
+      face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
     }, {
-      title: 'Indie',
-      id: 4
+      id: 3,
+      name: 'Perry Governor',
+      lastText: 'Look at my mukluks!',
+      face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
     }, {
-      title: 'Rap',
-      id: 5
-    }, {
-      title: 'Cowbell',
-      id: 6
+      id: 4,
+      name: 'Mike Harrington',
+      lastText: 'This is wicked good ice cream.',
+      face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
     }
   ];
-}).controller('PlaylistCtrl', function($scope, $stateParams) {});
+  return {
+    all: function() {
+      return chats;
+    },
+    remove: function(chat) {
+      chats.splice(chats.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < chats.length) {
+        if (chats[i].id === parseInt(chatId)) {
+          return chats[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Buildings', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Mass 200"
+    }, {
+      id: 2,
+      name: "Mass 300"
+    }
+  ];
+  return {
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).service('ActiveBuilding', function() {
+  var name;
+  return name = "Mass 300";
+}).factory('Presentations', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Pres1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Pres2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 300'
+    }
+  ];
+  return {
+    name: function() {
+      return "Presentation";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Renderings', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Rend1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Rend2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 300'
+    }
+  ];
+  return {
+    name: function() {
+      return "Rendering";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Views', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "View";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Floorplans', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Floorplan1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Floorplan2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "Floorplan";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Videos', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Video1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "Video2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "Video";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Webcams', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "FP1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "FP2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "FP1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "FP1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "FP1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "FP1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "Webcam";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+});

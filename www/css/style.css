@@ -22,7 +22,6 @@ ion-top-menu .item {
   color: white; }
 
 .list .item.item-accordion {
-  line-height: 38px;
   padding-top: 0;
   padding-bottom: 0;
   transition: 0.09s all linear; }
@@ -33,3 +32,25 @@ ion-top-menu .item {
 .list .item.item-accordion.ng-hide-add,
 .list .item.item-accordion.ng-hide-remove {
   display: block !important; }
+
+.gallery {
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto; }
+
+.pict {
+  display: inline-block;
+  min-width: 300px;
+  min-height: 300px; }
+
+.cust_col {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 165px;
+  -moz-box-flex: 0;
+  -moz-flex: 0 0 165px;
+  -ms-flex: 0 0 165px;
+  flex: 0 0 165px;
+  max-width: 165px;
+  max-height: 100px; }
+  .cust_col img {
+    max-height: 95px; }
