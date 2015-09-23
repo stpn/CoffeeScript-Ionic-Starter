@@ -377,6 +377,106 @@ angular.module('starter.services', []).factory('Chats', function() {
       name: "View2",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
       building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 1,
+      name: "View1",
+      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
+      building_name: 'Mass 200'
+    }, {
+      id: 2,
+      name: "View2",
+      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
+      building_name: 'Mass 200'
     }
   ];
   return {
@@ -384,7 +484,14 @@ angular.module('starter.services', []).factory('Chats', function() {
       return "View";
     },
     all: function() {
-      return models;
+      var j, len, model, newMod;
+      newMod = [];
+      for (j = 0, len = models.length; j < len; j++) {
+        model = models[j];
+        model.id = Math.floor((Math.random() * 10) + 1);
+        newMod.push(model);
+      }
+      return newMod;
     },
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);

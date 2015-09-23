@@ -1,5 +1,40 @@
+/*
+To customize the look and feel of Ionic, you can override the variables
+in Ionic's _variables.scss file.
+For example, you might change some of the default colors:
+$light:                           #fff !default;
+$stable:                          #f8f8f8 !default;
+$positive:                        #4a87ee !default;
+$calm:                            #43cee6 !default;
+$balanced:                        #66cc33 !default;
+$energized:                       #f0b840 !default;
+$assertive:                       #ef4e3a !default;
+$royal:                           #8a6de9 !default;
+$dark:                            #444 !default;
+*/
+
+// The path for our Ionicon font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default;
+// My custom color. I’ll override the default for $positive.
+// Note that it’s before we load the rest of Ionic.
+// This is important!
+$stable: #262626 !default;
+$base-background-color: #000 !default;
+$base-color: #999999 !default;
+$button-light-active-bg: #262626 !default;
+$button-stable-active-border: #262626 !default;
+$item-stable-bg: #262626 !default;
+$item-stable-border: #262626 !default;
+$item-stable-active-bg: #262626 !default;
+$item-stable-active-border: #262626 !default;
+// Include all of Ionic.
+@import "www/lib/ionic/scss/ionic";
 .tabs {
     top: 0px !important;
+}
+
+.accordion_container {
+    background-color: #333333;
 }
 
 // SUBHEADER:
@@ -45,19 +80,11 @@ ion-top-menu .item {
     display: block !important;
 }
 
-// .wide-as-needed {
-//     overflow: scroll;
-//     white-space: nowrap;
-// }
-
-// .scroll {
-//     min-width: 100%;
-// }
-
 .gallery {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
+    margin-left: 55px;
 }
 
 .pict {
@@ -74,8 +101,80 @@ ion-top-menu .item {
     -ms-flex: 0 0 165px;
     flex: 0 0 165px;
     max-width: 165px;
-    max-height: 100px;
+    //    max-height: 100px;
+    margin-top: 5px;
     img {
-        max-height: 95px;
+        max-height: 75px;
     }
+    a {
+        text-decoration: none;
+        background: none !important;
+        img {
+            max-height: 75px;
+            max-width: 165px;
+        }
+    }
+    background: none !important;
+    border: none !important;
+}
+    .image_name {
+        color: $base-color !important; 
+         text-decoration: none;
+
+    }
+
+
+// Presentation
+.presenation_container {
+    h1,
+    h2 {
+        margin-left: 55px;
+    }
+    .presentation_gal {
+        margin-left: 48px;
+    }
+}
+
+.col_slide {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 215px;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 215px;
+    -ms-flex: 0 0 215px;
+    flex: 0 0 215px;
+    max-width: 215px;
+    max-height: 115px;
+    margin-top: 5px;
+    border: none;
+    img {
+        max-height: 115px;
+    }
+}
+
+#presentation_controls {
+    background: black;
+    margin-left: 55px;
+    margin-top: 100px;
+    width: 768px;
+    .counter {
+        font-size: 60px;
+        line-height: 60px;
+    }
+    .pres_button {
+        width: 200px;
+        height: 89px;
+        border: 1px white;
+        i {
+            font-size: 60px;
+        }
+    }
+    li {
+        cursor: pointer;
+        float: left;
+    }
+}
+
+.close_button {
+    float: right;
+    margin-right: 100px;
 }

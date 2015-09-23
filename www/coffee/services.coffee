@@ -85,12 +85,14 @@ angular.module('starter.services', []).factory('Chats', ->
       name: "Pres1"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
+      project_name: "Mass 200"
     },
     {
       id: 2
       name: "Pres2"
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
       building_name: 'Mass 300'
+      project_name: "Mass 300"      
     }    
   ]
   {
@@ -108,6 +110,21 @@ angular.module('starter.services', []).factory('Chats', ->
           return models[i]
         i++
       null
+    getSlides: (presentationId) ->
+      slides = [
+        {
+          id: 1
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        },
+        {
+          id: 2
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        },
+        {
+          id: 3
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }                
+      ]
 
   }
 ).factory('Renderings', ->
@@ -161,229 +178,7 @@ angular.module('starter.services', []).factory('Chats', ->
       name: "View1"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    },   
-   {
-      id: 1
-      name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-    }                                 
+    }                               
   ]
   {
     name: ->
@@ -445,15 +240,24 @@ angular.module('starter.services', []).factory('Chats', ->
       name: "Video1"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
+      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
     },
     {
       id: 2
       name: "Video2"
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
       building_name: 'Mass 200'
+      recording: 'http://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
     }    
   ]
   {
+    getRecording: (videoId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(videoId)
+          return models[i].recording
+        i++
+      null
     name: ->
      "Video"        
     all: ->

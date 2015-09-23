@@ -8,7 +8,7 @@ angular.module('starter', [
   'ionic'
   'starter.controllers'
   'starter.services'
-  'starter.filters'
+  'starter.filters'  
 ]).run(($ionicPlatform) ->
   $ionicPlatform.ready ->
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -29,19 +29,33 @@ angular.module('starter', [
   $stateProvider.state('tab',
     url: '/tab'
     abstract: true
-    templateUrl: 'templates/tabs.html').state('tab.dash',
+    templateUrl: 'templates/tabs.html'
+    ).state('tab.dash',
     url: '/dash'
     views: 'tab-dash':
       templateUrl: 'templates/tab-dash.html'
-      controller: 'DashCtrl').state('tab.chats',
+      controller: 'DashCtrl'
+      ).state('tab.presentations',
+    url: '/presentations/:presentationId'
+    views: 'tab-dash':
+      templateUrl: 'templates/presentation.html'
+      controller: 'PresentationCtrl'
+      ).state('tab.videos',
+    url: '/videos/:videoId'
+    views: 'tab-dash':
+      templateUrl: 'templates/Videos/videoPlayer.html'
+      controller: 'VideoPlayerCtrl'
+      ).state('tab.chats',      
     url: '/chats'
     views: 'tab-chats':
       templateUrl: 'templates/tab-chats.html'
-      controller: 'ChatsCtrl').state('tab.chat-detail',
+      controller: 'ChatsCtrl'
+      ).state('tab.chat-detail',
     url: '/chats/:chatId'
     views: 'tab-chats':
       templateUrl: 'templates/chat-detail.html'
-      controller: 'ChatDetailCtrl').state 'tab.account',
+      controller: 'ChatDetailCtrl'
+      ).state 'tab.account',
     url: '/account'
     views: 'tab-account':
       templateUrl: 'templates/tab-account.html'

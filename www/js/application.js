@@ -21,6 +21,22 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'DashCtrl'
       }
     }
+  }).state('tab.presentations', {
+    url: '/presentations/:presentationId',
+    views: {
+      'tab-dash': {
+        templateUrl: 'templates/presentation.html',
+        controller: 'PresentationCtrl'
+      }
+    }
+  }).state('tab.videos', {
+    url: '/videos/:videoId',
+    views: {
+      'tab-dash': {
+        templateUrl: 'templates/Videos/videoPlayer.html',
+        controller: 'VideoPlayerCtrl'
+      }
+    }
   }).state('tab.chats', {
     url: '/chats',
     views: {
@@ -49,9 +65,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/dash');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) {
+  $scope.presentations = {
+    "Presentations": Presentations.all()
+  };
   $scope.factories = {
-    "Presentations": Presentations.all(),
     "Videos": Videos.all(),
     "Floor Plans": Floorplans.all(),
     "Rendering": Renderings.all(),
@@ -59,6 +77,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     "Webcams": Webcams.all()
   };
   $scope.activeBuilding = ActiveBuilding;
+  $scope.state = $state;
 
   /*
    * if given group is the selected group, deselect it
@@ -71,8 +90,43 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       $scope.shownGroup = group;
     }
   };
-  return $scope.isGroupShown = function(group) {
+  $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
+  };
+  return $scope.openPres = function(presId) {
+    window.location = '#/tab/presentations/' + presId;
+    window.location.reload();
+  };
+}).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
+  $scope.video = Videos.get($stateParams.modelId);
+}).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
+  $scope.floorplan = Floorplans.get($stateParams.modelId);
+}).controller('VideoDetailCtrl', function($scope, $stateParams, Webcams) {
+  $scope.webcam = Webcams.get($stateParams.modelId);
+}).controller('VideoDetailCtrl', function($scope, $stateParams, Presentations) {
+  $scope.presentation = Presentations.get($stateParams.modelId);
+}).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
+  $scope.presentation = Presentations.get($stateParams.presentationId);
+  $scope.slides = Presentations.getSlides($stateParams.presentationId);
+  $scope.presentation_name = $scope.presentation.name;
+  $scope.project_name = $scope.presentation.project_name;
+  $scope.postSlide = function(slideId) {
+    return $log.debug("FUCKYES " + slideId);
+  };
+  $scope.alertMe = function() {
+    return $log.debug("FUCK");
+  };
+}).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
+  $scope.video = Videos.get($stateParams.videoId);
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.trustSrc = function(src) {
+    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  };
+  $scope.postVideoId = function(videoId) {
+    return $log.debug("FUCKYES " + videoId);
+  };
+  $scope.alertMe = function() {
+    return $log.debug("FUCK");
   };
 }).controller('ChatsCtrl', function($scope, Chats) {
   $scope.chats = Chats.all();
@@ -207,12 +261,14 @@ angular.module('starter.services', []).factory('Chats', function() {
       id: 1,
       name: "Pres1",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      building_name: 'Mass 200',
+      project_name: "Mass 200"
     }, {
       id: 2,
       name: "Pres2",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 300'
+      building_name: 'Mass 300',
+      project_name: "Mass 300"
     }
   ];
   return {
@@ -235,6 +291,21 @@ angular.module('starter.services', []).factory('Chats', function() {
         i++;
       }
       return null;
+    },
+    getSlides: function(presentationId) {
+      var slides;
+      return slides = [
+        {
+          id: 1,
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }, {
+          id: 2,
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }, {
+          id: 3,
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }
+      ];
     }
   };
 }).factory('Renderings', function() {
@@ -291,191 +362,6 @@ angular.module('starter.services', []).factory('Chats', function() {
       id: 1,
       name: "View1",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
       building_name: 'Mass 200'
     }
   ];
@@ -552,15 +438,28 @@ angular.module('starter.services', []).factory('Chats', function() {
       id: 1,
       name: "Video1",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      building_name: 'Mass 200',
+      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
     }, {
       id: 2,
       name: "Video2",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
+      building_name: 'Mass 200',
+      recording: 'http://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
     }
   ];
   return {
+    getRecording: function(videoId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(videoId)) {
+          return models[i].recording;
+        }
+        i++;
+      }
+      return null;
+    },
     name: function() {
       return "Video";
     },
