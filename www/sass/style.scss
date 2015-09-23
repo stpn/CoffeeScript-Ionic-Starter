@@ -18,15 +18,28 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // My custom color. I’ll override the default for $positive.
 // Note that it’s before we load the rest of Ionic.
 // This is important!
-$stable: #262626 !default;
+$stable: #666666 !default;
 $base-background-color: #000 !default;
 $base-color: #999999 !default;
 $button-light-active-bg: #262626 !default;
-$button-stable-active-border: #262626 !default;
+$button-stable-active-border: #333333 !default;
 $item-stable-bg: #262626 !default;
 $item-stable-border: #262626 !default;
 $item-stable-active-bg: #262626 !default;
 $item-stable-active-border: #262626 !default;
+
+
+
+$corner-bevel: 30;
+
+
+@mixin corner-bottom-both-bevel($kolor) {
+
+  border-color: $kolor transparent transparent transparent;
+  border-width: #{$corner-bevel}px #{$corner-bevel}px 0 #{$corner-bevel}px;
+  background-color: none;
+}
+
 // Include all of Ionic.
 @import "www/lib/ionic/scss/ionic";
 .tabs {
@@ -40,7 +53,7 @@ $item-stable-active-border: #262626 !default;
 // SUBHEADER:
 ion-top-menu {
     position: absolute;
-    height: 0px;
+    height: 4px;
     width: 100%;
     background: #333;
     color: white;
@@ -59,6 +72,31 @@ ion-top-menu .item {
     background: none;
     border-color: #222;
     color: white;
+}
+
+
+.bevel{
+     @include corner-bottom-both-bevel($button-stable-active-border);
+     width: 357px;
+     margin-left: auto;
+     margin-right: auto;
+    border-style: solid;
+    height: 0;
+    div{
+
+       margin-top: -26px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 94px;
+
+    }
+
+}
+
+
+
+.empty{
+    background-color: rgba(0,0,0,0);
 }
 
 // LIST:
@@ -178,3 +216,6 @@ ion-top-menu .item {
     float: right;
     margin-right: 100px;
 }
+
+
+

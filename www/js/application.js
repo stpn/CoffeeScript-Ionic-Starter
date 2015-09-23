@@ -12,7 +12,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $stateProvider.state('tab', {
     url: '/tab',
     abstract: true,
-    templateUrl: 'templates/tabs.html'
+    views: {
+      'main-tabs': {
+        templateUrl: 'templates/tabs.html'
+      },
+      'bld_menu': {
+        templateUrl: 'templates/menu/building_menu.html'
+      }
+    }
   }).state('tab.dash', {
     url: '/dash',
     views: {
@@ -149,7 +156,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     var menu, pane;
     menu = document.getElementsByTagName('ion-top-menu')[0];
     pane = document.getElementsByTagName('ion-view')[0];
-    menu.style.height = pane.style.top = menu.offsetHeight === 0 ? '300px' : '0px';
+    menu.style.height = pane.style.top = menu.offsetHeight === 4 ? '300px' : '4px';
   };
 });
 
@@ -439,7 +446,7 @@ angular.module('starter.services', []).factory('Chats', function() {
       name: "Video1",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
       building_name: 'Mass 200',
-      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
+      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200 '
     }, {
       id: 2,
       name: "Video2",

@@ -29,7 +29,10 @@ angular.module('starter', [
   $stateProvider.state('tab',
     url: '/tab'
     abstract: true
-    templateUrl: 'templates/tabs.html'
+    #templateUrl: 'templates/tabs.html'
+    views:
+      'main-tabs': templateUrl: 'templates/tabs.html'
+      'bld_menu': templateUrl: 'templates/menu/building_menu.html'
     ).state('tab.dash',
     url: '/dash'
     views: 'tab-dash':

@@ -240,7 +240,7 @@ angular.module('starter.services', []).factory('Chats', ->
       name: "Video1"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
-      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
+      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200 '
     },
     {
       id: 2

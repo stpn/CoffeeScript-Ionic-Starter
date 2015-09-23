@@ -93,7 +93,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.toggleTopMenu = ->
     menu = document.getElementsByTagName('ion-top-menu')[0]
     pane = document.getElementsByTagName('ion-view')[0]
-    menu.style.height = pane.style.top = if menu.offsetHeight == 0 then '300px' else '0px'
+    menu.style.height = pane.style.top = if menu.offsetHeight == 4 then '300px' else '4px'
     return 
 )  
 # ---
