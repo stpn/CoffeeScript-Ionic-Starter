@@ -1,0 +1,79 @@
+<!--
+  This template loads for the 'tab.friend-detail' state (app.js)
+  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
+  The FriendsCtrl pulls data from the Friends service (service.js)
+  The Friends service returns an array of friend data
+-->
+<ion-view view-title="webcams">
+    <div class="webcam_title">
+        <span>webcam four</span>
+        <h1>FOUR CAMERA VIEW</h1>
+    </div>
+    <div class="webcam_title">
+        <span>webcam ONE</span>
+        <h1>FULL SCREEN VIEW</h1>
+    </div>
+    <div class="camera_buttons">
+        <ion-item class="camera1" ng-click="setActiveWebcam(1)">CAMERA1</ion-item>
+        <ion-item class="camera2" ng-click="setActiveWebcam(2)">CAMERA2</ion-item>
+        <ion-item class="camera3" ng-click="setActiveWebcam(3)">CAMERA3</ion-item>
+        <ion-item class="live" ng-click="setLive">LIVE FEED</ion-item>
+        <ion-item class="panorama" ng-click="setPanorama()">PANORAMA</ion-item>
+    </div>
+    <ion-content id="webcam_assets">
+        <ion-list>
+
+            <div  ng-model="panoramas" ng-model='panoramas' class="accordion_container">
+                <ion-item class="item-stable" ng-click="isEnabled(panoramas) || toggleGroup(panoramas)" ng-class="{active: isGroupShown(panoramas)}">
+                    <i class="icon"  ng-class="isGroupShown(panoramas) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; Panoramas
+                </ion-item>
+                <div class="row responsive-md item-accordion gallery" ng-show="isGroupShown(panoramas)" ng-repeat="model in panoramas" ng-if="$index % 4 === 0">
+                    <ion-item class="col cust_col" ng-if="$index < panoramas.length" href="#">
+                        <img ng-src="{{panoramas[$index].image}}" width="100%" height="100%" />
+                        <div class="image_name" ng-if="panoramas[$index].name !== undefined">
+                            {{panoramas[$index].image}}
+                        </div>
+                    </ion-item>
+                    <ion-item class="col cust_col" ng-if="$index + 1 < panoramas.length" href="#">
+                        <img ng-src="{{panoramas[$index + 1].image}}" width="100%" />
+                        <div class="image_name" ng-if="panoramas[$index + 1].name !== undefined">
+                            {{panoramas[$index + 1].image}}
+                        </div>
+                    </ion-item>
+                    <ion-item class="col cust_col" ng-if="$index + 2 < panoramas.length" href="#">
+                        <img ng-src="{{panoramas[$index + 2].image}}" width="100%" />
+                        <div class="image_name" ng-if="panoramas[$index + 2].name !== undefined">
+                            {{panoramas[$index + 2].image}}
+                        </div>
+                    </ion-item>
+                </div>
+            </div>
+            
+            <div  ng-model="timelapses" ng-model='timelapses' class="accordion_container">
+                <ion-item class="item-stable" ng-click="isEnabled(timelapses) || toggleGroup(timelapses)" ng-class="{active: isGroupShown(timelapses)}">
+                    <i class="icon"  ng-class="isGroupShown(timelapses) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; Timelapses
+                </ion-item>
+                <div class="row responsive-md item-accordion gallery" ng-show="isGroupShown(timelapses)" ng-repeat="model in timelapses" ng-if="$index % 4 === 0">
+                    <ion-item class="col cust_col" ng-if="$index < timelapses.length" href="#">
+                        <img ng-src="{{timelapses[$index].image}}" width="100%" height="100%" />
+                        <div class="image_name" ng-if="timelapses[$index].name !== undefined">
+                            {{timelapses[$index].image}}
+                        </div>
+                    </ion-item>
+                    <ion-item class="col cust_col" ng-if="$index + 1 < timelapses.length" href="#">
+                        <img ng-src="{{timelapses[$index + 1].image}}" width="100%" />
+                        <div class="image_name" ng-if="timelapses[$index + 1].name !== undefined">
+                            {{timelapses[$index + 1].image}}
+                        </div>
+                    </ion-item>
+                    <ion-item class="col cust_col" ng-if="$index + 2 < timelapses.length" href="#">
+                        <img ng-src="{{timelapses[$index + 2].image}}" width="100%" />
+                        <div class="image_name" ng-if="timelapses[$index + 2].name !== undefined">
+                            {{timelapses[$index + 2].image}}
+                        </div>
+                    </ion-item>
+                </div>
+            </div>
+        </ion-list>
+    </ion-content>
+</ion-view>

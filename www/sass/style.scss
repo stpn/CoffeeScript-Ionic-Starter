@@ -1,41 +1,5 @@
-/*
-To customize the look and feel of Ionic, you can override the variables
-in Ionic's _variables.scss file.
-For example, you might change some of the default colors:
-$light:                           #fff !default;
-$stable:                          #f8f8f8 !default;
-$positive:                        #4a87ee !default;
-$calm:                            #43cee6 !default;
-$balanced:                        #66cc33 !default;
-$energized:                       #f0b840 !default;
-$assertive:                       #ef4e3a !default;
-$royal:                           #8a6de9 !default;
-$dark:                            #444 !default;
-*/
+@import "www/sass/custom_variables.scss";
 
-// The path for our Ionicon font files, relative to the built CSS in www/css
-$ionicons-font-path: "../lib/ionic/fonts" !default;
-// My custom color. I’ll override the default for $positive.
-// Note that it’s before we load the rest of Ionic.
-// This is important!
-$stable: #666666 !default;
-$base-background-color: #000 !default;
-$base-color: #999999 !default;
-$button-light-active-bg: #262626 !default;
-$button-stable-active-border: #333333 !default;
-$item-stable-bg: #262626 !default;
-$item-stable-border: #262626 !default;
-$item-stable-active-bg: #262626 !default;
-$item-stable-active-border: #262626 !default;
-$corner-bevel: 30;
-@mixin corner-bottom-both-bevel($kolor) {
-    border-color: $kolor transparent transparent transparent;
-    border-width: #{$corner-bevel}px #{$corner-bevel}px 0 #{$corner-bevel}px;
-    background-color: none;
-}
-
-// Include all of Ionic.
-@import "www/lib/ionic/scss/ionic";
 .tabs {
     top: 0px !important;
 }
@@ -52,13 +16,14 @@ ion-top-menu {
     background: #333;
     color: white;
     z-index: 10;
-    top: 47px;
+    top: 45px !important;
     transition: all .5s;
 }
 
-ion-view {
+ion-content#main_menu {
+    top: 120px;
     position: absolute;
-    margin-top: 97px;
+    //    margin-top: 47px;
     transition: all .5s !important;
 }
 
@@ -82,164 +47,50 @@ ion-top-menu .item {
         width: 94px;
     }
 }
+ .building_wrap {
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        }
 
-#building_wrap {
-    position: relative;
-    margin-left: auto;
-    margin-right: auto;
-    width: 420px;
+#building_menu_wrap {
+    
+    .building_wrap {
+        width: 420px;
+
         transition: all .5s !important;
         //height: 4px;
-
-}
-
-.building {
-    position: absolute;
-    //float: left;
-}
-
-.M200 {
-    top: 0px;
-    left: 31px;
-}
-
-.M250 {
-    top: 66px;
-}
-
-.M600{
-    top: 0px;
-    left: 156px
-}
-
-.M201{
-    top: 0px;
-left: 219px;
-}
-
-
-.F200{
-    top: 0px;
-left: 288px;
+    }
+    .building {
+        position: absolute;
+        //float: left;
+    }
+    .M200 {
+        top: 0px;
+        left: 31px;
+    }
+    .M250 {
+        top: 66px;
+    }
+    .M600 {
+        top: 0px;
+        left: 156px
+    }
+    .M201 {
+        top: 0px;
+        left: 219px;
+    }
+    .F200 {
+        top: 0px;
+        left: 288px;
+    }
 }
 
 .empty {
     background-color: rgba(0, 0, 0, 0);
 }
 
-// LIST:
-.list .item.item-accordion {
-    //line-height: 38px;
-    //height: 20px;
-    //height: 64px;
-    padding-top: 0;
-    padding-bottom: 0;
-    transition: 0.09s all linear;
-}
-
-.list .item.item-accordion.ng-hide {
-    line-height: 0px;
-}
-
-.list .item.item-accordion.ng-hide-add,
-.list .item.item-accordion.ng-hide-remove {
-    display: block !important;
-}
-
-.gallery {
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
-    margin-left: 55px;
-}
-
-.pict {
-    display: inline-block;
-    min-width: 300px;
-    min-height: 300px;
-}
-
-.cust_col {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 165px;
-    -moz-box-flex: 0;
-    -moz-flex: 0 0 165px;
-    -ms-flex: 0 0 165px;
-    flex: 0 0 165px;
-    max-width: 165px;
-    //    max-height: 100px;
-    margin-top: 5px;
-    img {
-        max-height: 75px;
-    }
-    a {
-        text-decoration: none;
-        background: none !important;
-        img {
-            max-height: 75px;
-            max-width: 165px;
-        }
-    }
-    background: none !important;
-    border: none !important;
-}
-
-.image_name {
-    color: $base-color !important;
-    text-decoration: none;
-}
-
-// Presentation
-.presenation_container {
-    h1,
-    h2 {
-        margin-left: 55px;
-    }
-    .presentation_gal {
-        margin-left: 48px;
-    }
-}
-
-.col_slide {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 215px;
-    -moz-box-flex: 0;
-    -moz-flex: 0 0 215px;
-    -ms-flex: 0 0 215px;
-    flex: 0 0 215px;
-    max-width: 215px;
-    max-height: 115px;
-    margin-top: 5px;
-    border: none;
-    img {
-        max-height: 115px;
-    }
-}
-
-#presentation_controls {
-    background: black;
-    margin-left: 55px;
-    margin-top: 100px;
-    width: 768px;
-    .counter {
-        font-size: 60px;
-        line-height: 60px;
-    }
-    .pres_button {
-        width: 200px;
-        height: 89px;
-        border: 1px white;
-        i {
-            font-size: 60px;
-        }
-    }
-    li {
-        cursor: pointer;
-        float: left;
-    }
-}
-
-.close_button {
-    float: right;
-    margin-right: 100px;
+#webcam_assets {
+    position: relative !important;
+    background: red;
 }

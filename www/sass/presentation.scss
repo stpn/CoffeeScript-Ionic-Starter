@@ -1,0 +1,56 @@
+@import "www/sass/style.scss";
+
+// Presentation
+.presenation_container {
+    h1,
+    h2 {
+        margin-left: 55px;
+    }
+    .presentation_gal {
+        margin-left: 48px;
+    }
+}
+
+.col_slide {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 215px;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 215px;
+    -ms-flex: 0 0 215px;
+    flex: 0 0 215px;
+    max-width: 215px;
+    max-height: 115px;
+    margin-top: 5px;
+    border: none;
+    img {
+        max-height: 115px;
+    }
+}
+
+#presentation_controls {
+    background: black;
+    margin-left: 55px;
+    margin-top: 100px;
+    width: 768px;
+    .counter {
+        font-size: 60px;
+        line-height: 60px;
+    }
+    .pres_button {
+        width: 200px;
+        height: 89px;
+        border: 1px white;
+        i {
+            font-size: 60px;
+        }
+    }
+    li {
+        cursor: pointer;
+        float: left;
+    }
+}
+
+.close_button {
+    float: right;
+    margin-right: 100px;
+}

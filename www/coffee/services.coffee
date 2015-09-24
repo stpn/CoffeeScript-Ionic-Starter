@@ -90,20 +90,17 @@ angular.module('starter.services', []).factory('Chats', ->
           return models[i]
         i++
       null
-    getTemplate: (name) ->
-      if name == "Mass 200"
-        return '<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" >
-                <path fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" d="M115,0.6v54.9L1,55.4L23.3,0.6H115z" />
-                <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-1,66.1 -30.1,125 115,125 115,66.1 " />
-                <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="261.5,0.6 261.5,103.6 305.9,103.6 
-    305.9,86.9 392.8,86.9 392.8,0.6 " />
-                <rect x="125.9" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="54" height="124.9" />
-                <rect x="190.4" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" />
-            </svg>'
-
   }
 ).service('ActiveBuilding', ->
   name = "Mass 300"
+
+  {
+    setName: (new_name) ->
+      name = new_name
+
+    getName: (new_name) ->
+      name
+  }
 
 ).factory('Presentations', ->
   models = [
@@ -305,40 +302,22 @@ angular.module('starter.services', []).factory('Chats', ->
   models = [
     {
       id: 1
-      name: "FP1"
+      name: "Webcam1"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
     },
     {
       id: 2
-      name: "FP2"
+      name: "Webcam2"
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
       building_name: 'Mass 200'
     },
     {
-      id: 1
-      name: "FP1"
+      id: 3
+      name: "Webcam3"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
-    },        
-    {
-      id: 1
-      name: "FP1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },        
-    {
-      id: 1
-      name: "FP1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    },        
-    {
-      id: 1
-      name: "FP1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-    }    
+    }   
   ]
   {
     name: ->
@@ -355,7 +334,33 @@ angular.module('starter.services', []).factory('Chats', ->
           return models[i]
         i++
       null
+    getPanoramas: (chatId) ->
+      [
+        {
+          id: 1
+          name: "Video1"
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        },
+        {
+          id: 2
+          name: "Video2"
+          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+        }    
+      ]      
 
+    getTimelapses: (chatId) ->
+      [
+        {
+          id: 1
+          name: "Video1"
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        },
+        {
+          id: 2
+          name: "Video2"
+          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+        }    
+      ] 
   }
 )
 

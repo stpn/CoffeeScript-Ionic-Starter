@@ -33,31 +33,54 @@ angular.module('starter', [
     templateUrl: 'templates/tabs.html'
     # views:
     #   'bld-menu': templateUrl: 'templates/menu/building_menu.html'
+
     ).state('tab.dash',
     url: '/dash'
     views: 'tab-dash':
       templateUrl: 'templates/tab-dash.html'
       controller: 'DashCtrl'
+
+
       ).state('tab.presentations',
     url: '/presentations/:presentationId'
     views: 'tab-dash':
-      templateUrl: 'templates/presentation.html'
+      templateUrl: 'templates/presentations/presentation.html'
       controller: 'PresentationCtrl'
+      
+
       ).state('tab.videos',
     url: '/videos/:videoId'
     views: 'tab-dash':
       templateUrl: 'templates/Videos/videoPlayer.html'
-      controller: 'VideoPlayerCtrl'
+      controller: 'VideoPlayerCtrl'     
+
+
+    ).state('tab.webcams',
+    url: '/webcams'
+    views: 'webcams':
+      templateUrl: 'templates/webcams/webcams.html'
+      controller: 'WebcamsCtrl',       
+
+    ).state('tab.buildings',
+    url: '/buildings'
+    views: 'buildings':
+      templateUrl: 'templates/buildings/building_tab.html'
+      controller: 'BuildingsCtrl',       
+
       ).state('tab.chats',      
     url: '/chats'
     views: 'tab-chats':
       templateUrl: 'templates/tab-chats.html'
       controller: 'ChatsCtrl'
+      
+
       ).state('tab.chat-detail',
     url: '/chats/:chatId'
     views: 'tab-chats':
       templateUrl: 'templates/chat-detail.html'
       controller: 'ChatDetailCtrl'
+
+
       ).state 'tab.account',
     url: '/account'
     views: 'tab-account':

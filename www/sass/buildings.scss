@@ -1,0 +1,47 @@
+@import "www/sass/style.scss";
+
+
+#bld_tab_wrap{
+
+    margin-top: 200px;
+    
+    h2{
+      margin-left: 30%;
+      margin-bottom: 44px;
+      color: white;
+    }
+
+
+    .building_wrap {
+        width: 420px;
+        //margin-left: 500px;
+        margin-right: auto;
+
+        transition: all .5s !important;
+        //height: 4px;
+    }
+    .building {
+        position: absolute;
+        //float: left;
+    }
+    .M200 {
+        top: 0px;
+        left: 10px;
+    }
+    .M250 {
+        top: 79px;
+        left: -23px;
+    }
+    .M600 {
+        top: 6px;
+        left: 151px
+    }
+    .M201 {
+        top: 2px;
+        left: 225px;
+    }
+    .F200 {
+        top: 3px;
+        left: 312px;
+    }
+}

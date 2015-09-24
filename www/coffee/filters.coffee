@@ -20,14 +20,32 @@ angular.module('starter.directives',[]).directive 'clickMe', ($parse) ->
       console.log '$parse type:', type
       return
     return
-angular.module('starter.directives',[]).directive 'createControl', ->
-  {
-    scope: createControl: '='
+
+angular.module('starter.directives',[]).directive 'clickSvg', [
+  'ActiveBuilding'
+  (activeBuilding) ->
+    {
+    scope: clickSvg: '='
     link: (scope, element, attrs) ->
       element.bind 'click', ->
-        console.log '$eval type:', scope.createControl
+        name = scope.clickSvg
+        activeBuilding.setName(name)
+        console.log activeBuilding.getName()        
+        # console.log '$eval type:', scope.clickSvg
         return
-  }
+    }
+]
+    # }
+
+
+# angular.module('starter.directives',[]).directive 'click-svg', ->
+#   {
+#     scope: click-svg: '='
+#     link: (scope, element, attrs) ->
+#       element.bind 'click', ->
+#         console.log '$eval type:', scope.createControl
+#         return
+#   }
 
 # angular.module('starter.directives',[]).directive 'showData', ($compile) ->
 #   {

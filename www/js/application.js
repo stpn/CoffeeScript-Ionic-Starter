@@ -25,7 +25,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/presentations/:presentationId',
     views: {
       'tab-dash': {
-        templateUrl: 'templates/presentation.html',
+        templateUrl: 'templates/presentations/presentation.html',
         controller: 'PresentationCtrl'
       }
     }
@@ -35,6 +35,22 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       'tab-dash': {
         templateUrl: 'templates/Videos/videoPlayer.html',
         controller: 'VideoPlayerCtrl'
+      }
+    }
+  }).state('tab.webcams', {
+    url: '/webcams',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/webcams/webcams.html',
+        controller: 'WebcamsCtrl'
+      }
+    }
+  }).state('tab.buildings', {
+    url: '/buildings',
+    views: {
+      'buildings': {
+        templateUrl: 'templates/buildings/building_tab.html',
+        controller: 'BuildingsCtrl'
       }
     }
   }).state('tab.chats', {
@@ -101,8 +117,37 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.video = Videos.get($stateParams.modelId);
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.modelId);
-}).controller('VideoDetailCtrl', function($scope, $stateParams, Webcams) {
-  $scope.webcam = Webcams.get($stateParams.modelId);
+}).controller('WebcamsCtrl', function($scope, $log, $stateParams, Webcams) {
+  $scope.webcams = Webcams.all();
+  $scope.activeWebcam = void 0;
+  $scope.setActiveWebcam = function(activeWebcamId) {
+    $scope.activeWebcam = Webcams.get(activeWebcamId);
+    $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
+    $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
+    return $log.debug($scope.panoramas);
+  };
+  $scope.isEnabled = function(model) {
+    return model === void 0;
+  };
+  $scope.getActiveWebcam = function(activeWebcam) {
+    return $scope.activeWebcam;
+  };
+  $scope.showPanorama = function() {
+    return $log.debug("PANO");
+  };
+  $scope.showLive = function() {
+    return $log.debug("LIVE");
+  };
+  $scope.toggleGroup = function(group) {
+    if ($scope.isGroupShown(group)) {
+      $scope.shownGroup = null;
+    } else {
+      $scope.shownGroup = group;
+    }
+  };
+  $scope.isGroupShown = function(group) {
+    return $scope.shownGroup === group;
+  };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Presentations) {
   $scope.presentation = Presentations.get($stateParams.modelId);
 }).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
@@ -139,11 +184,25 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.settings = {
     enableFriends: true
   };
-}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log) {
+}).controller('BuildingsCtrl', function($scope, Buildings, $log) {
+  $scope.buildings = Buildings.all();
+  $scope.templatePath = "templates/menu/building_menu.html";
+  $scope.transformStyle = "scale(1.19)";
+  $scope.getTemplate = function(name) {
+    return Buildings.getTemplate(name);
+  };
+  $scope.building_is = function(code, name) {
+    if (code === name) {
+      return true;
+    }
+  };
+}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log, $window, $location) {
   $scope.activeBuilding = ActiveBuilding;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.bld_style = "margin-top: 5px";
+  $log.debug($location.url());
+  $scope.transformStyle = "transform: scale(1.0)";
   $scope.building_is = function(code, name) {
     if (code === name) {
       return true;
@@ -156,16 +215,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.activeBuilding.name = name;
   };
   return $scope.toggleTopMenu = function() {
-    var bld, i, len, menu, pane, panes;
+    var bld, menu, pane;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
-    panes = document.getElementsByTagName('ion-view');
-    for (i = 0, len = panes.length; i < len; i++) {
-      pane = panes[i];
-      menu.style.height = pane.style.top = menu.offsetHeight === 4 ? '300px' : '4px';
+    pane = document.getElementsByTagName('ion-content')[0];
+    if (menu.offsetHeight === 4) {
+      menu.style.height = '350px';
+      pane.style.top = '450px';
+    } else {
+      menu.style.height = '4px';
+      pane.style.top = '120px';
     }
     if (menu.style.height === "4px") {
-      $scope.bld_style = "margin-top: 5px";
+      $scope.bld_style = "margin-top: -200px";
     } else {
       $scope.bld_style = "margin-top: 50px";
     }
@@ -202,18 +264,23 @@ angular.module('starter.directives', []).directive('clickMe', function($parse) {
   };
 });
 
-angular.module('starter.directives', []).directive('createControl', function() {
-  return {
-    scope: {
-      createControl: '='
-    },
-    link: function(scope, element, attrs) {
-      return element.bind('click', function() {
-        console.log('$eval type:', scope.createControl);
-      });
-    }
-  };
-});
+angular.module('starter.directives', []).directive('clickSvg', [
+  'ActiveBuilding', function(activeBuilding) {
+    return {
+      scope: {
+        clickSvg: '='
+      },
+      link: function(scope, element, attrs) {
+        return element.bind('click', function() {
+          var name;
+          name = scope.clickSvg;
+          activeBuilding.setName(name);
+          console.log(activeBuilding.getName());
+        });
+      }
+    };
+  }
+]);
 
 angular.module('starter.services', []).factory('Chats', function() {
   var chats;
@@ -306,16 +373,19 @@ angular.module('starter.services', []).factory('Chats', function() {
         i++;
       }
       return null;
-    },
-    getTemplate: function(name) {
-      if (name === "Mass 200") {
-        return '<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" > <path fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" d="M115,0.6v54.9L1,55.4L23.3,0.6H115z" /> <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-1,66.1 -30.1,125 115,125 115,66.1 " /> <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="261.5,0.6 261.5,103.6 305.9,103.6 305.9,86.9 392.8,86.9 392.8,0.6 " /> <rect x="125.9" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="54" height="124.9" /> <rect x="190.4" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" /> </svg>';
-      }
     }
   };
 }).service('ActiveBuilding', function() {
   var name;
-  return name = "Mass 300";
+  name = "Mass 300";
+  return {
+    setName: function(new_name) {
+      return name = new_name;
+    },
+    getName: function(new_name) {
+      return name;
+    }
+  };
 }).factory('Presentations', function() {
   var models;
   models = [
@@ -548,32 +618,17 @@ angular.module('starter.services', []).factory('Chats', function() {
   models = [
     {
       id: 1,
-      name: "FP1",
+      name: "Webcam1",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
       building_name: 'Mass 200'
     }, {
       id: 2,
-      name: "FP2",
+      name: "Webcam2",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
       building_name: 'Mass 200'
     }, {
-      id: 1,
-      name: "FP1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "FP1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "FP1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
-    }, {
-      id: 1,
-      name: "FP1",
+      id: 3,
+      name: "Webcam3",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
       building_name: 'Mass 200'
     }
@@ -598,6 +653,32 @@ angular.module('starter.services', []).factory('Chats', function() {
         i++;
       }
       return null;
+    },
+    getPanoramas: function(chatId) {
+      return [
+        {
+          id: 1,
+          name: "Video1",
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }, {
+          id: 2,
+          name: "Video2",
+          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+        }
+      ];
+    },
+    getTimelapses: function(chatId) {
+      return [
+        {
+          id: 1,
+          name: "Video1",
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }, {
+          id: 2,
+          name: "Video2",
+          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+        }
+      ];
     }
   };
 });

@@ -30,15 +30,54 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.modelId)
   return
+
+
 ).controller('FloorplanDetailCtrl', ($scope, $stateParams, Floorplans) ->
   $scope.floorplan = Floorplans.get($stateParams.modelId)
   return
-).controller('VideoDetailCtrl', ($scope, $stateParams, Webcams) ->
-  $scope.webcam = Webcams.get($stateParams.modelId)
+
+
+).controller('WebcamsCtrl', ($scope, $log, $stateParams, Webcams) ->
+  $scope.webcams = Webcams.all()
+  $scope.activeWebcam = undefined
+  # $scope.panoramas = undefined
+  # $scope.timelapses = undefined
+  
+  $scope.setActiveWebcam = (activeWebcamId) ->    
+    $scope.activeWebcam = Webcams.get(activeWebcamId)
+    $scope.panoramas = Webcams.getPanoramas(activeWebcamId)
+    $scope.timelapses = Webcams.getTimelapses(activeWebcamId)
+    $log.debug($scope.panoramas)
+
+  $scope.isEnabled = (model) ->
+    model == undefined
+
+  $scope.getActiveWebcam = (activeWebcam) ->
+    $scope.activeWebcam    
+
+  $scope.showPanorama = ->
+    $log.debug("PANO")
+
+  $scope.showLive = ->
+    $log.debug("LIVE")
+
+  $scope.toggleGroup = (group) ->
+    if $scope.isGroupShown(group)
+      $scope.shownGroup = null
+    else
+      $scope.shownGroup = group
+    return
+
+  $scope.isGroupShown = (group) ->
+    $scope.shownGroup == group       
   return
+
+
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Presentations) ->
   $scope.presentation = Presentations.get($stateParams.modelId)
   return
+
+
 ).controller('PresentationCtrl', ($scope,$log, $stateParams, Presentations) ->
   $scope.presentation = Presentations.get($stateParams.presentationId)
   $scope.slides = Presentations.getSlides($stateParams.presentationId)
@@ -49,6 +88,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.alertMe = ()->
     $log.debug("FUCK")    
   return
+
+
 ).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.videoId)
   #$log.debug($scope.video.recording);
@@ -57,13 +98,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.trustSrc = (src) ->
     $scope.videos = $sce.getTrustedResourceUrl(src);
 
-
   $scope.postVideoId = (videoId) ->
     $log.debug("FUCKYES "+ videoId)
   
   $scope.alertMe = ()->
     $log.debug("FUCK")    
   return
+
 ).controller('ChatsCtrl', ($scope, Chats) ->
   # With the new view caching in Ionic, Controllers are only called
   # when they are recreated or on app start, instead of every page change.
@@ -82,28 +123,60 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 ).controller('ChatDetailCtrl', ($scope, $stateParams, Chats) ->
   $scope.chat = Chats.get($stateParams.chatId)
   return
+
+
 ).controller('AccountCtrl', ($scope) ->
   $scope.settings = enableFriends: true
   return
-).controller('TopMenuCtrl', ($scope,  Buildings,ActiveBuilding, $log) ->
-  $scope.activeBuilding = ActiveBuilding
+
+).controller('BuildingsCtrl', ($scope, Buildings, $log) ->
   $scope.buildings = Buildings.all()
   $scope.templatePath = "templates/menu/building_menu.html"
-  $scope.bld_style="margin-top: 5px"
+  $scope.transformStyle = "scale(1.19)"
+
+  $scope.getTemplate = (name) ->
+    Buildings.getTemplate(name)
+
   $scope.building_is = (code, name) ->
     if code == name
     # if name == "200 Mass"
       return true
+
+
+  return
+
+).controller('TopMenuCtrl', ($scope,  Buildings,ActiveBuilding, $log, $window, $location) ->
+  $scope.activeBuilding = ActiveBuilding
+  $scope.buildings = Buildings.all()
+  $scope.templatePath = "templates/menu/building_menu.html"
+  $scope.bld_style="margin-top: 5px"
+  $log.debug($location.url())
+  $scope.transformStyle = "transform: scale(1.0)"
+
+  $scope.building_is = (code, name) ->
+    if code == name
+    # if name == "200 Mass"
+      return true
+
   $scope.getTemplate = (name) ->
     Buildings.getTemplate(name)
+
   $scope.setActiveBuilding = (name)->
     $scope.activeBuilding.name = name
+
   $scope.toggleTopMenu = ->
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
-    panes = document.getElementsByTagName('ion-view')
-    for pane in panes
-      menu.style.height = pane.style.top = if menu.offsetHeight == 4 then '300px' else '4px'
+    pane = document.getElementsByTagName('ion-content')[0]
+    # for pane in panes
+     
+    if menu.offsetHeight == 4 
+      menu.style.height = '350px' 
+      pane.style.top = '450px'
+    else 
+      menu.style.height =  '4px' 
+      pane.style.top = '120px'
+
     if menu.style.height == "4px"
       $scope.bld_style = "margin-top: -200px"
     else

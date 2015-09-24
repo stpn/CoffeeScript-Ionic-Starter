@@ -10,18 +10,18 @@ navigation history that also transitions its views in and out.
         <ion-nav-view name="tab-dash"></ion-nav-view>
     </ion-tab>
     <!-- Chats Tab -->
-    <ion-tab title="Chats" icon-off="ion-ios-chatboxes-outline" icon-on="ion-ios-chatboxes" href="#/tab/chats">
-        <ion-nav-view name="tab-chats"></ion-nav-view>
+    <ion-tab title="Buildings" icon-off="ion-ios-chatboxes-outline" icon-on="ion-ios-chatboxes" href="#/tab/buildings">
+        <ion-nav-view name="buildings"></ion-nav-view>
     </ion-tab>
     <!-- Account Tab -->
-    <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
-        <ion-nav-view name="tab-account"></ion-nav-view>
+    <ion-tab title="Webcams" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/webcams">
+        <ion-nav-view name="webcams"></ion-nav-view>
     </ion-tab>
 </ion-tabs>
-<ion-top-menu ng-controller="TopMenuCtrl" id ="ionTopMenu">
+<!-- <ion-top-menu ng-controller="TopMenuCtrl" id ="ionTopMenu" ng-if="!isBuildingTab()">
     <ion-scroll style="width:100%;height:100%">
         <div class="list" >
-            <!--             <button class="button button-light" ng-click="setActiveBuilding(building.name)">
+                        <button class="button button-light" ng-click="setActiveBuilding(building.name)">
                 {{building.name}}
             </button>
  -->
@@ -30,11 +30,10 @@ navigation history that also transitions its views in and out.
 
                 
 
-        <ng-include ng-repeat="building in buildings" src="templatePath" ng-model=building></ng-include>
+     <!--    <ng-include ng-repeat="building in buildings" src="templatePath" ng-model=building></ng-include>
 
 
 
-<!-- 
 
  
             <svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" create-control=building.name>
@@ -44,7 +43,7 @@ navigation history that also transitions its views in and out.
     305.9,86.9 392.8,86.9 392.8,0.6 " />
                 <rect x="125.9" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="54" height="124.9" />
                 <rect x="190.4" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" /> 
-            </svg> -->
+            </svg>
         </div>
     </ion-scroll>
     <div class="buttons">
@@ -52,7 +51,8 @@ navigation history that also transitions its views in and out.
             <div class="bevel">
                 <div>Select Building</div>
             </div>
-        </div>
+        </div> -->
         <!-- <button class="button button-icon icon ion-navicon" ng-click="toggleTopMenu()"></button> -->
-    </div>
-</ion-top-menu>
+<!--     </div>
+</ion-top-menu> 
+ -->
