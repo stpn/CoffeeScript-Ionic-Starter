@@ -105,7 +105,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     for pane in panes
       menu.style.height = pane.style.top = if menu.offsetHeight == 4 then '300px' else '4px'
     if menu.style.height == "4px"
-      $scope.bld_style = "margin-top: 5px"
+      $scope.bld_style = "margin-top: -200px"
     else
       $scope.bld_style = "margin-top: 50px"
     return 
