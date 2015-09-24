@@ -27,17 +27,11 @@ $item-stable-bg: #262626 !default;
 $item-stable-border: #262626 !default;
 $item-stable-active-bg: #262626 !default;
 $item-stable-active-border: #262626 !default;
-
-
-
 $corner-bevel: 30;
-
-
 @mixin corner-bottom-both-bevel($kolor) {
-
-  border-color: $kolor transparent transparent transparent;
-  border-width: #{$corner-bevel}px #{$corner-bevel}px 0 #{$corner-bevel}px;
-  background-color: none;
+    border-color: $kolor transparent transparent transparent;
+    border-width: #{$corner-bevel}px #{$corner-bevel}px 0 #{$corner-bevel}px;
+    background-color: none;
 }
 
 // Include all of Ionic.
@@ -74,29 +68,63 @@ ion-top-menu .item {
     color: white;
 }
 
-
-.bevel{
-     @include corner-bottom-both-bevel($button-stable-active-border);
-     width: 357px;
-     margin-left: auto;
-     margin-right: auto;
-    border-style: solid;
-    height: 0;
-    div{
-
-       margin-top: -26px;
+.bevel {
+    @include corner-bottom-both-bevel($button-stable-active-border);
+    width: 357px;
     margin-left: auto;
     margin-right: auto;
-    width: 94px;
-
+    border-style: solid;
+    height: 0;
+    div {
+        margin-top: -26px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 94px;
     }
+}
+
+#building_wrap {
+    position: relative;
+    margin-left: auto;
+    margin-right: auto;
+    width: 420px;
+        transition: all .5s !important;
+        //height: 4px;
 
 }
 
+.building {
+    position: absolute;
+    //float: left;
+}
+
+.M200 {
+    top: 0px;
+    left: 31px;
+}
+
+.M250 {
+    top: 66px;
+}
+
+.M600{
+    top: 0px;
+    left: 156px
+}
+
+.M201{
+    top: 0px;
+left: 219px;
+}
 
 
-.empty{
-    background-color: rgba(0,0,0,0);
+.F200{
+    top: 0px;
+left: 288px;
+}
+
+.empty {
+    background-color: rgba(0, 0, 0, 0);
 }
 
 // LIST:
@@ -155,12 +183,11 @@ ion-top-menu .item {
     background: none !important;
     border: none !important;
 }
-    .image_name {
-        color: $base-color !important; 
-         text-decoration: none;
 
-    }
-
+.image_name {
+    color: $base-color !important;
+    text-decoration: none;
+}
 
 // Presentation
 .presenation_container {
@@ -216,6 +243,3 @@ ion-top-menu .item {
     float: right;
     margin-right: 100px;
 }
-
-
-

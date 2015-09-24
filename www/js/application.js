@@ -1,4 +1,4 @@
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters']).run(function($ionicPlatform) {
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters', 'starter.directives']).run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
@@ -12,14 +12,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $stateProvider.state('tab', {
     url: '/tab',
     abstract: true,
-    views: {
-      'main-tabs': {
-        templateUrl: 'templates/tabs.html'
-      },
-      'bld_menu': {
-        templateUrl: 'templates/menu/building_menu.html'
-      }
-    }
+    templateUrl: 'templates/tabs.html'
   }).state('tab.dash', {
     url: '/dash',
     views: {
@@ -149,14 +142,33 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
 }).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log) {
   $scope.activeBuilding = ActiveBuilding;
   $scope.buildings = Buildings.all();
+  $scope.templatePath = "templates/menu/building_menu.html";
+  $scope.bld_style = "margin-top: 5px";
+  $scope.building_is = function(code, name) {
+    if (code === name) {
+      return true;
+    }
+  };
+  $scope.getTemplate = function(name) {
+    return Buildings.getTemplate(name);
+  };
   $scope.setActiveBuilding = function(name) {
     return $scope.activeBuilding.name = name;
   };
   return $scope.toggleTopMenu = function() {
-    var menu, pane;
-    menu = document.getElementsByTagName('ion-top-menu')[0];
-    pane = document.getElementsByTagName('ion-view')[0];
-    menu.style.height = pane.style.top = menu.offsetHeight === 4 ? '300px' : '4px';
+    var bld, i, len, menu, pane, panes;
+    bld = document.getElementById('building_wrap');
+    menu = document.getElementById('ionTopMenu');
+    panes = document.getElementsByTagName('ion-view');
+    for (i = 0, len = panes.length; i < len; i++) {
+      pane = panes[i];
+      menu.style.height = pane.style.top = menu.offsetHeight === 4 ? '300px' : '4px';
+    }
+    if (menu.style.height === "4px") {
+      $scope.bld_style = "margin-top: 5px";
+    } else {
+      $scope.bld_style = "margin-top: 50px";
+    }
   };
 });
 
@@ -178,6 +190,30 @@ angular.module('starter.filters', []).filter('buildingFilter', [
     };
   }
 ]);
+
+angular.module('starter.directives', []).directive('clickMe', function($parse) {
+  return function(scope, element, attrs) {
+    element.bind('click', function() {
+      var type;
+      console.log('$eval type:', scope.$eval(attrs.clickMe));
+      type = $parse(attrs.clickMe)(scope);
+      console.log('$parse type:', type);
+    });
+  };
+});
+
+angular.module('starter.directives', []).directive('createControl', function() {
+  return {
+    scope: {
+      createControl: '='
+    },
+    link: function(scope, element, attrs) {
+      return element.bind('click', function() {
+        console.log('$eval type:', scope.createControl);
+      });
+    }
+  };
+});
 
 angular.module('starter.services', []).factory('Chats', function() {
   var chats;
@@ -233,10 +269,24 @@ angular.module('starter.services', []).factory('Chats', function() {
   models = [
     {
       id: 1,
-      name: "Mass 200"
+      name: "Mass 200",
+      code: "M200"
     }, {
       id: 2,
-      name: "Mass 300"
+      name: "Mass 300",
+      code: "M250"
+    }, {
+      id: 3,
+      name: "Mass 200",
+      code: "M600"
+    }, {
+      id: 4,
+      name: "Mass 300",
+      code: "M201"
+    }, {
+      id: 5,
+      name: "Mass 200",
+      code: "F200"
     }
   ];
   return {
@@ -256,6 +306,11 @@ angular.module('starter.services', []).factory('Chats', function() {
         i++;
       }
       return null;
+    },
+    getTemplate: function(name) {
+      if (name === "Mass 200") {
+        return '<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" > <path fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" d="M115,0.6v54.9L1,55.4L23.3,0.6H115z" /> <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-1,66.1 -30.1,125 115,125 115,66.1 " /> <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="261.5,0.6 261.5,103.6 305.9,103.6 305.9,86.9 392.8,86.9 392.8,0.6 " /> <rect x="125.9" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="54" height="124.9" /> <rect x="190.4" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" /> </svg>';
+      }
     }
   };
 }).service('ActiveBuilding', function() {

@@ -8,7 +8,8 @@ angular.module('starter', [
   'ionic'
   'starter.controllers'
   'starter.services'
-  'starter.filters'  
+  'starter.filters'
+  'starter.directives'  
 ]).run(($ionicPlatform) ->
   $ionicPlatform.ready ->
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -29,10 +30,9 @@ angular.module('starter', [
   $stateProvider.state('tab',
     url: '/tab'
     abstract: true
-    #templateUrl: 'templates/tabs.html'
-    views:
-      'main-tabs': templateUrl: 'templates/tabs.html'
-      'bld_menu': templateUrl: 'templates/menu/building_menu.html'
+    templateUrl: 'templates/tabs.html'
+    # views:
+    #   'bld-menu': templateUrl: 'templates/menu/building_menu.html'
     ).state('tab.dash',
     url: '/dash'
     views: 'tab-dash':

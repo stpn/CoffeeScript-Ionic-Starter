@@ -54,11 +54,28 @@ angular.module('starter.services', []).factory('Chats', ->
     {
       id: 1
       name: "Mass 200"
+      code: "M200"
     },
     {
       id: 2
       name: "Mass 300"
-    }    
+      code: "M250"
+    },
+    {
+      id: 3
+      name: "Mass 200"
+      code: "M600"
+    },
+    {
+      id: 4
+      name: "Mass 300"
+      code: "M201"
+    },
+    {
+      id: 5
+      name: "Mass 200"
+      code: "F200"
+    }
   ]
   {
     all: ->
@@ -73,6 +90,16 @@ angular.module('starter.services', []).factory('Chats', ->
           return models[i]
         i++
       null
+    getTemplate: (name) ->
+      if name == "Mass 200"
+        return '<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" >
+                <path fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" d="M115,0.6v54.9L1,55.4L23.3,0.6H115z" />
+                <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-1,66.1 -30.1,125 115,125 115,66.1 " />
+                <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="261.5,0.6 261.5,103.6 305.9,103.6 
+    305.9,86.9 392.8,86.9 392.8,0.6 " />
+                <rect x="125.9" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="54" height="124.9" />
+                <rect x="190.4" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" />
+            </svg>'
 
   }
 ).service('ActiveBuilding', ->

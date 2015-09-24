@@ -9202,6 +9202,35 @@ ion-top-menu .item {
     margin-right: auto;
     width: 94px; }
 
+#building_wrap {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  width: 420px;
+  transition: all 0.5s !important; }
+
+.building {
+  position: absolute; }
+
+.M200 {
+  top: 0px;
+  left: 31px; }
+
+.M250 {
+  top: 66px; }
+
+.M600 {
+  top: 0px;
+  left: 156px; }
+
+.M201 {
+  top: 0px;
+  left: 219px; }
+
+.F200 {
+  top: 0px;
+  left: 288px; }
+
 .empty {
   background-color: transparent; }
 

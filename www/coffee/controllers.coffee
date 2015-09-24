@@ -85,15 +85,29 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 ).controller('AccountCtrl', ($scope) ->
   $scope.settings = enableFriends: true
   return
-).controller('TopMenuCtrl', ($scope, Buildings,ActiveBuilding, $log) ->
+).controller('TopMenuCtrl', ($scope,  Buildings,ActiveBuilding, $log) ->
   $scope.activeBuilding = ActiveBuilding
   $scope.buildings = Buildings.all()
+  $scope.templatePath = "templates/menu/building_menu.html"
+  $scope.bld_style="margin-top: 5px"
+  $scope.building_is = (code, name) ->
+    if code == name
+    # if name == "200 Mass"
+      return true
+  $scope.getTemplate = (name) ->
+    Buildings.getTemplate(name)
   $scope.setActiveBuilding = (name)->
     $scope.activeBuilding.name = name
   $scope.toggleTopMenu = ->
-    menu = document.getElementsByTagName('ion-top-menu')[0]
-    pane = document.getElementsByTagName('ion-view')[0]
-    menu.style.height = pane.style.top = if menu.offsetHeight == 4 then '300px' else '4px'
+    bld = document.getElementById('building_wrap')
+    menu = document.getElementById('ionTopMenu')
+    panes = document.getElementsByTagName('ion-view')
+    for pane in panes
+      menu.style.height = pane.style.top = if menu.offsetHeight == 4 then '300px' else '4px'
+    if menu.style.height == "4px"
+      $scope.bld_style = "margin-top: 5px"
+    else
+      $scope.bld_style = "margin-top: 50px"
     return 
 )  
 # ---
