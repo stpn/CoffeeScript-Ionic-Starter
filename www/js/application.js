@@ -248,6 +248,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 });
 
+Number.prototype.map = function(in_min, in_max, out_min, out_max) {
+  return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+};
+
 angular.module('starter.filters', []).filter('buildingFilter', [
   function() {
     return function(models, activeBuilding) {
@@ -310,10 +314,11 @@ angular.module('starter.directives', []).directive('backImg', function() {
 angular.module('starter.directives', []).directive('ionPinch', function($timeout) {
   return {
     restrict: 'A',
-    link: function($scope, $element) {
+    link: function($scope, $element, attrs) {
       $timeout(function() {
-        var bufferX, bufferY, dragReady, lastPosX, lastPosY, lastScale, last_rotation, posX, posY, rotation, scale, square;
+        var bufferX, bufferY, dragReady, fixPosXmax, fixPosXmin, halt, lastMaxX, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square;
         square = $element[0];
+        console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right);
         posX = 0;
         posY = 0;
         lastPosX = 0;
@@ -325,6 +330,13 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
         rotation = 0;
         last_rotation = void 0;
         dragReady = 0;
+        leftXLimit = 380;
+        rightXLimit = 1060;
+        fixPosXmin = 0;
+        fixPosXmax = 300;
+        lastMaxX = 0;
+        halt = false;
+        max = 200;
         ionic.onGesture('touch drag transform dragend', (function(e) {
           var transform;
           e.gesture.srcEvent.preventDefault();
@@ -335,8 +347,28 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
               last_rotation = rotation;
               break;
             case 'drag':
-              posX = e.gesture.deltaX + lastPosX;
-              posY = e.gesture.deltaY + lastPosY;
+              console.log("CHARS", square.getBoundingClientRect().left + square.getBoundingClientRect().width);
+              console.log("NOW", e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX);
+              if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit) {
+                posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+                lastMaxX = posX;
+                halt = false;
+              } else {
+                if (square.getBoundingClientRect().left === leftXLimit) {
+                  fixPosXmin = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+                }
+                if (square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt === false) {
+                  fixPosXmax = lastMaxX;
+                  console.log(fixPosXmax, "AMX");
+                  halt = true;
+                }
+              }
+              if (fixPosXmin > e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX) {
+                posX = fixPosXmin;
+              }
+              if (e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX > 250) {
+                posX = 250;
+              }
               break;
             case 'transform':
               rotation = e.gesture.rotation + last_rotation;
@@ -344,10 +376,9 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
               break;
             case 'dragend':
               lastPosX = posX;
-              lastPosY = posY;
               lastScale = scale;
           }
-          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) ';
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) ';
           e.target.style.transform = transform;
           e.target.style.webkitTransform = transform;
         }), $element[0]);

@@ -1,3 +1,7 @@
+Number::map = (in_min, in_max, out_min, out_max) ->
+  (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+
+
 angular.module('starter.filters', []).filter 'buildingFilter', [ ->
   (models, activeBuilding) ->
     if !angular.isUndefined(models) and !angular.isUndefined(activeBuilding) and activeBuilding.length > 0
@@ -48,9 +52,10 @@ angular.module('starter.directives',[]).directive 'backImg', ->
 angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
   {
     restrict: 'A'
-    link: ($scope, $element) ->
-      $timeout ->
+    link: ($scope, $element, attrs) ->
+      $timeout ->        
         square = $element[0]
+        console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right)
         posX = 0
         posY = 0
         lastPosX = 0
@@ -62,6 +67,13 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
         rotation = 0
         last_rotation = undefined
         dragReady = 0
+        leftXLimit = 380
+        rightXLimit = 1060
+        fixPosXmin = 0
+        fixPosXmax = 300
+        lastMaxX = 0
+        halt = false
+        max = 200
         ionic.onGesture 'touch drag transform dragend', ((e) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
@@ -70,18 +82,30 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
               lastScale = scale
               last_rotation = rotation
             when 'drag'
-              posX = e.gesture.deltaX + lastPosX
-              posY = e.gesture.deltaY + lastPosY
+              if square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit 
+                posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+                lastMaxX = posX
+                halt = false
+              else 
+                if square.getBoundingClientRect().left == leftXLimit
+                  fixPosXmin = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+                if square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt == false
+                  fixPosXmax =  lastMaxX #e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+                  halt = true
+              if fixPosXmin > e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+                posX = fixPosXmin
+              if e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX > 250
+                posX = 250
             when 'transform'
               rotation = e.gesture.rotation + last_rotation
               scale = e.gesture.scale * lastScale
             when 'dragend'
               lastPosX = posX
-              lastPosY = posY
               lastScale = scale
-          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) '
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) '
           e.target.style.transform = transform
           e.target.style.webkitTransform = transform
+
           return
         ), $element[0]
         return
