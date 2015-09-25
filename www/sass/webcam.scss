@@ -29,24 +29,3 @@
     z-index: 99999999;
 }
 
-#comparison_wrap {
-    transition: all .5s;
-    width: 642px;
-    margin-top: 85px;
-    margin-left: auto;
-    margin-right: auto;
-    #comp_left,
-    #comp_mid {
-        float: left;
-    }
-    #comp_right,
-    #comp_mid {
-        margin-left: 142px;
-    }
-    #comp_left {
-        margin-left: 0px !important;
-    }
-    #comp_right {
-        float: right
-    }
-}

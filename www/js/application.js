@@ -275,8 +275,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       $scope.bld_style = "margin-top: 50px";
     }
     if (TopmenuState.getBuildings() === false) {
-      TopmenuState.setBuildings(true);
-      TopmenuState.setComparison(false);
+      setTimeout((function() {
+        TopmenuState.setBuildings(true);
+        return TopmenuState.setComparison(false);
+      }), 1000);
     }
   };
 }).controller('ChatsCtrl', function($scope, Chats) {

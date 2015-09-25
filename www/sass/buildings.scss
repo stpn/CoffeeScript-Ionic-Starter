@@ -1,9 +1,6 @@
 @import "www/sass/style.scss";
 #bld_tab_wrap {
-
-
     margin-top: 303px;
-
     #all_buildings {
         position: absolute;
         margin-top: -5px;
@@ -50,10 +47,29 @@
 
 #comparison_wrap {
     //transition: .5s linear all !important;
+    position: absolute;
     width: 642px;
     margin-top: 85px;
-    margin-left: auto;
-    margin-right: auto;
+    //margin-left: 67px;
+    left: 50%;
+    margin-left: -321px;
+    
+    // #comp_left, #comp_mid, #comp_right{
+    //     position: absolute;
+    // }
+    // #comp_left{
+    //     left: 100px;
+    // }
+
+    // #comp_mid{
+    //     left: 300px;
+    // }
+
+    // #comp_right{
+    //     left: 100px;
+    // }
+
+
     #comp_left,
     #comp_mid {
         float: left;
@@ -69,7 +85,19 @@
         float: right
     }
 }
-#building_menu_wrap.ng-hide-add, #building_menu_wrap.ng-hide-remove, #comparison_wrap.ng-hide-add, #comparison_wrap.ng-hide-remove{
-      transition: .5s linear all !important;
-      -webkit-transition:.5s linear all !important;
+
+// #building_menu_wrap.ng-hide-add,
+// #building_menu_wrap.ng-hide-remove,
+#comparison_wrap.ng-hide-add,
+#comparison_wrap.ng-hide-remove {
+    -webkit-transition: 0.5s linear all;
+    transition: 0.5s linear all;
+    /* remember to add this */
+    display: block!important;
+    opacity: 1;
+}
+
+// #building_menu_wrap.ng-hide,
+#comparison_wrap.ng-hide-add {
+    opacity: 0;
 }

@@ -12,9 +12,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     TopmenuState.getComparison()
 
   $scope.showCompareMenu = () ->
+    proceed = false
+    if TopmenuState.getComparison() == true
+      proceed = true
     TopmenuState.setBuildings(false)
     TopmenuState.setComparison(true)
-    $scope.toggleTopMenu()
+    menu = document.getElementById('ionTopMenu')
+    if menu.offsetHeight == 4 || proceed == true
+      $scope.toggleTopMenu()
     
   $scope.toggleTopMenu = ->
     bld = document.getElementById('building_wrap')

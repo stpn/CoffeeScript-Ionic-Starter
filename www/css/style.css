@@ -9164,16 +9164,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container.ng-hide-add, .accordion_container.ng-hide-remove {
-  background-color: #333333;
-  transition: all 0.09s; }
-
-.item {
-  background: #262626; }
-
-.row.ng-hide-add, .row.ng-hide-remove {
-  transition: .5s linear all; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -9244,8 +9234,7 @@ ion-top-menu .item {
   background-color: transparent; }
 
 #webcam_assets {
-  position: relative !important;
-  background: red; }
+  position: relative !important; }
 
 #bld_tab_wrap {
   margin-top: 303px; }
@@ -9281,10 +9270,11 @@ ion-top-menu .item {
     left: 322px; }
 
 #comparison_wrap {
+  position: absolute;
   width: 642px;
   margin-top: 85px;
-  margin-left: auto;
-  margin-right: auto; }
+  left: 50%;
+  margin-left: -321px; }
   #comparison_wrap #comp_left,
   #comparison_wrap #comp_mid {
     float: left; }
@@ -9296,9 +9286,16 @@ ion-top-menu .item {
   #comparison_wrap #comp_right {
     float: right; }
 
-#building_menu_wrap.ng-hide-add, #building_menu_wrap.ng-hide-remove, #comparison_wrap.ng-hide-add, #comparison_wrap.ng-hide-remove {
-  transition: .5s linear all !important;
-  -webkit-transition: .5s linear all !important; }
+#comparison_wrap.ng-hide-add,
+#comparison_wrap.ng-hide-remove {
+  -webkit-transition: 0.5s linear all;
+  transition: 0.5s linear all;
+  /* remember to add this */
+  display: block !important;
+  opacity: 1; }
+
+#comparison_wrap.ng-hide-add {
+  opacity: 0; }
 
 @charset "UTF-8";
 /*
@@ -27629,16 +27626,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container.ng-hide-add, .accordion_container.ng-hide-remove {
-  background-color: #333333;
-  transition: all 0.09s; }
-
-.item {
-  background: #262626; }
-
-.row.ng-hide-add, .row.ng-hide-remove {
-  transition: .5s linear all; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -27709,25 +27696,7 @@ ion-top-menu .item {
   background-color: transparent; }
 
 #webcam_assets {
-  position: relative !important;
-  background: red; }
-
-.accordion_container {
-  transition: 0.09s all linear; }
-
-.list .item.item-accordion {
-  padding-top: 0;
-  padding-bottom: 0;
-  transition: 0.09s all linear; }
-
-.list .item.item-accordion.ng-hide {
-  line-height: 0px;
-  transition: all 0.5s !important; }
-
-.list .item.item-accordion.ng-hide-add,
-.list .item.item-accordion.ng-hide-remove {
-  display: block !important;
-  transition: all 0.5s !important; }
+  position: relative !important; }
 
 .gallery {
   width: 90%;
@@ -36930,16 +36899,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container.ng-hide-add, .accordion_container.ng-hide-remove {
-  background-color: #333333;
-  transition: all 0.09s; }
-
-.item {
-  background: #262626; }
-
-.row.ng-hide-add, .row.ng-hide-remove {
-  transition: .5s linear all; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -37010,8 +36969,7 @@ ion-top-menu .item {
   background-color: transparent; }
 
 #webcam_assets {
-  position: relative !important;
-  background: red; }
+  position: relative !important; }
 
 .presenation_container h1,
 .presenation_container h2 {
@@ -46222,16 +46180,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container.ng-hide-add, .accordion_container.ng-hide-remove {
-  background-color: #333333;
-  transition: all 0.09s; }
-
-.item {
-  background: #262626; }
-
-.row.ng-hide-add, .row.ng-hide-remove {
-  transition: .5s linear all; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -46302,8 +46250,7 @@ ion-top-menu .item {
   background-color: transparent; }
 
 #webcam_assets {
-  position: relative !important;
-  background: red; }
+  position: relative !important; }
 
 @charset "UTF-8";
 /*
@@ -55471,16 +55418,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container.ng-hide-add, .accordion_container.ng-hide-remove {
-  background-color: #333333;
-  transition: all 0.09s; }
-
-.item {
-  background: #262626; }
-
-.row.ng-hide-add, .row.ng-hide-remove {
-  transition: .5s linear all; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -55551,8 +55488,7 @@ ion-top-menu .item {
   background-color: transparent; }
 
 #webcam_assets {
-  position: relative !important;
-  background: red; }
+  position: relative !important; }
 
 #webcam_content {
   width: 696px;
@@ -55577,20 +55513,3 @@ ion-top-menu .item {
   border-color: white;
   background: rgba(255, 255, 255, 0.01);
   z-index: 99999999; }
-
-#comparison_wrap {
-  transition: all 0.5s;
-  width: 642px;
-  margin-top: 85px;
-  margin-left: auto;
-  margin-right: auto; }
-  #comparison_wrap #comp_left,
-  #comparison_wrap #comp_mid {
-    float: left; }
-  #comparison_wrap #comp_right,
-  #comparison_wrap #comp_mid {
-    margin-left: 142px; }
-  #comparison_wrap #comp_left {
-    margin-left: 0px !important; }
-  #comparison_wrap #comp_right {
-    float: right; }

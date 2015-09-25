@@ -187,6 +187,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.setActiveBuilding = (name)->
     $scope.activeBuilding.name = name
 
+
   $scope.toggleTopMenu = ->
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
@@ -205,8 +206,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     else
       $scope.bld_style = "margin-top: 50px"
     if TopmenuState.getBuildings() == false
-      TopmenuState.setBuildings(true)
-      TopmenuState.setComparison(false)
+      setTimeout (->
+        TopmenuState.setBuildings(true)
+        TopmenuState.setComparison(false)
+      ), 1000      
 
     return 
 

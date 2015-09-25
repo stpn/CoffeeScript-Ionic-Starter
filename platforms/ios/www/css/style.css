@@ -9164,12 +9164,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container {
-  background-color: #333333; }
-
-.item {
-  background: #262626; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -9257,7 +9251,7 @@ ion-top-menu .item {
   #bld_tab_wrap .building_wrap {
     width: 420px;
     margin-right: 132px;
-    transition: all 0.5s !important; }
+    transition: .5s linear all !important; }
   #bld_tab_wrap .building {
     position: absolute; }
   #bld_tab_wrap .M200 {
@@ -9275,6 +9269,26 @@ ion-top-menu .item {
   #bld_tab_wrap .F200 {
     top: 5px;
     left: 322px; }
+
+#comparison_wrap {
+  width: 642px;
+  margin-top: 85px;
+  margin-left: auto;
+  margin-right: auto; }
+  #comparison_wrap #comp_left,
+  #comparison_wrap #comp_mid {
+    float: left; }
+  #comparison_wrap #comp_right,
+  #comparison_wrap #comp_mid {
+    margin-left: 142px; }
+  #comparison_wrap #comp_left {
+    margin-left: 0px !important; }
+  #comparison_wrap #comp_right {
+    float: right; }
+
+#building_menu_wrap.ng-hide-add, #building_menu_wrap.ng-hide-remove, #comparison_wrap.ng-hide-add, #comparison_wrap.ng-hide-remove {
+  transition: .5s linear all !important;
+  -webkit-transition: .5s linear all !important; }
 
 @charset "UTF-8";
 /*
@@ -27605,12 +27619,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container {
-  background-color: #333333; }
-
-.item {
-  background: #262626; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -27687,19 +27695,25 @@ ion-top-menu .item {
 .accordion_container {
   transition: 0.09s all linear; }
 
-.list .item.item-accordion {
+.row {
+  line-height: 38px;
   padding-top: 0;
   padding-bottom: 0;
   transition: 0.09s all linear; }
 
-.list .item.item-accordion.ng-hide {
-  line-height: 0px;
-  transition: all 0.5s !important; }
+.row.ng-hide {
+  line-height: 0px; }
 
-.list .item.item-accordion.ng-hide-add,
-.list .item.item-accordion.ng-hide-remove {
-  display: block !important;
-  transition: all 0.5s !important; }
+.row.ng-hide-add,
+.row.ng-hide-remove {
+  display: block !important; }
+
+.row.ng-hide {
+  line-height: 0px; }
+
+.row.ng-hide-add,
+.row.ng-hide-remove {
+  display: block !important; }
 
 .gallery {
   width: 90%;
@@ -36901,12 +36915,6 @@ a.button {
 
 .tabs {
   top: 0px !important; }
-
-.accordion_container {
-  background-color: #333333; }
-
-.item {
-  background: #262626; }
 
 ion-top-menu {
   position: absolute;
@@ -46190,12 +46198,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container {
-  background-color: #333333; }
-
-.item {
-  background: #262626; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -55435,12 +55437,6 @@ a.button {
 .tabs {
   top: 0px !important; }
 
-.accordion_container {
-  background-color: #333333; }
-
-.item {
-  background: #262626; }
-
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -55539,13 +55535,16 @@ ion-top-menu .item {
   z-index: 99999999; }
 
 #comparison_wrap {
+  transition: all 0.5s;
   width: 642px;
-  margin-top: 36px;
+  margin-top: 85px;
   margin-left: auto;
   margin-right: auto; }
-  #comparison_wrap svg {
+  #comparison_wrap #comp_left,
+  #comparison_wrap #comp_mid {
     float: left; }
-  #comparison_wrap #comp_right, #comparison_wrap #comp_mid {
+  #comparison_wrap #comp_right,
+  #comparison_wrap #comp_mid {
     margin-left: 142px; }
   #comparison_wrap #comp_left {
     margin-left: 0px !important; }

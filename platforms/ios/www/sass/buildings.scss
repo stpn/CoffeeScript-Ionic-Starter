@@ -19,7 +19,7 @@
         width: 420px;
         //margin-left: 500px;
         margin-right: 132px;
-        transition: all .5s !important;
+        transition: .5s linear all !important;
         //height: 4px;
     }
     .building {
@@ -46,4 +46,30 @@
         top: 5px;
         left: 322px;
     }
+}
+
+#comparison_wrap {
+    //transition: .5s linear all !important;
+    width: 642px;
+    margin-top: 85px;
+    margin-left: auto;
+    margin-right: auto;
+    #comp_left,
+    #comp_mid {
+        float: left;
+    }
+    #comp_right,
+    #comp_mid {
+        margin-left: 142px;
+    }
+    #comp_left {
+        margin-left: 0px !important;
+    }
+    #comp_right {
+        float: right
+    }
+}
+#building_menu_wrap.ng-hide-add, #building_menu_wrap.ng-hide-remove, #comparison_wrap.ng-hide-add, #comparison_wrap.ng-hide-remove{
+      transition: .5s linear all !important;
+      -webkit-transition:.5s linear all !important;
 }

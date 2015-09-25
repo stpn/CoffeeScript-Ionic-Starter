@@ -110,9 +110,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return TopmenuState.getComparison();
   };
   $scope.showCompareMenu = function() {
+    var menu, proceed;
+    proceed = false;
+    if (TopmenuState.getComparison() === true) {
+      proceed = true;
+    }
     TopmenuState.setBuildings(false);
     TopmenuState.setComparison(true);
-    return $scope.toggleTopMenu();
+    menu = document.getElementById('ionTopMenu');
+    if (menu.offsetHeight === 4 || proceed === true) {
+      return $scope.toggleTopMenu();
+    }
   };
   $scope.toggleTopMenu = function() {
     var bld, menu, pane;
