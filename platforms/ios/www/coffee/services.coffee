@@ -400,6 +400,29 @@ angular.module('starter.services', []).factory('Chats', ->
       null
 
   }
+).factory('TopmenuState', ->
+  
+  states =
+    buildings: true
+    comparisons: false
+
+
+  {
+    getBuildings:  ->
+      states.buildings
+
+    getComparison:  ->
+      states.comparison
+
+
+    setBuildings:(st)  ->
+      states.buildings = st
+
+    setComparison: (st) ->
+      states.comparison = st
+
+
+  }
 )
 
 

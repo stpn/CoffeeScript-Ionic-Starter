@@ -1,17 +1,21 @@
 <ion-view view-title="Dash">
     <ion-top-menu ng-controller="TopMenuCtrl" id="ionTopMenu">
         <ion-scroll style="width:100%;height:100%">
-            <div class="list" id="building_menu_wrap" ng-show="topMenu.buildings">
-
+            <div class="list" id="building_menu_wrap" ng-show="isBuildings()">
                 <ng-include ng-repeat="building in buildings" src="templatePath" ng-model=building></ng-include>
             </div>
-            <div class="list" id="building_menu_wrap" ng-show="topMenu.comparison">
 
-                <ng-include ng-repeat="building in buildings" src="templatePath" ng-model=building></ng-include>
+
+            <div class="list" id="building_menu_wrap" ng-show="isComparison()">
+                <ng-include src="compTemplate" ></ng-include>
             </div>
+
+
         </ion-scroll>
+
+
         <div class="buttons">
-            <div ng-click="toggleTopMenu()" class="empty">
+            <div ng-click="toggleTopMenu()" class="empty" id="menuBtn">
                 <div class="bevel">
                     <div>Select Building</div>
                 </div>

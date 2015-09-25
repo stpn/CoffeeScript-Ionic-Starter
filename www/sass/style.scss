@@ -4,11 +4,17 @@
     top: 0px !important;
 }
 
-.accordion_container {
+.accordion_container.ng-hide-add, .accordion_container.ng-hide-remove {
     background-color: #333333;
+        transition: all .09s;
+
 }
 .item{
     background: $item-stable-bg;
+}
+
+.row.ng-hide-add, .row.ng-hide-remove {
+transition: .5s linear all;
 }
 
 // SUBHEADER:

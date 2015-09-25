@@ -55537,3 +55537,17 @@ ion-top-menu .item {
   border-color: white;
   background: rgba(255, 255, 255, 0.01);
   z-index: 99999999; }
+
+#comparison_wrap {
+  width: 642px;
+  margin-top: 36px;
+  margin-left: auto;
+  margin-right: auto; }
+  #comparison_wrap svg {
+    float: left; }
+  #comparison_wrap #comp_right, #comparison_wrap #comp_mid {
+    margin-left: 142px; }
+  #comparison_wrap #comp_left {
+    margin-left: 0px !important; }
+  #comparison_wrap #comp_right {
+    float: right; }
