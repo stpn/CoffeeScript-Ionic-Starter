@@ -1,11 +1,13 @@
-angular.module('starter.controllers', []).controller('DashCtrl', ($scope,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) -> 
-  $scope.factories = {"Presentations": Presentations.all(), "Videos" : Videos.all(),  "Floor Plans" : Floorplans.all(), "Rendering":Renderings.all(), "Views" : Views.all(),  "Webcams" : Webcams.all(),}
+angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) -> 
+  $scope.presentations = {"Presentations": Presentations.all()}
+  $scope.factories = {"Videos" : Videos.all(),  "Floor Plans" : Floorplans.all(), "Rendering":Renderings.all(), "Views" : Views.all(),  "Webcams" : Webcams.all(),}
   $scope.activeBuilding = ActiveBuilding
+  $scope.state = $state;
+
   ###
   # if given group is the selected group, deselect it
   # else, select the given group
   ###
-
 
   $scope.toggleGroup = (group) ->
     if $scope.isGroupShown(group)
@@ -16,6 +18,153 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope,  $log,
 
   $scope.isGroupShown = (group) ->
     $scope.shownGroup == group    
+  
+  $scope.openPres = (presId) ->
+    window.location = '#/tab/presentations/' + presId
+    window.location.reload()
+    return
+
+
+).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
+  $scope.video = Videos.get($stateParams.modelId)
+  return
+
+
+).controller('FloorplanDetailCtrl', ($scope, $stateParams, Floorplans) ->
+  $scope.floorplan = Floorplans.get($stateParams.modelId)
+  return
+
+
+).controller('WebcamsCtrl', ($scope, $log, $stateParams, Webcams) ->
+  $scope.webcams = Webcams.all()
+  $scope.activeWebcam = undefined
+  # $scope.panoramas = undefined
+  # $scope.timelapses = undefined
+  
+  $scope.setActiveWebcam = (activeWebcamId) ->    
+    $scope.activeWebcam = Webcams.get(activeWebcamId)
+    $scope.panoramas = Webcams.getPanoramas(activeWebcamId)
+    $scope.timelapses = Webcams.getTimelapses(activeWebcamId)
+    $log.debug($scope.panoramas)
+
+  $scope.isEnabled = (model) ->
+    model == undefined
+
+  $scope.getActiveWebcam = (activeWebcam) ->
+    $scope.activeWebcam    
+
+  $scope.showPanorama = ->
+    $log.debug("PANO")
+
+  $scope.showLive = ->
+    $log.debug("LIVE")
+
+  $scope.toggleGroup = (group) ->
+    if $scope.isGroupShown(group)
+      $scope.shownGroup = null
+    else
+      $scope.shownGroup = group
+    return
+
+  $scope.isGroupShown = (group) ->
+    $scope.shownGroup == group       
+  return
+
+
+).controller('PresentationCtrl', ($scope,$log, $stateParams, Presentations) ->
+  $scope.presentation = Presentations.get($stateParams.presentationId)
+  $scope.slides = Presentations.getSlides($stateParams.presentationId)
+  $scope.presentation_name = $scope.presentation.name
+  $scope.project_name = $scope.presentation.project_name
+  $scope.postSlide = (slideId) ->
+    $log.debug("FUCKYES "+ slideId)
+  $scope.alertMe = ()->
+    $log.debug("FUCK")    
+  return
+
+
+).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
+  $scope.video = Videos.get($stateParams.videoId)
+  #$log.debug($scope.video.recording);
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+  
+  $scope.trustSrc = (src) ->
+    $scope.videos = $sce.getTrustedResourceUrl(src);
+
+  $scope.postVideoId = (videoId) ->
+    $log.debug("FUCKYES "+ videoId)
+  
+  $scope.alertMe = ()->
+    $log.debug("FUCK")    
+  return
+
+
+).controller('BuildingsCtrl', ($scope, Buildings, $log) ->
+  $scope.buildings = Buildings.all()
+  $scope.templatePath = "templates/menu/building_menu.html"
+  $scope.transformStyle = "scale(1.19)"
+
+  $scope.getTemplate = (name) ->
+    Buildings.getTemplate(name)
+
+  $scope.building_is = (code, name) ->
+    if code == name
+    # if name == "200 Mass"
+      return true
+
+  return
+
+
+).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, activeCamera) ->
+  $scope.panorama = Panoramas.get($stateParams.panoramaId)
+
+  $scope.getPanorama =  ->
+    $scope.panorama.image
+
+  $scope.getCamera =  ->
+    1
+
+
+  return
+
+).controller('TopMenuCtrl', ($scope,  Buildings,ActiveBuilding, $log, $window, $location) ->
+  $scope.activeBuilding = ActiveBuilding
+  $scope.buildings = Buildings.all()
+  $scope.templatePath = "templates/menu/building_menu.html"
+  $scope.bld_style="margin-top: 5px"
+  $log.debug($location.url())
+  $scope.transformStyle = "transform: scale(1.0)"
+
+  $scope.building_is = (code, name) ->
+    if code == name
+    # if name == "200 Mass"
+      return true
+
+  $scope.getTemplate = (name) ->
+    Buildings.getTemplate(name)
+
+  $scope.setActiveBuilding = (name)->
+    $scope.activeBuilding.name = name
+
+  $scope.toggleTopMenu = ->
+    bld = document.getElementById('building_wrap')
+    menu = document.getElementById('ionTopMenu')
+    pane = document.getElementsByTagName('ion-content')[0]
+    # for pane in panes
+     
+    if menu.offsetHeight == 4 
+      menu.style.height = '350px' 
+      pane.style.top = '450px'
+    else 
+      menu.style.height =  '4px' 
+      pane.style.top = '120px'
+
+    if menu.style.height == "4px"
+      $scope.bld_style = "margin-top: -200px"
+    else
+      $scope.bld_style = "margin-top: 50px"
+    return 
+
 
 ).controller('ChatsCtrl', ($scope, Chats) ->
   # With the new view caching in Ionic, Controllers are only called
@@ -32,22 +181,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope,  $log,
     return
 
   return
+
 ).controller('ChatDetailCtrl', ($scope, $stateParams, Chats) ->
   $scope.chat = Chats.get($stateParams.chatId)
   return
-).controller('AccountCtrl', ($scope) ->
+
+).controller 'AccountCtrl', ($scope) ->
   $scope.settings = enableFriends: true
-  return
-).controller('TopMenuCtrl', ($scope, Buildings,ActiveBuilding, $log) ->
-  $scope.activeBuilding = ActiveBuilding
-  $scope.buildings = Buildings.all()
-  $scope.setActiveBuilding = (name)->
-    $scope.activeBuilding.name = name
-  $scope.toggleTopMenu = ->
-    menu = document.getElementsByTagName('ion-top-menu')[0]
-    pane = document.getElementsByTagName('ion-view')[0]
-    menu.style.height = pane.style.top = if menu.offsetHeight == 0 then '300px' else '0px'
-    return 
-)  
+  return  
 # ---
 # generated by js2coffee 2.1.0

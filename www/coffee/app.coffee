@@ -59,7 +59,13 @@ angular.module('starter', [
     url: '/webcams'
     views: 'webcams':
       templateUrl: 'templates/webcams/webcams.html'
-      controller: 'WebcamsCtrl',       
+      controller: 'WebcamsCtrl',    
+
+    ).state('tab.panoramas',
+    url: '/panoramas/:panoramaId'
+    views: 'webcams':
+      templateUrl: 'templates/panoramas/panorama.html'
+      controller: 'PanoramasCtrl',          
 
     ).state('tab.buildings',
     url: '/buildings'

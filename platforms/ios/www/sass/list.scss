@@ -1,0 +1,74 @@
+@import "www/sass/style.scss";
+
+// LIST:
+
+.accordion_container{
+        transition: 0.09s all linear;
+
+}
+.list .item.item-accordion {
+    //line-height: 38px;
+    //height: 20px;
+    //height: 64px;
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: 0.09s all linear;
+
+}
+
+.list .item.item-accordion.ng-hide {
+    line-height: 0px;
+        transition: all .5s !important;
+
+}
+
+.list .item.item-accordion.ng-hide-add,
+.list .item.item-accordion.ng-hide-remove {
+    display: block !important;
+    transition: all .5s !important;
+}
+
+
+
+.gallery {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-left: 55px;
+}
+
+.pict {
+    display: inline-block;
+    min-width: 300px;
+    min-height: 300px;
+}
+
+.cust_col {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 165px;
+    -moz-box-flex: 0;
+    -moz-flex: 0 0 165px;
+    -ms-flex: 0 0 165px;
+    flex: 0 0 165px;
+    max-width: 165px;
+    //    max-height: 100px;
+    margin-top: 5px;
+    img {
+        max-height: 75px;
+    }
+    a {
+        text-decoration: none;
+        background: none !important;
+        img {
+            max-height: 75px;
+            max-width: 165px;
+        }
+    }
+    background: none !important;
+    border: none !important;
+}
+
+.image_name {
+    color: $base-color !important;
+    text-decoration: none;
+}

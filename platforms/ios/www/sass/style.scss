@@ -1,22 +1,29 @@
+@import "www/sass/custom_variables.scss";
+
 .tabs {
     top: 0px !important;
+}
+
+.accordion_container {
+    background-color: #333333;
 }
 
 // SUBHEADER:
 ion-top-menu {
     position: absolute;
-    height: 0px;
+    height: 4px;
     width: 100%;
     background: #333;
     color: white;
     z-index: 10;
-    top: 47px;
+    top: 45px !important;
     transition: all .5s;
 }
 
-ion-view {
+ion-content#main_menu {
+    top: 120px;
     position: absolute;
-    margin-top: 97px;
+    //    margin-top: 47px;
     transition: all .5s !important;
 }
 
@@ -26,56 +33,64 @@ ion-top-menu .item {
     color: white;
 }
 
-// LIST:
-.list .item.item-accordion {
-    //line-height: 38px;
-    //height: 20px;
-    //height: 64px;
-    padding-top: 0;
-    padding-bottom: 0;
-    transition: 0.09s all linear;
-}
-
-.list .item.item-accordion.ng-hide {
-    line-height: 0px;
-}
-
-.list .item.item-accordion.ng-hide-add,
-.list .item.item-accordion.ng-hide-remove {
-    display: block !important;
-}
-
-// .wide-as-needed {
-//     overflow: scroll;
-//     white-space: nowrap;
-// }
-
-// .scroll {
-//     min-width: 100%;
-// }
-
-.gallery {
-    width: 90%;
+.bevel {
+    @include corner-bottom-both-bevel($button-stable-active-border);
+    width: 357px;
     margin-left: auto;
     margin-right: auto;
-}
-
-.pict {
-    display: inline-block;
-    min-width: 300px;
-    min-height: 300px;
-}
-
-.cust_col {
-    -webkit-box-flex: 0;
-    -webkit-flex: 0 0 165px;
-    -moz-box-flex: 0;
-    -moz-flex: 0 0 165px;
-    -ms-flex: 0 0 165px;
-    flex: 0 0 165px;
-    max-width: 165px;
-    max-height: 100px;
-    img {
-        max-height: 95px;
+    border-style: solid;
+    height: 0;
+    div {
+        margin-top: -26px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 94px;
     }
+}
+ .building_wrap {
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        }
+
+#building_menu_wrap {
+    
+    .building_wrap {
+        width: 420px;
+
+        transition: all .5s !important;
+        //height: 4px;
+    }
+    .building {
+        position: absolute;
+        //float: left;
+    }
+    .M200 {
+        top: 0px;
+        left: 31px;
+    }
+    .M250 {
+        top: 66px;
+    }
+    .M600 {
+        top: 0px;
+        left: 156px
+    }
+    .M201 {
+        top: 0px;
+        left: 219px;
+    }
+    .F200 {
+        top: 0px;
+        left: 288px;
+    }
+}
+
+.empty {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+#webcam_assets {
+    position: relative !important;
+    background: red;
 }

@@ -1,0 +1,13 @@
+<!--
+  This template loads for the 'tab.friend-detail' state (app.js)
+  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
+  The FriendsCtrl pulls data from the Friends service (service.js)
+  The Friends service returns an array of friend data
+-->
+<ion-view view-title="{{video.name}}">
+    <ion-content padding="true" overflow-scroll="true">
+        <video controls="controls" preload="metadata" autoplay="autoplay" webkit-playsinline="webkit-playsinline" class="videoPlayer">
+            <source ng-src={{recording}} type="video/mp4" />
+        </video>
+    </ion-content>
+</ion-view>

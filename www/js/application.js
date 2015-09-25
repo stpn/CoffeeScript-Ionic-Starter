@@ -45,6 +45,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'WebcamsCtrl'
       }
     }
+  }).state('tab.panoramas', {
+    url: '/panoramas/:panoramaId',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/panoramas/panorama.html',
+        controller: 'PanoramasCtrl'
+      }
+    }
   }).state('tab.buildings', {
     url: '/buildings',
     views: {
@@ -148,8 +156,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
   };
-}).controller('VideoDetailCtrl', function($scope, $stateParams, Presentations) {
-  $scope.presentation = Presentations.get($stateParams.modelId);
 }).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
   $scope.presentation = Presentations.get($stateParams.presentationId);
   $scope.slides = Presentations.getSlides($stateParams.presentationId);
@@ -173,17 +179,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.alertMe = function() {
     return $log.debug("FUCK");
   };
-}).controller('ChatsCtrl', function($scope, Chats) {
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  };
-}).controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
-}).controller('AccountCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
 }).controller('BuildingsCtrl', function($scope, Buildings, $log) {
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
@@ -195,6 +190,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if (code === name) {
       return true;
     }
+  };
+}).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera) {
+  $scope.panorama = Panoramas.get($stateParams.panoramaId);
+  $scope.getPanorama = function() {
+    return $scope.panorama.image;
+  };
+  $scope.getCamera = function() {
+    return 1;
   };
 }).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log, $window, $location) {
   $scope.activeBuilding = ActiveBuilding;
@@ -231,6 +234,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else {
       $scope.bld_style = "margin-top: 50px";
     }
+  };
+}).controller('ChatsCtrl', function($scope, Chats) {
+  $scope.chats = Chats.all();
+  $scope.remove = function(chat) {
+    Chats.remove(chat);
+  };
+}).controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
+  $scope.chat = Chats.get($stateParams.chatId);
+}).controller('AccountCtrl', function($scope) {
+  $scope.settings = {
+    enableFriends: true
   };
 });
 
@@ -281,6 +295,66 @@ angular.module('starter.directives', []).directive('clickSvg', [
     };
   }
 ]);
+
+angular.module('starter.directives', []).directive('backImg', function() {
+  return function(scope, element, attrs) {
+    attrs.$observe('backImg', function(value) {
+      element.css({
+        'background-image': 'url(' + value + ')',
+        'background-size': 'cover'
+      });
+    });
+  };
+});
+
+angular.module('starter.directives', []).directive('ionPinch', function($timeout) {
+  return {
+    restrict: 'A',
+    link: function($scope, $element) {
+      $timeout(function() {
+        var bufferX, bufferY, dragReady, lastPosX, lastPosY, lastScale, last_rotation, posX, posY, rotation, scale, square;
+        square = $element[0];
+        posX = 0;
+        posY = 0;
+        lastPosX = 0;
+        lastPosY = 0;
+        bufferX = 0;
+        bufferY = 0;
+        scale = 1;
+        lastScale = void 0;
+        rotation = 0;
+        last_rotation = void 0;
+        dragReady = 0;
+        ionic.onGesture('touch drag transform dragend', (function(e) {
+          var transform;
+          e.gesture.srcEvent.preventDefault();
+          e.gesture.preventDefault();
+          switch (e.type) {
+            case 'touch':
+              lastScale = scale;
+              last_rotation = rotation;
+              break;
+            case 'drag':
+              posX = e.gesture.deltaX + lastPosX;
+              posY = e.gesture.deltaY + lastPosY;
+              break;
+            case 'transform':
+              rotation = e.gesture.rotation + last_rotation;
+              scale = e.gesture.scale * lastScale;
+              break;
+            case 'dragend':
+              lastPosX = posX;
+              lastPosY = posY;
+              lastScale = scale;
+          }
+          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) ';
+          e.target.style.transform = transform;
+          e.target.style.webkitTransform = transform;
+        }), $element[0]);
+      });
+    }
+  };
+});
 
 angular.module('starter.services', []).factory('Chats', function() {
   var chats;
@@ -613,6 +687,17 @@ angular.module('starter.services', []).factory('Chats', function() {
       return null;
     }
   };
+}).service('ActiveCamera', function() {
+  var name;
+  name = "Mass 300";
+  return {
+    setName: function(new_name) {
+      return name = new_name;
+    },
+    getName: function(new_name) {
+      return name;
+    }
+  };
 }).factory('Webcams', function() {
   var models;
   models = [
@@ -679,6 +764,38 @@ angular.module('starter.services', []).factory('Chats', function() {
           image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
         }
       ];
+    }
+  };
+}).factory('Panoramas', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Pan1",
+      image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg',
+      building_name: 'Mass 200'
+    }
+  ];
+  return {
+    name: function() {
+      return "Panorama";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
     }
   };
 });

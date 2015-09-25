@@ -35,8 +35,59 @@ angular.module('starter.directives',[]).directive 'clickSvg', [
         return
     }
 ]
-    # }
 
+angular.module('starter.directives',[]).directive 'backImg', ->
+  (scope, element, attrs) ->
+    attrs.$observe 'backImg', (value) ->
+      element.css
+        'background-image': 'url(' + value + ')'
+        'background-size': 'cover'
+      return
+    return
+    # }
+angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
+  {
+    restrict: 'A'
+    link: ($scope, $element) ->
+      $timeout ->
+        square = $element[0]
+        posX = 0
+        posY = 0
+        lastPosX = 0
+        lastPosY = 0
+        bufferX = 0
+        bufferY = 0
+        scale = 1
+        lastScale = undefined
+        rotation = 0
+        last_rotation = undefined
+        dragReady = 0
+        ionic.onGesture 'touch drag transform dragend', ((e) ->
+          e.gesture.srcEvent.preventDefault()
+          e.gesture.preventDefault()
+          switch e.type
+            when 'touch'
+              lastScale = scale
+              last_rotation = rotation
+            when 'drag'
+              posX = e.gesture.deltaX + lastPosX
+              posY = e.gesture.deltaY + lastPosY
+            when 'transform'
+              rotation = e.gesture.rotation + last_rotation
+              scale = e.gesture.scale * lastScale
+            when 'dragend'
+              lastPosX = posX
+              lastPosY = posY
+              lastScale = scale
+          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) '
+          e.target.style.transform = transform
+          e.target.style.webkitTransform = transform
+          return
+        ), $element[0]
+        return
+      return
+
+  }
 
 # angular.module('starter.directives',[]).directive 'click-svg', ->
 #   {
