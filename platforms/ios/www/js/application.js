@@ -102,6 +102,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.activeBuilding = ActiveBuilding;
   $scope.state = $state;
+  $scope.topMenu = {
+    buildings: true,
+    comparison: false
+  };
+  $scope.showCompareMenu = function() {
+    $scope.topMenu.buildings = false;
+    return $scope.topMenu.comparison = true;
+  };
 
   /*
    * if given group is the selected group, deselect it
@@ -191,13 +199,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return true;
     }
   };
-}).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas) {
+}).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera) {
   $scope.panorama = Panoramas.get($stateParams.panoramaId);
   $scope.getPanorama = function() {
     return $scope.panorama.image;
   };
   $scope.getCamera = function() {
-    return $scope.panorama.image;
+    return 1;
   };
 }).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log, $window, $location) {
   $scope.activeBuilding = ActiveBuilding;
@@ -247,6 +255,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     enableFriends: true
   };
 });
+
+Number.prototype.map = function(in_min, in_max, out_min, out_max) {
+  return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+};
 
 angular.module('starter.filters', []).filter('buildingFilter', [
   function() {
@@ -304,6 +316,79 @@ angular.module('starter.directives', []).directive('backImg', function() {
         'background-size': 'cover'
       });
     });
+  };
+});
+
+angular.module('starter.directives', []).directive('ionPinch', function($timeout) {
+  return {
+    restrict: 'A',
+    link: function($scope, $element, attrs) {
+      $timeout(function() {
+        var bufferX, bufferY, dragReady, fixPosXmax, fixPosXmin, halt, lastMaxX, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square;
+        square = $element[0];
+        console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right);
+        posX = 0;
+        posY = 0;
+        lastPosX = 0;
+        lastPosY = 0;
+        bufferX = 0;
+        bufferY = 0;
+        scale = 1;
+        lastScale = void 0;
+        rotation = 0;
+        last_rotation = void 0;
+        dragReady = 0;
+        leftXLimit = 380;
+        rightXLimit = 1060;
+        fixPosXmin = 0;
+        fixPosXmax = 300;
+        lastMaxX = 0;
+        halt = false;
+        max = 200;
+        ionic.onGesture('touch drag transform dragend', (function(e) {
+          var transform;
+          e.gesture.srcEvent.preventDefault();
+          e.gesture.preventDefault();
+          switch (e.type) {
+            case 'touch':
+              lastScale = scale;
+              last_rotation = rotation;
+              break;
+            case 'drag':
+              if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit) {
+                posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+                lastMaxX = posX;
+                halt = false;
+              } else {
+                if (square.getBoundingClientRect().left === leftXLimit) {
+                  fixPosXmin = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+                }
+                if (square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt === false) {
+                  fixPosXmax = lastMaxX;
+                  halt = true;
+                }
+              }
+              if (fixPosXmin > e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX) {
+                posX = fixPosXmin;
+              }
+              if (e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX > 250) {
+                posX = 250;
+              }
+              break;
+            case 'transform':
+              rotation = e.gesture.rotation + last_rotation;
+              scale = e.gesture.scale * lastScale;
+              break;
+            case 'dragend':
+              lastPosX = posX;
+              lastScale = scale;
+          }
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) ';
+          e.target.style.transform = transform;
+          e.target.style.webkitTransform = transform;
+        }), $element[0]);
+      });
+    }
   };
 });
 
@@ -636,6 +721,17 @@ angular.module('starter.services', []).factory('Chats', function() {
         i++;
       }
       return null;
+    }
+  };
+}).service('ActiveCamera', function() {
+  var name;
+  name = "Mass 300";
+  return {
+    setName: function(new_name) {
+      return name = new_name;
+    },
+    getName: function(new_name) {
+      return name;
     }
   };
 }).factory('Webcams', function() {

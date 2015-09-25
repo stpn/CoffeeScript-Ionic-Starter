@@ -3,6 +3,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.factories = {"Videos" : Videos.all(),  "Floor Plans" : Floorplans.all(), "Rendering":Renderings.all(), "Views" : Views.all(),  "Webcams" : Webcams.all(),}
   $scope.activeBuilding = ActiveBuilding
   $scope.state = $state;
+  $scope.topMenu =
+    buildings: true
+    comparison: false
+
+  $scope.showCompareMenu =() ->
+    $scope.topMenu.buildings = false
+    $scope.topMenu.comparison = true
+
+    
 
   ###
   # if given group is the selected group, deselect it
@@ -40,7 +49,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.activeWebcam = undefined
   # $scope.panoramas = undefined
   # $scope.timelapses = undefined
-  
+
+
   $scope.setActiveWebcam = (activeWebcamId) ->    
     $scope.activeWebcam = Webcams.get(activeWebcamId)
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId)
@@ -115,7 +125,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   return
 
 
-).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, activeCamera) ->
+).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, ActiveCamera) ->
   $scope.panorama = Panoramas.get($stateParams.panoramaId)
 
   $scope.getPanorama =  ->

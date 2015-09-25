@@ -298,6 +298,18 @@ angular.module('starter.services', []).factory('Chats', ->
       null
 
   }
+
+).service('ActiveCamera', ->
+  name = "Mass 300"
+
+  {
+    setName: (new_name) ->
+      name = new_name
+
+    getName: (new_name) ->
+      name
+  }
+
 ).factory('Webcams', ->
   models = [
     {

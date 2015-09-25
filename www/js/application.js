@@ -89,7 +89,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/dash');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState) {
   $scope.presentations = {
     "Presentations": Presentations.all()
   };
@@ -102,13 +102,35 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.activeBuilding = ActiveBuilding;
   $scope.state = $state;
-  $scope.topMenu = {
-    buildings: true,
-    comparison: false
+  $scope.topMenu = TopmenuState.states;
+  $scope.isBuildings = function() {
+    return TopmenuState.getBuildings();
+  };
+  $scope.isComparison = function() {
+    return TopmenuState.getComparison();
   };
   $scope.showCompareMenu = function() {
-    $scope.topMenu.buildings = false;
-    return $scope.topMenu.comparison = true;
+    TopmenuState.setBuildings(false);
+    TopmenuState.setComparison(true);
+    return $scope.toggleTopMenu();
+  };
+  $scope.toggleTopMenu = function() {
+    var bld, menu, pane;
+    bld = document.getElementById('building_wrap');
+    menu = document.getElementById('ionTopMenu');
+    pane = document.getElementsByTagName('ion-content')[0];
+    if (menu.offsetHeight === 4) {
+      menu.style.height = '350px';
+      pane.style.top = '450px';
+    } else {
+      menu.style.height = '4px';
+      pane.style.top = '120px';
+    }
+    if (menu.style.height === "4px") {
+      $scope.bld_style = "margin-top: -200px";
+    } else {
+      $scope.bld_style = "margin-top: 50px";
+    }
   };
 
   /*
@@ -207,13 +229,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.getCamera = function() {
     return 1;
   };
-}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log, $window, $location) {
+}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log, $window, $location, TopmenuState) {
   $scope.activeBuilding = ActiveBuilding;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
+  $scope.compTemplate = "templates/menu/comparison_menu.html";
   $scope.bld_style = "margin-top: 5px";
   $log.debug($location.url());
   $scope.transformStyle = "transform: scale(1.0)";
+  $scope.topMenu = TopmenuState;
   $scope.building_is = function(code, name) {
     if (code === name) {
       return true;
@@ -241,6 +265,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       $scope.bld_style = "margin-top: -200px";
     } else {
       $scope.bld_style = "margin-top: 50px";
+    }
+    if (TopmenuState.getBuildings() === false) {
+      TopmenuState.setBuildings(true);
+      TopmenuState.setComparison(false);
     }
   };
 }).controller('ChatsCtrl', function($scope, Chats) {
@@ -832,6 +860,26 @@ angular.module('starter.services', []).factory('Chats', function() {
         i++;
       }
       return null;
+    }
+  };
+}).factory('TopmenuState', function() {
+  var states;
+  states = {
+    buildings: true,
+    comparisons: false
+  };
+  return {
+    getBuildings: function() {
+      return states.buildings;
+    },
+    getComparison: function() {
+      return states.comparison;
+    },
+    setBuildings: function(st) {
+      return states.buildings = st;
+    },
+    setComparison: function(st) {
+      return states.comparison = st;
     }
   };
 });

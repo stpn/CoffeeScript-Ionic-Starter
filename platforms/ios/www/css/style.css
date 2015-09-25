@@ -9167,6 +9167,9 @@ a.button {
 .accordion_container {
   background-color: #333333; }
 
+.item {
+  background: #262626; }
+
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -27605,6 +27608,9 @@ a.button {
 .accordion_container {
   background-color: #333333; }
 
+.item {
+  background: #262626; }
+
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -36899,6 +36905,9 @@ a.button {
 .accordion_container {
   background-color: #333333; }
 
+.item {
+  background: #262626; }
+
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -46184,6 +46193,9 @@ a.button {
 .accordion_container {
   background-color: #333333; }
 
+.item {
+  background: #262626; }
+
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -55426,6 +55438,9 @@ a.button {
 .accordion_container {
   background-color: #333333; }
 
+.item {
+  background: #262626; }
+
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -55504,9 +55519,21 @@ ion-top-menu .item {
   margin-left: auto;
   margin-right: auto; }
 
+#panorama_title {
+  margin-top: 88px; }
+
 #panorama_view {
   height: 242px;
-  margin-top: 135px; }
+  margin-top: 44px; }
   #panorama_view img {
     max-width: 100%;
     max-height: 100%; }
+
+.square {
+  position: absolute;
+  width: 426px;
+  height: 179px;
+  border: solid 3px;
+  border-color: white;
+  background: rgba(255, 255, 255, 0.01);
+  z-index: 99999999; }

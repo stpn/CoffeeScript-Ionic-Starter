@@ -3,15 +3,29 @@
 #webcam_content{
       width: 696px;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: auto;  
 
 }
+
+#panorama_title{
+  margin-top: 88px;  
+}
+
 #panorama_view {
-  
     height: 242px;
-    margin-top: 135px;
+    margin-top: 44px;
     img {
         max-width: 100%;
         max-height: 100%;
     }
+}
+
+.square{
+  position:absolute;
+  width: 426px;
+  height: 179px;
+  border: solid 3px;
+  border-color: white;
+  background: rgba(255,255,255,0.01);
+  z-index: 99999999;
 }
