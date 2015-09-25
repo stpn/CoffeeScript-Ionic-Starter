@@ -102,6 +102,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.activeBuilding = ActiveBuilding;
   $scope.state = $state;
+  $scope.topMenu = {
+    buildings: true,
+    comparison: false
+  };
+  $scope.showCompareMenu = function() {
+    $scope.topMenu.buildings = false;
+    return $scope.topMenu.comparison = true;
+  };
 
   /*
    * if given group is the selected group, deselect it
@@ -347,8 +355,6 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
               last_rotation = rotation;
               break;
             case 'drag':
-              console.log("CHARS", square.getBoundingClientRect().left + square.getBoundingClientRect().width);
-              console.log("NOW", e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX);
               if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit) {
                 posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
                 lastMaxX = posX;
@@ -359,7 +365,6 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
                 }
                 if (square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt === false) {
                   fixPosXmax = lastMaxX;
-                  console.log(fixPosXmax, "AMX");
                   halt = true;
                 }
               }
