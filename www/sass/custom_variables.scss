@@ -28,11 +28,28 @@ $item-stable-border: #262626 !default;
 $item-stable-active-bg: #262626 !default;
 $item-stable-active-border: #262626 !default;
 $corner-bevel: 30;
+
+$positive: white !default;
+
 @mixin corner-bottom-both-bevel($kolor) {
     border-color: $kolor transparent transparent transparent;
     border-width: #{$corner-bevel}px #{$corner-bevel}px 0 #{$corner-bevel}px;
     background-color: none;
 }
+
+@font-face {
+  font-family: 'Gotham Book';
+  src: url('../fonts/gotham-book.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/gotham-book.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/gotham-book.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/gotham-book.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/gotham-book.svg#65526539dec42e535893223c14767f58') format('svg'); /* Legacy iOS */
+       
+  font-style:   normal;
+  font-weight:  400;
+}
+
+
 
 // Include all of Ionic.
 @import "www/lib/ionic/scss/ionic";
