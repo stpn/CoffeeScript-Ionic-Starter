@@ -161,6 +161,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.modelId);
+}).controller('titleCtrl', function($scope, $stateParams) {
+  $scope.titleTemplate = "templates/menu/title.html";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.modelId);
 }).controller('WebcamsCtrl', function($scope, $log, $stateParams, Webcams) {

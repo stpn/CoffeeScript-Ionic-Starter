@@ -66,6 +66,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.video = Videos.get($stateParams.modelId)
   return
 
+).controller('titleCtrl', ($scope, $stateParams) ->
+  $scope.titleTemplate = "templates/menu/title.html"
+  return
+
 
 ).controller('FloorplanDetailCtrl', ($scope, $stateParams, Floorplans) ->
   $scope.floorplan = Floorplans.get($stateParams.modelId)
