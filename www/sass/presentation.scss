@@ -1,17 +1,18 @@
 // Presentation
-.presenation_container {
-    margin-top: 53px;
-    .presentation_titles {
-        margin-left: 36px;
-        color: #DAD9D9;
-        font-family: "Gotham Light";
-    }
+.presentation_titles {
+    margin-left: 36px;
+    color: #DAD9D9;
+    font-family: "Gotham Light";
     .presentation_title {
         font-size: 22px;
     }
     .presentation_subtitle {
         font-size: 20px;
     }
+}
+
+.presenation_container {
+    margin-top: 53px;
     .presentation_gal {
         margin-left: 25px;
         min-height: 743px;
@@ -46,7 +47,7 @@
         font-family: "Gotham Book";
         line-height: 60px;
         margin-top: 11px;
-        margin-left: 54px;  
+        margin-left: 54px;
     }
     .pres_button {
         width: 172px;

@@ -1,0 +1,30 @@
+#video_container {
+    margin-top: 55px;
+    width: 696px;
+    margin-left: auto;
+    margin-right: auto;
+    ion-content {
+        position: relative;
+    }
+    .video_controls {
+        input.seekbar {
+            min-width: 696px;
+        }
+        .pres_button {
+            width: 172px;
+            height: 75px;
+            border: solid 1px;
+            margin-left: 5px;
+            i {
+                font-size: 60px;
+                margin-left: 70px;
+                margin-right: auto;
+                line-height: 75px;
+            }
+        }
+        li {
+            cursor: pointer;
+            float: left;
+        }
+    }
+}

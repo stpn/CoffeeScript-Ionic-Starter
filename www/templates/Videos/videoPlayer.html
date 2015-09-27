@@ -5,9 +5,38 @@
   The Friends service returns an array of friend data
 -->
 <ion-view view-title="{{video.name}}">
-    <ion-content padding="true" overflow-scroll="true">
-        <video controls="controls" preload="metadata" autoplay="autoplay" webkit-playsinline="webkit-playsinline" class="videoPlayer">
-            <source ng-src={{recording}} type="video/mp4" />
-        </video>
-    </ion-content>
+    <div id="video_container">
+        <a class="close_button" href="#/dash/">
+            <i class="ion-close"></i>
+        </a>
+        <div class="presentation_titles">
+            <div id="presentation_title">{{building_name | uppercase}}</div>
+            <div id="presentation_subtitle">{{video.name}}</div>
+        </div>
+        <ion-content padding="true" overflow-scroll="true">
+            <video controls="controls" preload="metadata" autoplay="autoplay" webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px">
+                <source ng-src={{recording}} type="video/mp4" />
+            </video>
+        </ion-content>
+
+        <div class ="video_controls">
+        <input type="range" id="seekbar" class="seekbar" value="0">
+
+            <li class="skipbackward_button pres_button" href="#">
+                <i class="ion-ios-rewind"></i>
+            </li>
+            <li class="rewind_button pres_button" ng-click="alertMe()">
+                <i class="ion-ios-skipbackward"></i>
+            </li>
+            <li class="play_button pres_button" href="#">
+                <i class="ion-ios-play"></i>
+            </li>
+            <li class="forward_button pres_button" href="#">
+                <i class="ion-ios-skipforward"></i>
+            </li>
+
+
+        </div>
+
+    </div>
 </ion-view>

@@ -179,6 +179,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.video = Videos.get($stateParams.videoId)
   #$log.debug($scope.video.recording);
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+  $scope.building_name = $scope.video.building_name 
   
   $scope.trustSrc = (src) ->
     $scope.videos = $sce.getTrustedResourceUrl(src);

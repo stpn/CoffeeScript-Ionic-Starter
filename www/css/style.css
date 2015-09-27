@@ -9275,7 +9275,7 @@ a.button {
   width: 90%;
   margin-left: auto;
   margin-right: auto;
-  margin-left: 55px; }
+  margin-left: 12px !important; }
 
 .pict {
   display: inline-block;
@@ -9308,16 +9308,17 @@ a.button {
     font-size: 12px;
     font-family: "Gotham Narrow Book"; }
 
+.presentation_titles {
+  margin-left: 36px;
+  color: #DAD9D9;
+  font-family: "Gotham Light"; }
+  .presentation_titles .presentation_title {
+    font-size: 22px; }
+  .presentation_titles .presentation_subtitle {
+    font-size: 20px; }
+
 .presenation_container {
   margin-top: 53px; }
-  .presenation_container .presentation_titles {
-    margin-left: 36px;
-    color: #DAD9D9;
-    font-family: "Gotham Light"; }
-  .presenation_container .presentation_title {
-    font-size: 22px; }
-  .presenation_container .presentation_subtitle {
-    font-size: 20px; }
   .presenation_container .presentation_gal {
     margin-left: 25px;
     min-height: 743px; }
@@ -18713,6 +18714,29 @@ ion-top-menu .item {
 .image_name {
   color: #999999 !important;
   text-decoration: none; }
+
+#video_container {
+  margin-top: 55px;
+  width: 696px;
+  margin-left: auto;
+  margin-right: auto; }
+  #video_container ion-content {
+    position: relative; }
+  #video_container .video_controls input.seekbar {
+    min-width: 696px; }
+  #video_container .video_controls .pres_button {
+    width: 172px;
+    height: 75px;
+    border: solid 1px;
+    margin-left: 5px; }
+    #video_container .video_controls .pres_button i {
+      font-size: 60px;
+      margin-left: 70px;
+      margin-right: auto;
+      line-height: 75px; }
+  #video_container .video_controls li {
+    cursor: pointer;
+    float: left; }
 
 #webcams_view {
   margin-top: 47px; }
