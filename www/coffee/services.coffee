@@ -39,6 +39,14 @@ angular.module('starter.services', []).factory('Buildings', ->
           return models[i]
         i++
       null
+
+    buildingCode: (name)->    
+      if name == "M201"    
+        return "201"
+      if name == "M600"
+        return "600"
+      else
+        return name      
   }
 ).service('ActiveBuilding', ->
   name = undefined

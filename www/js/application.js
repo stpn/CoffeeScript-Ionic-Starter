@@ -171,14 +171,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return ActiveBuilding.setName(name);
   };
   $scope.buildingCode = function(name) {
-    if (name === "M201") {
-      return "201";
-    }
-    if (name === "M600") {
-      return "600";
-    } else {
-      return name;
-    }
+    return Buildings.buildingCode(name);
   };
   return $scope.toggleTopMenu = function() {
     var bld, menu, pane;
@@ -274,6 +267,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if (code === name) {
       return true;
     }
+  };
+  $scope.buildingCode = function(name) {
+    return Buildings.buildingCode(name);
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera) {
   $scope.panorama = Panoramas.get($stateParams.panoramaId);
@@ -530,6 +526,16 @@ angular.module('starter.services', []).factory('Buildings', function() {
         i++;
       }
       return null;
+    },
+    buildingCode: function(name) {
+      if (name === "M201") {
+        return "201";
+      }
+      if (name === "M600") {
+        return "600";
+      } else {
+        return name;
+      }
     }
   };
 }).service('ActiveBuilding', function() {

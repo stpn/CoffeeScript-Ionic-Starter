@@ -4,6 +4,9 @@
     position: absolute;
     margin-top: -5px;
     margin-left: 67px; }
+    #bld_tab_wrap #all_buildings span.bld_name {
+      left: 38px;
+      top: 22px; }
   #bld_tab_wrap h2 {
     margin-left: 105px;
     margin-bottom: 44px;
@@ -18,18 +21,37 @@
   #bld_tab_wrap .M200 {
     top: 0px;
     left: 10px; }
+    #bld_tab_wrap .M200 span.bld_name {
+      left: 38px;
+      top: 17px; }
   #bld_tab_wrap .M250 {
     top: 79px;
     left: -23px; }
+    #bld_tab_wrap .M250 span.bld_name {
+      left: 60px;
+      top: 20px; }
   #bld_tab_wrap .M600 {
     top: 7px;
     left: 154px; }
+    #bld_tab_wrap .M600 span.bld_name {
+      left: 8px;
+      top: 48px; }
   #bld_tab_wrap .M201 {
     top: 3px;
     left: 231px; }
+    #bld_tab_wrap .M201 span.bld_name {
+      left: 14px;
+      top: 30px; }
   #bld_tab_wrap .F200 {
     top: 5px;
     left: 322px; }
+    #bld_tab_wrap .F200 span.bld_name {
+      left: 41px;
+      top: 30px; }
+  #bld_tab_wrap span.bld_name {
+    font-family: "Gotham Book";
+    font-size: 20px;
+    position: absolute; }
 
 #comparison_wrap {
   position: absolute;
@@ -18577,7 +18599,7 @@ ion-top-menu .item {
   margin-right: auto; }
 
 #building_menu_wrap {
-  margin-top: 44px;
+  margin-top: 0px;
   width: 420px;
   height: 200px;
   margin-left: auto;

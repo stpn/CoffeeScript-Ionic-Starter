@@ -78,12 +78,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.buildingCode = (name)->    
-    if name == "M201"    
-      return "201"
-    if name == "M600"
-      return "600"
-    else
-      return name
+    Buildings.buildingCode(name)
 
 
   $scope.toggleTopMenu = ->
@@ -203,6 +198,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     if code == name
     # if name == "200 Mass"
       return true
+
+  $scope.buildingCode = (name)->    
+    Buildings.buildingCode(name)
 
   return
 
