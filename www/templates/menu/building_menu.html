@@ -1,6 +1,12 @@
 
-<div class="building_wrap" style="{{bld_style}}">
- <svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" click-svg=building.name ng-if="building_is(building.code, 'M200')" ng-class=building.code class="building" ng-style="{'transform': transformStyle, '-webkit-transform': transformStyle, '-ms-transform': transformStyle }">
+<!-- <div class="building_wrap" style="{{bld_style}}">
+ -->
+<div  ng-repeat="building in buildings"   class="building" ng-style="{'transform': transformStyle, '-webkit-transform': transformStyle, '-ms-transform': transformStyle }" ng-click="setActiveBuilding(building.name)" ng-class=building.code>
+
+<span class="bld_name">{{buildingCode(building.code)}}</span>
+
+
+ <svg version="1.0" id="bld1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="115.6px" height="56.2px" viewBox="0 0 115.6 56.2" enable-background="new 0 0 115.6 56.2" xml:space="preserve" ng-if="building_is(building.code, 'M200')">
     
     <path fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" d="M115,0.6v54.9L1,55.4L23.3,0.6H115z" />
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-1,66.1 -30.1,125 115,125 115,66.1 " />
@@ -11,15 +17,14 @@
 
 </svg>
 
-<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="146.8px" height="60.2px" viewBox="0 0 146.8 60.2" enable-background="new 0 0 146.8 60.2" xml:space="preserve" click-svg=building.name ng-if="building_is(building.code, 'M250')" ng-class=building.code class="building" ng-style="{'transform': transformStyle, '-webkit-transform': transformStyle, '-ms-transform': transformStyle }">
+<svg version="1.0" id="bld2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="146.8px" height="60.2px" viewBox="0 0 146.8 60.2" enable-background="new 0 0 146.8 60.2" xml:space="preserve" ng-if="building_is(building.code, 'M250')">
     <path fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" d="M146.1-64.9V-10l-114-0.1l22.3-54.8H146.1z
      M30.2,0.6L1,59.4l145.1,0.1V0.6H30.2z M292.7-64.9v103h44.4V21.4H424v-86.3H292.7z M211.1-64.9h-54V60.1h54V-64.9z M281.3-64.9
     h-59.7v82.9h59.7V-64.9z" />
 </svg>
 
-<!-- </div>
- -->
-<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="132.5px" height="104.3px" viewBox="0 0 132.5 104.3" enable-background="new 0 0 132.5 104.3" xml:space="preserve" click-svg=building.name ng-if="building_is(building.code, 'F200')" ng-class=building.code class="building" ng-style="{'transform': transformStyle, '-webkit-transform': transformStyle, '-ms-transform': transformStyle }">
+
+<svg version="1.0" id="bld3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="132.5px" height="104.3px" viewBox="0 0 132.5 104.3" enable-background="new 0 0 132.5 104.3" xml:space="preserve"  ng-if="building_is(building.code, 'F200')">
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-237.6,0.6 -260,55.4 -145.9,55.5 
     -145.9,0.6 " />
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-261.9,66.1 -291,125 -145.9,125 
@@ -30,7 +35,8 @@
     <rect x="-70.6" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" />
 </svg>
 
-<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="55.3px" height="126.2px" viewBox="0 0 55.3 126.2" enable-background="new 0 0 55.3 126.2" xml:space="preserve" click-svg=building.name ng-if="building_is(building.code, 'M600')" ng-class=building.code class="building" ng-style="{'transform': transformStyle, '-webkit-transform': transformStyle, '-ms-transform': transformStyle }">
+
+<svg version="1.0" id="bld4" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="55.3px" height="126.2px" viewBox="0 0 55.3 126.2" enable-background="new 0 0 55.3 126.2" xml:space="preserve"   ng-if="building_is(building.code, 'M600')">
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-102,0.6 -124.4,55.4 -10.3,55.5 
     -10.3,0.6 " />
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-126.3,66.1 -155.4,125 -10.3,125 
@@ -42,7 +48,7 @@
 </svg>
 
 
-<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="61px" height="84.2px" viewBox="0 0 61 84.2" enable-background="new 0 0 61 84.2" xml:space="preserve" click-svg=building.name ng-if="building_is(building.code, 'M201')" ng-class=building.code class="building" ng-style="{'transform': transformStyle, '-webkit-transform': transformStyle, '-ms-transform': transformStyle }">
+<svg version="1.0" id="bld5" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="61px" height="84.2px" viewBox="0 0 61 84.2" enable-background="new 0 0 61 84.2" xml:space="preserve" ng-if="building_is(building.code, 'M201')" >
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-166.4,0.6 -188.8,55.4 -74.7,55.5 
     -74.7,0.6 " />
     <polygon fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" points="-190.7,66.1 -219.8,125 -74.7,125 
@@ -53,4 +59,5 @@
     <rect x="0.6" y="0.6" fill="none" stroke="#999999" stroke-width="1.283" stroke-miterlimit="10" width="59.7" height="82.9" />
 </svg>
 </div>
+<!-- </div> -->
 

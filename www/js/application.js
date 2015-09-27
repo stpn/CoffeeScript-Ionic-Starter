@@ -89,7 +89,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/dash');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
   $scope.presentations = {
     "Presentations": Presentations.all()
   };
@@ -103,6 +103,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.activeBuilding = ActiveBuilding;
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states;
+  $scope.buildings = Buildings.all();
+  $scope.templatePath = "templates/menu/building_menu.html";
+  $scope.compTemplate = "templates/menu/comparison_menu.html";
+  $scope.bld_style = "margin-top: 5px";
+  $scope.transformStyle = "transform: scale(1.0)";
+  $scope.topMenu = TopmenuState;
   $scope.isBuildings = function() {
     return TopmenuState.getBuildings();
   };
@@ -122,13 +128,65 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.toggleTopMenu();
     }
   };
-  $scope.toggleTopMenu = function() {
+  $scope.isActive = function(name) {
+    return $scope.activeBuilding.isActive(name);
+  };
+  $scope.toggleGroup = function(group) {
+    $log.debug($scope.activeBuilding.name, "NAME");
+    if ($scope.isGroupShown(group)) {
+      $scope.shownGroup = null;
+    } else {
+      $scope.shownGroup = group;
+    }
+  };
+  $scope.isGroupShown = function(group) {
+    return $scope.shownGroup === group;
+  };
+  $scope.openPres = function(presId) {
+    window.location = '#/tab/presentations/' + presId;
+    window.location.reload();
+  };
+  $scope.cancelActiveBuilding = function($event) {
+    var bld_box;
+    bld_box = document.getElementById('building_menu_wrap');
+    bld_box = bld_box.getBoundingClientRect();
+    $log.debug($event.clientX, $event.clientY, bld_box);
+    if ($event.clientX > bld_box.left && $event.clientX < bld_box.right && $event.clientY > bld_box.top && $event.clientY < bld_box.bottom) {
+
+    } else {
+      $log.debug($event.clientX, $scope.activeBuilding.name);
+      return $scope.setActiveBuilding(void 0);
+    }
+  };
+  $scope.building_is = function(code, name) {
+    if (code === name) {
+      return true;
+    }
+  };
+  $scope.getTemplate = function(name) {
+    return Buildings.getTemplate(name);
+  };
+  $scope.setActiveBuilding = function(name) {
+    $log.debug(name);
+    return ActiveBuilding.setName(name);
+  };
+  $scope.buildingCode = function(name) {
+    if (name === "M201") {
+      return "201";
+    }
+    if (name === "M600") {
+      return "600";
+    } else {
+      return name;
+    }
+  };
+  return $scope.toggleTopMenu = function() {
     var bld, menu, pane;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
     if (menu.offsetHeight === 4) {
-      menu.style.height = '350px';
+      menu.style.height = '250px';
       pane.style.top = '450px';
     } else {
       menu.style.height = '4px';
@@ -139,25 +197,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else {
       $scope.bld_style = "margin-top: 50px";
     }
-  };
-
-  /*
-   * if given group is the selected group, deselect it
-   * else, select the given group
-   */
-  $scope.toggleGroup = function(group) {
-    if ($scope.isGroupShown(group)) {
-      $scope.shownGroup = null;
-    } else {
-      $scope.shownGroup = group;
+    if (TopmenuState.getBuildings() === false) {
+      setTimeout((function() {
+        TopmenuState.setBuildings(true);
+        return TopmenuState.setComparison(false);
+      }), 1000);
     }
-  };
-  $scope.isGroupShown = function(group) {
-    return $scope.shownGroup === group;
-  };
-  return $scope.openPres = function(presId) {
-    window.location = '#/tab/presentations/' + presId;
-    window.location.reload();
   };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.modelId);
@@ -171,8 +216,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setActiveWebcam = function(activeWebcamId) {
     $scope.activeWebcam = Webcams.get(activeWebcamId);
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
-    $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
-    return $log.debug($scope.panoramas);
+    return $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
   };
   $scope.isEnabled = function(model) {
     return model === void 0;
@@ -239,15 +283,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.getCamera = function() {
     return 1;
   };
-}).controller('TopMenuCtrl', function($scope, Buildings, ActiveBuilding, $log, $window, $location, TopmenuState) {
+}).controller('TopMenuCtrl', function($scope, $sce, Buildings, ActiveBuilding, $log, $window, $location, TopmenuState) {
   $scope.activeBuilding = ActiveBuilding;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.compTemplate = "templates/menu/comparison_menu.html";
   $scope.bld_style = "margin-top: 5px";
-  $log.debug($location.url());
   $scope.transformStyle = "transform: scale(1.0)";
   $scope.topMenu = TopmenuState;
+  $scope.cancelActiveBuilding = function() {
+    return ActiveBuilding.name = void 0;
+  };
   $scope.building_is = function(code, name) {
     if (code === name) {
       return true;
@@ -257,7 +303,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.getTemplate(name);
   };
   $scope.setActiveBuilding = function(name) {
-    return $scope.activeBuilding.name = name;
+    return $log.debug(name);
+  };
+  $scope.buildingCode = function(name) {
+    if (name === "M201") {
+      return "201";
+    }
+    if (name === "M600") {
+      return "600";
+    } else {
+      return name;
+    }
   };
   return $scope.toggleTopMenu = function() {
     var bld, menu, pane;
@@ -308,6 +364,7 @@ angular.module('starter.filters', []).filter('buildingFilter', [
         tempClients = [];
         angular.forEach(models, function(model) {
           if (angular.equals(model.building_name, activeBuilding)) {
+            console.log(activeBuilding, model.building_name);
             return tempClients.push(model);
           }
         });
@@ -319,14 +376,14 @@ angular.module('starter.filters', []).filter('buildingFilter', [
   }
 ]);
 
-angular.module('starter.directives', []).directive('clickMe', function($parse) {
-  return function(scope, element, attrs) {
-    element.bind('click', function() {
-      var type;
-      console.log('$eval type:', scope.$eval(attrs.clickMe));
-      type = $parse(attrs.clickMe)(scope);
-      console.log('$parse type:', type);
-    });
+angular.module('starter.directives', []).directive('clickMe', function() {
+  return {
+    link: function($scope, element, iAttrs, controller) {
+      console.log(element);
+      element.bind('click', function() {
+        console.log('I\'ve just been clicked!');
+      });
+    }
   };
 });
 
@@ -341,7 +398,7 @@ angular.module('starter.directives', []).directive('clickSvg', [
           var name;
           name = scope.clickSvg;
           activeBuilding.setName(name);
-          console.log(activeBuilding.getName());
+          console.log("FUCK");
         });
       }
     };
@@ -366,7 +423,6 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
       $timeout(function() {
         var bufferX, bufferY, dragReady, fixPosXmax, fixPosXmin, halt, lastMaxX, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square;
         square = $element[0];
-        console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right);
         posX = 0;
         posY = 0;
         lastPosX = 0;
@@ -432,56 +488,7 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
   };
 });
 
-angular.module('starter.services', []).factory('Chats', function() {
-  var chats;
-  chats = [
-    {
-      id: 0,
-      name: 'Ben Sparrow',
-      lastText: 'You on your way?',
-      face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-    }, {
-      id: 1,
-      name: 'Max Lynx',
-      lastText: 'Hey, it\'s me',
-      face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-    }, {
-      id: 2,
-      name: 'Adam Bradleyson',
-      lastText: 'I should buy a boat',
-      face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-    }, {
-      id: 3,
-      name: 'Perry Governor',
-      lastText: 'Look at my mukluks!',
-      face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-    }, {
-      id: 4,
-      name: 'Mike Harrington',
-      lastText: 'This is wicked good ice cream.',
-      face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-    }
-  ];
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < chats.length) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-        i++;
-      }
-      return null;
-    }
-  };
-}).factory('Buildings', function() {
+angular.module('starter.services', []).factory('Buildings', function() {
   var models;
   models = [
     {
@@ -490,19 +497,19 @@ angular.module('starter.services', []).factory('Chats', function() {
       code: "M200"
     }, {
       id: 2,
-      name: "Mass 300",
+      name: "Mass 250",
       code: "M250"
     }, {
       id: 3,
-      name: "Mass 200",
+      name: "Mass 600",
       code: "M600"
     }, {
       id: 4,
-      name: "Mass 300",
+      name: "Mass 201",
       code: "M201"
     }, {
       id: 5,
-      name: "Mass 200",
+      name: "Fass 200",
       code: "F200"
     }
   ];
@@ -527,13 +534,20 @@ angular.module('starter.services', []).factory('Chats', function() {
   };
 }).service('ActiveBuilding', function() {
   var name;
-  name = "Mass 300";
+  name = void 0;
   return {
     setName: function(new_name) {
       return name = new_name;
     },
     getName: function(new_name) {
       return name;
+    },
+    isActive: function(q_name) {
+      if (angular.equals(name, q_name) || name === void 0) {
+        return true;
+      } else {
+        return false;
+      }
     }
   };
 }).factory('Presentations', function() {
@@ -549,8 +563,8 @@ angular.module('starter.services', []).factory('Chats', function() {
       id: 2,
       name: "Pres2",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 300',
-      project_name: "Mass 300"
+      building_name: 'Mass 250',
+      project_name: "Mass 250"
     }
   ];
   return {
@@ -765,7 +779,7 @@ angular.module('starter.services', []).factory('Chats', function() {
   };
 }).service('ActiveCamera', function() {
   var name;
-  name = "Mass 300";
+  name = void 0;
   return {
     setName: function(new_name) {
       return name = new_name;

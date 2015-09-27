@@ -18480,6 +18480,12 @@ a.button {
 .tabs {
   top: 0px !important; }
 
+.item.item-stable {
+  color: #999 !important; }
+
+.item .icon {
+  color: white; }
+
 #header a span {
   color: white;
   font-family: "Gotham Book";
@@ -18496,7 +18502,7 @@ a.button {
 #header a.webcam_tab.tab-item-active::after {
   content: '';
   position: absolute;
-  left: 654px;
+  left: 655px;
   top: 23px;
   display: inline-block;
   height: 10px;
@@ -18570,31 +18576,50 @@ ion-top-menu .item {
   margin-left: auto;
   margin-right: auto; }
 
-#building_menu_wrap .building_wrap {
+#building_menu_wrap {
+  margin-top: 44px;
   width: 420px;
-  transition: all 0.5s !important; }
-
-#building_menu_wrap .building {
-  position: absolute; }
-
-#building_menu_wrap .M200 {
-  top: 0px;
-  left: 31px; }
-
-#building_menu_wrap .M250 {
-  top: 66px; }
-
-#building_menu_wrap .M600 {
-  top: 0px;
-  left: 156px; }
-
-#building_menu_wrap .M201 {
-  top: 0px;
-  left: 219px; }
-
-#building_menu_wrap .F200 {
-  top: 0px;
-  left: 288px; }
+  height: 200px;
+  margin-left: auto;
+  margin-right: auto; }
+  #building_menu_wrap .building_wrap {
+    transition: all 0.5s !important; }
+  #building_menu_wrap .building {
+    position: absolute;
+    cursor: pointer; }
+  #building_menu_wrap .M200 {
+    top: 0px;
+    left: 31px; }
+    #building_menu_wrap .M200 span.bld_name {
+      left: 38px;
+      top: 17px; }
+  #building_menu_wrap .M250 {
+    top: 66px; }
+    #building_menu_wrap .M250 span.bld_name {
+      left: 60px;
+      top: 20px; }
+  #building_menu_wrap .M600 {
+    top: 0px;
+    left: 156px; }
+    #building_menu_wrap .M600 span.bld_name {
+      left: 8px;
+      top: 48px; }
+  #building_menu_wrap .M201 {
+    top: 0px;
+    left: 219px; }
+    #building_menu_wrap .M201 span.bld_name {
+      left: 14px;
+      top: 30px; }
+  #building_menu_wrap .F200 {
+    top: 0px;
+    left: 288px; }
+    #building_menu_wrap .F200 span.bld_name {
+      left: 41px;
+      top: 30px; }
+  #building_menu_wrap span.bld_name {
+    font-family: "Gotham Book";
+    font-size: 20px;
+    position: absolute; }
 
 .empty {
   background-color: transparent; }

@@ -31,6 +31,8 @@ $corner-bevel: 30;
 
 $positive: white !default;
 
+
+
 @mixin corner-bottom-both-bevel($kolor) {
     border-color: $kolor transparent transparent transparent;
     border-width: #{$corner-bevel}px #{$corner-bevel}px 0 #{$corner-bevel}px;
