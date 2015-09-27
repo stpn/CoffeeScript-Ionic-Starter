@@ -69,14 +69,14 @@ angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
       id: 1
-      name: "Pres1"
+      name: "Overview Presentation"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
       project_name: "Mass 200"
     },
     {
       id: 2
-      name: "Pres2"
+      name: "Sustainability Presentation"
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
       building_name: 'Mass 250'
       project_name: "Mass 250"      

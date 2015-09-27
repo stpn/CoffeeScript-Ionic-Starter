@@ -1,6 +1,7 @@
 angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) -> 
-  $scope.presentations = {"Presentations": Presentations.all()}
-  $scope.factories = {"Videos" : Videos.all(),  "Floor Plans" : Floorplans.all(), "Rendering":Renderings.all(), "Views" : Views.all(),  "Webcams" : Webcams.all(),}
+  $scope.presentations = {}
+#  $scope.factories = [{"Presentations": Presentations.all()}, {"Videos" : Videos.all()},  {"Floor Plans" : Floorplans.all()}, {"Rendering":Renderings.all()}, {"Views" : Views.all()},  {"Webcams" : Webcams.all()}]
+  $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()],  ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()],  ["Webcams", Webcams.all()]]
   $scope.activeBuilding = ActiveBuilding
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states
@@ -127,8 +128,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   # $scope.panoramas = undefined
   # $scope.timelapses = undefined
 
+  $scope.isActive = (item) ->
+    $scope.selected == item
 
-  $scope.setActiveWebcam = (activeWebcamId) ->    
+
+  $scope.setActiveWebcam = (activeWebcamId) ->   
+    $scope.selected = activeWebcamId
     $scope.activeWebcam = Webcams.get(activeWebcamId)
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId)
     $scope.timelapses = Webcams.getTimelapses(activeWebcamId)

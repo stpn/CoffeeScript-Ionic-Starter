@@ -61,6 +61,9 @@
     min-height: 300px;
 }
 
+.col{
+    padding: 0px !important;
+}
 .cust_col {
     -webkit-box-flex: 0;
     -webkit-flex: 0 0 165px;
@@ -72,17 +75,22 @@
     //    max-height: 100px;
     margin-top: 5px;
     img {
-        max-height: 75px;
+        max-height: 92px;
     }
     a {
         text-decoration: none;
         background: none !important;
         img {
-            max-height: 75px;
-            max-width: 165px;
+            min-height: 92px;
+            min-width: 165px;
         }
     }
     background: none !important;
     border: none !important;
+
+    .image_name{
+        font-size: 12px;
+        font-family: "Gotham Narrow Book";
+    }
 }
 

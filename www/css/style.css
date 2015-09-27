@@ -105,6 +105,15 @@ $dark:                            #444 !default;
   font-style: normal;
   font-weight: 400; }
 
+@font-face {
+  font-family: 'Gotham Narrow Book';
+  src: url("../fonts/GothamNarrow-Book.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/GothamNarrow-Book.eot?#iefix") format("embedded-opentype"), url("../fonts/GothamNarrow-Book.woff") format("woff"), url("../fonts/GothamNarrow-Book.ttf") format("truetype"), url("../fonts/GothamNarrow-Book.svg#10b925c554673ed1307f253dfbf21ea0") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 400; }
+
 /*!
   Ionicons, v2.0.1
   Created by Ben Sperry for the Ionic Framework, http://ionicons.com/
@@ -9264,6 +9273,9 @@ a.button {
   min-width: 300px;
   min-height: 300px; }
 
+.col {
+  padding: 0px !important; }
+
 .cust_col {
   -webkit-box-flex: 0;
   -webkit-flex: 0 0 165px;
@@ -9276,13 +9288,16 @@ a.button {
   background: none !important;
   border: none !important; }
   .cust_col img {
-    max-height: 75px; }
+    max-height: 92px; }
   .cust_col a {
     text-decoration: none;
     background: none !important; }
     .cust_col a img {
-      max-height: 75px;
-      max-width: 165px; }
+      min-height: 92px;
+      min-width: 165px; }
+  .cust_col .image_name {
+    font-size: 12px;
+    font-family: "Gotham Narrow Book"; }
 
 .presenation_container h1,
 .presenation_container h2 {
@@ -9347,6 +9362,15 @@ $dark:                            #444 !default;
   src: url("../fonts/gotham-book.eot");
   /* IE9 Compat Modes */
   src: url("../fonts/gotham-book.eot?#iefix") format("embedded-opentype"), url("../fonts/gotham-book.woff") format("woff"), url("../fonts/gotham-book.ttf") format("truetype"), url("../fonts/gotham-book.svg#65526539dec42e535893223c14767f58") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 400; }
+
+@font-face {
+  font-family: 'Gotham Narrow Book';
+  src: url("../fonts/GothamNarrow-Book.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/GothamNarrow-Book.eot?#iefix") format("embedded-opentype"), url("../fonts/GothamNarrow-Book.woff") format("woff"), url("../fonts/GothamNarrow-Book.ttf") format("truetype"), url("../fonts/GothamNarrow-Book.svg#10b925c554673ed1307f253dfbf21ea0") format("svg");
   /* Legacy iOS */
   font-style: normal;
   font-weight: 400; }
@@ -18653,10 +18677,70 @@ ion-top-menu .item {
   color: #999999 !important;
   text-decoration: none; }
 
+#webcams_view {
+  margin-top: 47px; }
+
+.webcam_title {
+  margin-top: 34px;
+  width: 324px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative; }
+  .webcam_title span {
+    margin-left: 18px;
+    font-family: "Gotham Book";
+    font-size: 22px; }
+
+.camera_buttons {
+  margin-top: 17px;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto; }
+  .camera_buttons .item {
+    border-color: #4D4D4E;
+    background: black;
+    min-width: 500px; }
+  .camera_buttons .short_btn {
+    min-width: 245px !important;
+    float: left;
+    margin-bottom: 10px; }
+  .camera_buttons .camera1,
+  .camera_buttons .camera3 {
+    margin-right: 5px; }
+  .camera_buttons .camera2,
+  .camera_buttons .live {
+    margin-left: 5px; }
+  .camera_buttons .panorama {
+    max-width: 500px; }
+
 #webcam_content {
   width: 696px;
   margin-left: auto;
   margin-right: auto; }
+
+#webcam_assets {
+  margin-left: auto;
+  margin-right: auto; }
+  #webcam_assets .item {
+    width: 501px !important; }
+  #webcam_assets .scroll {
+    margin-top: 10px;
+    max-width: 500px !important;
+    margin-left: auto;
+    margin-right: auto; }
+  #webcam_assets ion-item.item-stable.item {
+    border-color: #4D4D4E;
+    background-color: black;
+    margin-bottom: 10px; }
+  #webcam_assets ion-item.item-stable.item.active {
+    border-color: #4D4D4E;
+    background-color: #4D4D4E !important;
+    margin-bottom: 10px; }
+  #webcam_assets .accordion_container {
+    background-color: #333 !important; }
+  #webcam_assets .image_name {
+    font-family: "Gotham Narrow Book";
+    font-size: 12.5px; }
 
 #panorama_title {
   margin-top: 88px; }

@@ -1,9 +1,94 @@
 // @import "www/sass/custom_variables.scss";
+#webcams_view {
+    margin-top: 47px;
+}
+
+.webcam_title {
+    margin-top: 34px;
+    width: 324px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    span {
+        margin-left: 18px;
+        font-family: "Gotham Book";
+        font-size: 22px;
+    }
+}
+
+.camera_buttons {
+    margin-top: 17px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    .item {
+                border-color: #4D4D4E;
+
+        background: black;
+        min-width: 500px;
+    }
+    .short_btn {
+        min-width: 245px !important;
+        //margin-right: 5px;
+        float: left;
+        //margin-top: 5px;
+        margin-bottom: 10px;
+    }
+    .camera1,
+    .camera3 {
+        margin-right: 5px;
+    }
+    .camera2,
+    .live {
+        margin-left: 5px;
+    }
+    .panorama{
+        max-width: 500px;
+    }
+}
 
 #webcam_content {
     width: 696px;
     margin-left: auto;
     margin-right: auto;
+}
+
+#webcam_assets {
+    
+    margin-left: auto;
+    margin-right: auto;
+    .item{
+        width: 501px !important;
+    }
+    .scroll {
+        margin-top: 10px;
+        max-width: 500px !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    ion-item.item-stable.item{
+        border-color: #4D4D4E;
+        background-color: black;    
+        margin-bottom: 10px;
+
+    }
+
+    ion-item.item-stable.item.active{
+        border-color: #4D4D4E;
+        background-color: #4D4D4E !important;    
+        margin-bottom: 10px;
+
+    }
+    .accordion_container{
+
+                background-color: #333 !important;    
+
+    }
+    .image_name{
+        font-family: "Gotham Narrow Book";
+        font-size: 12.5px;
+    }
+
 }
 
 #panorama_title {
@@ -28,4 +113,3 @@
     background: rgba(255, 255, 255, 0.01);
     z-index: 99999999;
 }
-

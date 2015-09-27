@@ -90,16 +90,8 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
 });
 
 angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
-  $scope.presentations = {
-    "Presentations": Presentations.all()
-  };
-  $scope.factories = {
-    "Videos": Videos.all(),
-    "Floor Plans": Floorplans.all(),
-    "Rendering": Renderings.all(),
-    "Views": Views.all(),
-    "Webcams": Webcams.all()
-  };
+  $scope.presentations = {};
+  $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()], ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()], ["Webcams", Webcams.all()]];
   $scope.activeBuilding = ActiveBuilding;
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states;
@@ -206,7 +198,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
 }).controller('WebcamsCtrl', function($scope, $log, $stateParams, Webcams) {
   $scope.webcams = Webcams.all();
   $scope.activeWebcam = void 0;
+  $scope.isActive = function(item) {
+    return $scope.selected === item;
+  };
   $scope.setActiveWebcam = function(activeWebcamId) {
+    $scope.selected = activeWebcamId;
     $scope.activeWebcam = Webcams.get(activeWebcamId);
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
     return $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
@@ -561,13 +557,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
   models = [
     {
       id: 1,
-      name: "Pres1",
+      name: "Overview Presentation",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
       building_name: 'Mass 200',
       project_name: "Mass 200"
     }, {
       id: 2,
-      name: "Pres2",
+      name: "Sustainability Presentation",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
       building_name: 'Mass 250',
       project_name: "Mass 250"
