@@ -1,13 +1,13 @@
-@import "www/sass/style.scss";
 #bld_tab_wrap {
-
-
     margin-top: 303px;
-
     #all_buildings {
         position: absolute;
         margin-top: -5px;
         margin-left: 67px;
+                span.bld_name {
+            left: 38px;
+            top: 22px;
+        }
     }
     h2 {
         margin-left: 105px;
@@ -29,31 +29,70 @@
     .M200 {
         top: 0px;
         left: 10px;
+        span.bld_name {
+            left: 38px;
+            top: 17px;
+        }
     }
     .M250 {
         top: 79px;
         left: -23px;
+        span.bld_name {
+            left: 60px;
+            top: 20px;
+        }
     }
     .M600 {
         top: 7px;
         left: 154px;
+        span.bld_name {
+            left: 8px;
+            top: 48px;
+        }
     }
     .M201 {
         top: 3px;
         left: 231px;
+        span.bld_name {
+            left: 14px;
+            top: 30px;
+        }
     }
     .F200 {
         top: 5px;
         left: 322px;
+        span.bld_name {
+            left: 41px;
+            top: 30px;
+        }
+    }
+    span.bld_name {
+        font-family: "Gotham Book";
+        font-size: 20px;
+        position: absolute;
     }
 }
 
 #comparison_wrap {
     //transition: .5s linear all !important;
+    position: absolute;
     width: 642px;
     margin-top: 85px;
-    margin-left: auto;
-    margin-right: auto;
+    //margin-left: 67px;
+    left: 50%;
+    margin-left: -321px;
+    // #comp_left, #comp_mid, #comp_right{
+    //     position: absolute;
+    // }
+    // #comp_left{
+    //     left: 100px;
+    // }
+    // #comp_mid{
+    //     left: 300px;
+    // }
+    // #comp_right{
+    //     left: 100px;
+    // }
     #comp_left,
     #comp_mid {
         float: left;
@@ -69,7 +108,19 @@
         float: right
     }
 }
-#building_menu_wrap.ng-hide-add, #building_menu_wrap.ng-hide-remove, #comparison_wrap.ng-hide-add, #comparison_wrap.ng-hide-remove{
-      transition: .5s linear all !important;
-      -webkit-transition:.5s linear all !important;
+
+// #building_menu_wrap.ng-hide-add,
+// #building_menu_wrap.ng-hide-remove,
+#comparison_wrap.ng-hide-add,
+#comparison_wrap.ng-hide-remove {
+    -webkit-transition: 0.5s linear all;
+    transition: 0.5s linear all;
+    /* remember to add this */
+    display: block!important;
+    opacity: 1;
+}
+
+// #building_menu_wrap.ng-hide,
+#comparison_wrap.ng-hide-add {
+    opacity: 0;
 }

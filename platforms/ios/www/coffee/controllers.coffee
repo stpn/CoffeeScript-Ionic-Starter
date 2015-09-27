@@ -1,9 +1,18 @@
-angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState) -> 
-  $scope.presentations = {"Presentations": Presentations.all()}
-  $scope.factories = {"Videos" : Videos.all(),  "Floor Plans" : Floorplans.all(), "Rendering":Renderings.all(), "Views" : Views.all(),  "Webcams" : Webcams.all(),}
+angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) -> 
+  $scope.presentations = {}
+#  $scope.factories = [{"Presentations": Presentations.all()}, {"Videos" : Videos.all()},  {"Floor Plans" : Floorplans.all()}, {"Rendering":Renderings.all()}, {"Views" : Views.all()},  {"Webcams" : Webcams.all()}]
+  $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()],  ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()],  ["Webcams", Webcams.all()]]
   $scope.activeBuilding = ActiveBuilding
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states
+
+
+  $scope.buildings = Buildings.all()
+  $scope.templatePath = "templates/menu/building_menu.html"
+  $scope.compTemplate = "templates/menu/comparison_menu.html"
+  $scope.bld_style="margin-top: 5px"
+  $scope.transformStyle = "transform: scale(1.0)"
+  $scope.topMenu = TopmenuState  
 
   $scope.isBuildings = () ->
     TopmenuState.getBuildings()
@@ -19,34 +28,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     TopmenuState.setComparison(true)
     menu = document.getElementById('ionTopMenu')
     if menu.offsetHeight == 4 || proceed == true
-      $scope.toggleTopMenu()
-    
-  $scope.toggleTopMenu = ->
-    bld = document.getElementById('building_wrap')
-    menu = document.getElementById('ionTopMenu')
-    pane = document.getElementsByTagName('ion-content')[0]
-    # for pane in panes
-     
-    if menu.offsetHeight == 4 
-      menu.style.height = '350px' 
-      pane.style.top = '450px'
-    else 
-      menu.style.height =  '4px' 
-      pane.style.top = '120px'
+      $scope.toggleTopMenu()   
 
-    if menu.style.height == "4px"
-      $scope.bld_style = "margin-top: -200px"
-    else
-      $scope.bld_style = "margin-top: 50px"
-
-    return     
-
-  ###
-  # if given group is the selected group, deselect it
-  # else, select the given group
-  ###
+  $scope.isActive =(name) ->
+    $scope.activeBuilding.isActive(name)
 
   $scope.toggleGroup = (group) ->
+    $log.debug($scope.activeBuilding.name, "NAME")
+    #$log.debug("GROUP: ",$scope.activeBuilding.getName())
     if $scope.isGroupShown(group)
       $scope.shownGroup = null
     else
@@ -61,9 +50,70 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     window.location.reload()
     return
 
+  $scope.cancelActiveBuilding = ($event) ->
+    
+    bld_box = document.getElementById('building_menu_wrap')
+    bld_box = bld_box.getBoundingClientRect()
+    $log.debug($event.clientX,$event.clientY, bld_box)
+    #if $event.target.nodeName != "SVG" # != document.getElementById('bld1') && $event.target != document.getElementById('bld2') && $event.target != document.getElementById('bld3') && $event.target != document.getElementById('bld4') && $event.target != document.getElementById('bld5') 
+    if $event.clientX > bld_box.left && $event.clientX < bld_box.right && $event.clientY > bld_box.top && $event.clientY < bld_box.bottom
+      return 
+    else 
+      $log.debug($event.clientX, $scope.activeBuilding.name)
+      $scope.setActiveBuilding(undefined)
+
+    # $scope.activeBuilding.name = undefined
+    # $log.debug($scope.activeBuilding)
+    
+  $scope.building_is = (code, name) ->
+    if code == name
+    # if name == "200 Mass"
+      return true
+
+  $scope.getTemplate = (name) ->
+    Buildings.getTemplate(name)
+
+  $scope.setActiveBuilding = (name)->
+    $log.debug(name)
+    ActiveBuilding.setName(name)
+
+
+  $scope.buildingCode = (name)->    
+    Buildings.buildingCode(name)
+
+
+  $scope.toggleTopMenu = ->
+    bld = document.getElementById('building_wrap')
+    menu = document.getElementById('ionTopMenu')
+    pane = document.getElementsByTagName('ion-content')[0]
+    # for pane in panes
+     
+    if menu.offsetHeight == 4 
+      menu.style.height = '250px' 
+      pane.style.top = '450px'
+    else 
+      menu.style.height =  '4px' 
+      pane.style.top = '120px'
+
+    if menu.style.height == "4px"
+      $scope.bld_style = "margin-top: -200px"
+    else
+      $scope.bld_style = "margin-top: 50px"
+    if TopmenuState.getBuildings() == false
+      setTimeout (->
+        TopmenuState.setBuildings(true)
+        TopmenuState.setComparison(false)
+      ), 1000      
+
+    return 
+
 
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.modelId)
+  return
+
+).controller('titleCtrl', ($scope, $stateParams) ->
+  $scope.titleTemplate = "templates/menu/title.html"
   return
 
 
@@ -78,12 +128,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   # $scope.panoramas = undefined
   # $scope.timelapses = undefined
 
+  $scope.isActive = (item) ->
+    $scope.selected == item
 
-  $scope.setActiveWebcam = (activeWebcamId) ->    
+
+  $scope.setActiveWebcam = (activeWebcamId) ->   
+    $scope.selected = activeWebcamId
     $scope.activeWebcam = Webcams.get(activeWebcamId)
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId)
     $scope.timelapses = Webcams.getTimelapses(activeWebcamId)
-    $log.debug($scope.panoramas)
+    #$log.debug($scope.panoramas)
 
   $scope.isEnabled = (model) ->
     model == undefined
@@ -150,6 +204,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     # if name == "200 Mass"
       return true
 
+  $scope.buildingCode = (name)->    
+    Buildings.buildingCode(name)
+
   return
 
 
@@ -165,17 +222,18 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
   return
 
-).controller('TopMenuCtrl', ($scope,  Buildings,ActiveBuilding, $log, $window, $location, TopmenuState) ->
+).controller('TopMenuCtrl', ($scope, $sce, Buildings,ActiveBuilding, $log, $window, $location, TopmenuState) ->
   $scope.activeBuilding = ActiveBuilding
   $scope.buildings = Buildings.all()
   $scope.templatePath = "templates/menu/building_menu.html"
   $scope.compTemplate = "templates/menu/comparison_menu.html"
   $scope.bld_style="margin-top: 5px"
-  $log.debug($location.url())
   $scope.transformStyle = "transform: scale(1.0)"
   $scope.topMenu = TopmenuState
 
-
+  $scope.cancelActiveBuilding = () ->
+    ActiveBuilding.name = undefined
+    
   $scope.building_is = (code, name) ->
     if code == name
     # if name == "200 Mass"
@@ -185,7 +243,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     Buildings.getTemplate(name)
 
   $scope.setActiveBuilding = (name)->
-    $scope.activeBuilding.name = name
+    $log.debug(name)
+    #ActiveBuilding.name = name
+
+  $scope.buildingCode = (name)->    
+    if name == "M201"    
+      return "201"
+    if name == "M600"
+      return "600"
+    else
+      return name
+
 
   $scope.toggleTopMenu = ->
     bld = document.getElementById('building_wrap')
@@ -205,8 +273,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     else
       $scope.bld_style = "margin-top: 50px"
     if TopmenuState.getBuildings() == false
-      TopmenuState.setBuildings(true)
-      TopmenuState.setComparison(false)
+      setTimeout (->
+        TopmenuState.setBuildings(true)
+        TopmenuState.setComparison(false)
+      ), 1000      
 
     return 
 

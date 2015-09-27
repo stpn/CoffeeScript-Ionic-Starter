@@ -1,55 +1,4 @@
-angular.module('starter.services', []).factory('Chats', ->
-  # Might use a resource here that returns a JSON array
-  # Some fake testing data
-  
-  chats = [
-    {
-      id: 0
-      name: 'Ben Sparrow'
-      lastText: 'You on your way?'
-      face: 'https://pbs.twimg.com/profile_images/514549811765211136/9SgAuHeY.png'
-    }
-    {
-      id: 1
-      name: 'Max Lynx'
-      lastText: 'Hey, it\'s me'
-      face: 'https://avatars3.githubusercontent.com/u/11214?v=3&s=460'
-    }
-    {
-      id: 2
-      name: 'Adam Bradleyson'
-      lastText: 'I should buy a boat'
-      face: 'https://pbs.twimg.com/profile_images/479090794058379264/84TKj_qa.jpeg'
-    }
-    {
-      id: 3
-      name: 'Perry Governor'
-      lastText: 'Look at my mukluks!'
-      face: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-    }
-    {
-      id: 4
-      name: 'Mike Harrington'
-      lastText: 'This is wicked good ice cream.'
-      face: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-    }
-  ]
-  {
-    all: ->
-      chats
-    remove: (chat) ->
-      chats.splice chats.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < chats.length
-        if chats[i].id == parseInt(chatId)
-          return chats[i]
-        i++
-      null
-
-  }
-).factory('Buildings', ->
+angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
       id: 1
@@ -58,22 +7,22 @@ angular.module('starter.services', []).factory('Chats', ->
     },
     {
       id: 2
-      name: "Mass 300"
+      name: "Mass 250"
       code: "M250"
     },
     {
       id: 3
-      name: "Mass 200"
+      name: "Mass 600"
       code: "M600"
     },
     {
       id: 4
-      name: "Mass 300"
+      name: "Mass 201"
       code: "M201"
     },
     {
       id: 5
-      name: "Mass 200"
+      name: "Fass 200"
       code: "F200"
     }
   ]
@@ -90,9 +39,17 @@ angular.module('starter.services', []).factory('Chats', ->
           return models[i]
         i++
       null
+
+    buildingCode: (name)->    
+      if name == "M201"    
+        return "201"
+      if name == "M600"
+        return "600"
+      else
+        return name      
   }
 ).service('ActiveBuilding', ->
-  name = "Mass 300"
+  name = undefined
 
   {
     setName: (new_name) ->
@@ -100,23 +57,29 @@ angular.module('starter.services', []).factory('Chats', ->
 
     getName: (new_name) ->
       name
+
+    isActive: (q_name) ->
+      if angular.equals(name,q_name) || name == undefined
+        return true
+      else 
+        return false
   }
 
 ).factory('Presentations', ->
   models = [
     {
       id: 1
-      name: "Pres1"
+      name: "Overview Presentation"
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
       building_name: 'Mass 200'
       project_name: "Mass 200"
     },
     {
       id: 2
-      name: "Pres2"
+      name: "Sustainability Presentation"
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 300'
-      project_name: "Mass 300"      
+      building_name: 'Mass 250'
+      project_name: "Mass 250"      
     }    
   ]
   {
@@ -300,7 +263,7 @@ angular.module('starter.services', []).factory('Chats', ->
   }
 
 ).service('ActiveCamera', ->
-  name = "Mass 300"
+  name = undefined
 
   {
     setName: (new_name) ->

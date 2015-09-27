@@ -5,25 +5,24 @@ Number::map = (in_min, in_max, out_min, out_max) ->
 angular.module('starter.filters', []).filter 'buildingFilter', [ ->
   (models, activeBuilding) ->
     if !angular.isUndefined(models) and !angular.isUndefined(activeBuilding) and activeBuilding.length > 0
-
       tempClients = []
       angular.forEach models, (model) ->
         if angular.equals(model.building_name, activeBuilding)
+          console.log(activeBuilding, model.building_name)
           tempClients.push model
       tempClients
     else
       models
  ]
-angular.module('starter.directives',[]).directive 'clickMe', ($parse) ->
+angular.module('starter.directives',[]).directive 'clickMe', ->
   # Runs during compile
-  (scope, element, attrs) ->  
-#  { link: ($scope, element, iAttrs, controller) ->
+  { link: ($scope, element, iAttrs, controller) ->
+    console.log element
     element.bind 'click', ->
-      console.log '$eval type:', scope.$eval(attrs.clickMe)
-      type = $parse(attrs.clickMe)(scope)
-      console.log '$parse type:', type
+      console.log 'I\'ve just been clicked!'
       return
     return
+ }
 
 angular.module('starter.directives',[]).directive 'clickSvg', [
   'ActiveBuilding'
@@ -34,7 +33,7 @@ angular.module('starter.directives',[]).directive 'clickSvg', [
       element.bind 'click', ->
         name = scope.clickSvg
         activeBuilding.setName(name)
-        console.log activeBuilding.getName()        
+        console.log "FUCK"
         # console.log '$eval type:', scope.clickSvg
         return
     }
@@ -55,7 +54,7 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
     link: ($scope, $element, attrs) ->
       $timeout ->        
         square = $element[0]
-        console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right)
+        #console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right)
         posX = 0
         posY = 0
         lastPosX = 0
