@@ -110,7 +110,15 @@ angular.module('starter.services', []).factory('Buildings', ->
         {
           id: 3
           image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-        }                
+        },
+        {
+          id: 4
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        },
+        {
+          id: 5
+          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+        }  
       ]
 
   }

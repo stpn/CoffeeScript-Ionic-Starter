@@ -2,11 +2,13 @@
 .tabs {
     top: 0px !important;
 }
-.item.item-stable{
+
+.item.item-stable {
     color: #999 !important;
 }
-.item{
-    .icon{
+
+.item {
+    .icon {
         color: white;
     }
 }
@@ -68,6 +70,12 @@
     }
 }
 
+ion-nav-view {
+    ion-nav-view {
+        margin-top: 47px !important;
+    }
+}
+
 // SUBHEADER:
 ion-top-menu {
     position: absolute;
@@ -76,12 +84,9 @@ ion-top-menu {
     background: #333;
     color: white;
     z-index: 10;
-    top: 45px !important;
+    //top: 45px !important;
     transition: all .5s;
-
 }
-
-
 
 ion-content#main_menu {
     top: 120px;
@@ -123,7 +128,6 @@ ion-top-menu .item {
     height: 200px;
     margin-left: auto;
     margin-right: auto;
-
     .building_wrap {
         //width: 420px;
         transition: all .5s !important;

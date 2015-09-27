@@ -63,6 +63,19 @@ $positive: white !default;
   font-weight:  400;
 }
 
+@font-face {
+  font-family: 'Gotham Light';
+  src: url('../fonts/gotham-light.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/gotham-light.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/gotham-light.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/gotham-light.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/gotham-light.svg#0fdc6c734a7ca54436fb28af9ab2f202') format('svg'); /* Legacy iOS */
+       
+  font-style:   normal;
+  font-weight:  200;
+}
+
+
 
 
 // Include all of Ionic.

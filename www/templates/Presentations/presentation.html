@@ -4,15 +4,17 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="{{presentation.name}}">
+<ion-view view-title="{{presentation.name}}" id='presentation_view'>
     <ion-content>
         <ion-list>
             <div class="presenation_container">
                 <a class="close_button" href="#/dash/">
                     <i class="ion-close"></i>
                 </a>
-                <h1 id="presentation_title">{{project_name}}</h1>
-                <h2 id="presentation_subtitle">{{presentation_name}}</h2>
+                <div class = "presentation_titles">
+                <div id="presentation_title">{{project_name | uppercase}}</div>
+                <div id="presentation_subtitle">{{presentation_name}}</div>
+                </div>
                 <div class="row responsive-md gallery presentation_gal" ng-repeat="slide in slides" ng-if="$index % 5 === 0">
                     <ion-item class="col col_slide" ng-if="$index < slides.length" ng-click="postSlide(slides[$index].id)">
                         <img ng-src="{{slides[$index].image}}" width="100%" height="100%" />

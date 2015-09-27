@@ -1,5 +1,5 @@
 #bld_tab_wrap {
-  margin-top: 303px; }
+  margin-top: 262px; }
   #bld_tab_wrap #all_buildings {
     position: absolute;
     margin-top: -5px;
@@ -113,6 +113,15 @@ $dark:                            #444 !default;
   /* Legacy iOS */
   font-style: normal;
   font-weight: 400; }
+
+@font-face {
+  font-family: 'Gotham Light';
+  src: url("../fonts/gotham-light.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/gotham-light.eot?#iefix") format("embedded-opentype"), url("../fonts/gotham-light.woff") format("woff"), url("../fonts/gotham-light.ttf") format("truetype"), url("../fonts/gotham-light.svg#0fdc6c734a7ca54436fb28af9ab2f202") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 200; }
 
 /*!
   Ionicons, v2.0.1
@@ -9299,31 +9308,37 @@ a.button {
     font-size: 12px;
     font-family: "Gotham Narrow Book"; }
 
-.presenation_container h1,
-.presenation_container h2 {
-  margin-left: 55px; }
-
-.presenation_container .presentation_gal {
-  margin-left: 48px; }
-
-.col_slide {
-  -webkit-box-flex: 0;
-  -webkit-flex: 0 0 215px;
-  -moz-box-flex: 0;
-  -moz-flex: 0 0 215px;
-  -ms-flex: 0 0 215px;
-  flex: 0 0 215px;
-  max-width: 215px;
-  max-height: 115px;
-  margin-top: 5px;
-  border: none; }
-  .col_slide img {
-    max-height: 115px; }
+.presenation_container {
+  margin-top: 53px; }
+  .presenation_container .presentation_titles {
+    margin-left: 55px;
+    color: #DAD9D9;
+    font-family: "Gotham Light"; }
+  .presenation_container .presentation_title {
+    font-size: 22px; }
+  .presenation_container .presentation_subtitle {
+    font-size: 20px; }
+  .presenation_container .presentation_gal {
+    margin-left: 43px;
+    min-height: 743px; }
+    .presenation_container .presentation_gal .col_slide {
+      -webkit-box-flex: 0;
+      -webkit-flex: 0 0 215px;
+      -moz-box-flex: 0;
+      -moz-flex: 0 0 215px;
+      -ms-flex: 0 0 215px;
+      flex: 0 0 215px;
+      max-width: 215px;
+      max-height: 115px;
+      border: none;
+      margin: 5px; }
+      .presenation_container .presentation_gal .col_slide img {
+        max-height: 115px; }
 
 #presentation_controls {
   background: black;
   margin-left: 55px;
-  margin-top: 100px;
+  margin-top: 200px;
   width: 768px; }
   #presentation_controls .counter {
     font-size: 60px;
@@ -9331,16 +9346,22 @@ a.button {
   #presentation_controls .pres_button {
     width: 200px;
     height: 89px;
-    border: 1px white; }
+    border: solid 1px; }
     #presentation_controls .pres_button i {
-      font-size: 60px; }
+      font-size: 60px;
+      margin-left: 80px;
+      margin-right: auto;
+      line-height: 80px; }
   #presentation_controls li {
     cursor: pointer;
     float: left; }
 
 .close_button {
   float: right;
+  font-size: 25px;
   margin-right: 100px; }
+  .close_button .ion-close::before {
+    color: #808080; }
 
 @charset "UTF-8";
 /*
@@ -9374,6 +9395,15 @@ $dark:                            #444 !default;
   /* Legacy iOS */
   font-style: normal;
   font-weight: 400; }
+
+@font-face {
+  font-family: 'Gotham Light';
+  src: url("../fonts/gotham-light.eot");
+  /* IE9 Compat Modes */
+  src: url("../fonts/gotham-light.eot?#iefix") format("embedded-opentype"), url("../fonts/gotham-light.woff") format("woff"), url("../fonts/gotham-light.ttf") format("truetype"), url("../fonts/gotham-light.svg#0fdc6c734a7ca54436fb28af9ab2f202") format("svg");
+  /* Legacy iOS */
+  font-style: normal;
+  font-weight: 200; }
 
 /*!
   Ionicons, v2.0.1
@@ -18582,6 +18612,9 @@ a.button {
   padding-right: 90px;
   padding-left: 40px; }
 
+ion-nav-view ion-nav-view {
+  margin-top: 47px !important; }
+
 ion-top-menu {
   position: absolute;
   height: 4px;
@@ -18589,7 +18622,6 @@ ion-top-menu {
   background: #333;
   color: white;
   z-index: 10;
-  top: 45px !important;
   transition: all 0.5s; }
 
 ion-content#main_menu {
@@ -18682,7 +18714,7 @@ ion-top-menu .item {
 
 .webcam_title {
   margin-top: 34px;
-  width: 324px;
+  width: 536px;
   margin-left: auto;
   margin-right: auto;
   position: relative; }
