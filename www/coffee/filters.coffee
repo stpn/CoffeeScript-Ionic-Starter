@@ -39,6 +39,17 @@ angular.module('starter.directives',[]).directive 'clickSvg', [
     }
 ]
 
+# angular.module('starter.directives',[]).directive 'input', ($parse) ->
+#   {
+#     restrict: 'E'
+#     require: '?ngModel'
+#     link: (scope, element, attrs) ->
+#       if attrs.ngModel and attrs.value
+#         $parse(attrs.ngModel).assign scope, attrs.value
+#       return
+
+# }
+
 angular.module('starter.directives',[]).directive 'backImg', ->
   (scope, element, attrs) ->
     attrs.$observe 'backImg', (value) ->

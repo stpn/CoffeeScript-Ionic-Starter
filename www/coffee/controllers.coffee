@@ -3,6 +3,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 #  $scope.factories = [{"Presentations": Presentations.all()}, {"Videos" : Videos.all()},  {"Floor Plans" : Floorplans.all()}, {"Rendering":Renderings.all()}, {"Views" : Views.all()},  {"Webcams" : Webcams.all()}]
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()],  ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()],  ["Webcams", Webcams.all()]]
   $scope.activeBuilding = ActiveBuilding
+  $scope.activeBuildingName = $scope.activeBuilding.getName()
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states
 
@@ -64,7 +65,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
     # $scope.activeBuilding.name = undefined
     # $log.debug($scope.activeBuilding)
-    
+  
+  $scope.activeBuildingTabName = ->
+    if $scope.activeBuilding.name == undefined 
+      "SELECT BUILDING"
+    else 
+      $scope.activeBuilding.name
+
   $scope.building_is = (code, name) ->
     if code == name
     # if name == "200 Mass"
@@ -280,7 +287,58 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       ), 1000      
 
     return 
+).controller('VideoCtrl', ($scope, $stateParams, Videos) ->
+  $scope.video = Videos.get($stateParams.videoId)
+  $scope.videoDiv = document.getElementById('video')
+  $scope.seekBar = document.getElementById('seekbar')
+  $scope.volume = document.getElementById('volume')
+  $scope.skipValue = 0
 
+  $scope.videoDiv.addEventListener 'timeupdate', ->
+    # console.log 'test'
+    # never calls
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    console.log value
+    $scope.seekBar.value = value
+    return
+
+  $scope.seekRelease = ->
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    $scope.videoDiv.currentTime = currentTime;
+
+  $scope.volumeUp = ->
+    console.log 'UP'
+    if $scope.volume.value < 100
+      $scope.volume.value = $scope.volume.value + 5
+    else
+      $scope.volume.value = 100
+
+  $scope.volumeDown = ->
+    console.log 'DOWN'
+    if $scope.volume.value > 0 
+      $scope.volume.value = $scope.volume.value - 5
+    else
+      $scope.volume.value = 0    
+
+
+  $scope.videoBack =  ->
+    $scope.videoDiv.currentTime = 0
+
+  $scope.videoBw =  ->
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5
+
+  $scope.videoFw =  ->
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5
+
+  $scope.videoPlay =  ->
+    if $scope.videoDiv.paused
+      $scope.videoDiv.play()
+    else
+      $scope.videoDiv.pause()
+
+
+
+  return
 
 ).controller('ChatsCtrl', ($scope, Chats) ->
   # With the new view caching in Ionic, Controllers are only called

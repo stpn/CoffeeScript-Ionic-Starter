@@ -9,7 +9,7 @@ var sh = require('shelljs');
 var coffee = require('gulp-coffee');
 
 var paths = {
-  sass: ['./www/**/*.scss'],
+  sass: ['./www/sass/*.scss'],
   coffee: ['./www/coffee/*.coffee']
 };
 

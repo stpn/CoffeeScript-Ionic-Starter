@@ -4,7 +4,7 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="{{video.name}}">
+<ion-view view-title="{{video.name}}" ng-controller="VideoCtrl">
     <div id="video_container">
         <a class="close_button" href="#/dash/">
             <i class="ion-close"></i>
@@ -13,30 +13,37 @@
             <div id="presentation_title">{{building_name | uppercase}}</div>
             <div id="presentation_subtitle">{{video.name}}</div>
         </div>
-        <ion-content padding="true" overflow-scroll="true">
-            <video controls="controls" preload="metadata" autoplay="autoplay" webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px">
+        <ion-content overflow-scroll="true">
+            <video preload="metadata"  webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px" id="video">
                 <source ng-src={{recording}} type="video/mp4" />
             </video>
         </ion-content>
-
-        <div class ="video_controls">
-        <input type="range" id="seekbar" class="seekbar" value="0">
-
-            <li class="skipbackward_button pres_button" href="#">
-                <i class="ion-ios-rewind"></i>
+        <div class="video_controls">
+            <input type="range" id="seekbar" class="seekbar" value="0" ng-model="skipValue" ng-change="update()" on-release="seekRelease()">
+            <li class="skipbackward_button pres_button" href="#" ng-click="videoBack()">
+                <i class="ion-rewind-back"></i>
             </li>
-            <li class="rewind_button pres_button" ng-click="alertMe()">
-                <i class="ion-ios-skipbackward"></i>
+            <li class="rewind_button pres_button" ng-click="videoBw()">
+                <i class="ion-backward-capxing"></i>
             </li>
-            <li class="play_button pres_button" href="#">
-                <i class="ion-ios-play"></i>
+            <li class="play_button pres_button" ng-click="videoPlay()">
+                <i class="ion-play-capxing"></i>
             </li>
-            <li class="forward_button pres_button" href="#">
-                <i class="ion-ios-skipforward"></i>
+            <li class="forward_button pres_button" ng-click="videoFw()">
+                <i class="ion-skip-forward-capxing"></i>
             </li>
+            <div class="volume_controls">
+                <li ><i class="ion-volume-high" ></i></li>
+                                <li ng-click="volumeDown()"><i class="ion-minus"></i></li>
 
+                <li>
+                    <!-- <input type="range" id="volume" class="volume" min="0" max="1" step="0.1" value="1"> </li> -->
+<progress value="22" max="100"  id="volume">
+</progress>
+</li>
+                <li ng-click="volumeUp()"><i class="ion-plus" ></i></li>
 
+            </div>
         </div>
-
     </div>
 </ion-view>

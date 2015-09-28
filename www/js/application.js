@@ -93,6 +93,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.presentations = {};
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()], ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()], ["Webcams", Webcams.all()]];
   $scope.activeBuilding = ActiveBuilding;
+  $scope.activeBuildingName = $scope.activeBuilding.getName();
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states;
   $scope.buildings = Buildings.all();
@@ -148,6 +149,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else {
       $log.debug($event.clientX, $scope.activeBuilding.name);
       return $scope.setActiveBuilding(void 0);
+    }
+  };
+  $scope.activeBuildingTabName = function() {
+    if ($scope.activeBuilding.name === void 0) {
+      return "SELECT BUILDING";
+    } else {
+      return $scope.activeBuilding.name;
     }
   };
   $scope.building_is = function(code, name) {
@@ -243,6 +251,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
 }).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.videoId);
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.building_name = $scope.video.building_name;
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
@@ -329,6 +338,55 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
         TopmenuState.setBuildings(true);
         return TopmenuState.setComparison(false);
       }), 1000);
+    }
+  };
+}).controller('VideoCtrl', function($scope, $stateParams, Videos) {
+  $scope.video = Videos.get($stateParams.videoId);
+  $scope.videoDiv = document.getElementById('video');
+  $scope.seekBar = document.getElementById('seekbar');
+  $scope.volume = document.getElementById('volume');
+  $scope.skipValue = 0;
+  $scope.videoDiv.addEventListener('timeupdate', function() {
+    var value;
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    console.log(value);
+    $scope.seekBar.value = value;
+  });
+  $scope.seekRelease = function() {
+    var currentTime;
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    return $scope.videoDiv.currentTime = currentTime;
+  };
+  $scope.volumeUp = function() {
+    console.log('UP');
+    if ($scope.volume.value < 100) {
+      return $scope.volume.value = $scope.volume.value + 5;
+    } else {
+      return $scope.volume.value = 100;
+    }
+  };
+  $scope.volumeDown = function() {
+    console.log('DOWN');
+    if ($scope.volume.value > 0) {
+      return $scope.volume.value = $scope.volume.value - 5;
+    } else {
+      return $scope.volume.value = 0;
+    }
+  };
+  $scope.videoBack = function() {
+    return $scope.videoDiv.currentTime = 0;
+  };
+  $scope.videoBw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+  };
+  $scope.videoFw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+  };
+  $scope.videoPlay = function() {
+    if ($scope.videoDiv.paused) {
+      return $scope.videoDiv.play();
+    } else {
+      return $scope.videoDiv.pause();
     }
   };
 }).controller('ChatsCtrl', function($scope, Chats) {
@@ -743,13 +801,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
       name: "Video1",
       image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
       building_name: 'Mass 200',
-      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200 '
+      recording: 'http://www.w3schools.com/html/mov_bbb.mp4 '
     }, {
       id: 2,
       name: "Video2",
       image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
       building_name: 'Mass 200',
-      recording: 'http://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
+      recording: 'http://www.w3schools.com/html/mov_bbb.mp4'
     }
   ];
   return {
