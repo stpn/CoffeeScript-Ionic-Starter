@@ -3,11 +3,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 #  $scope.factories = [{"Presentations": Presentations.all()}, {"Videos" : Videos.all()},  {"Floor Plans" : Floorplans.all()}, {"Rendering":Renderings.all()}, {"Views" : Views.all()},  {"Webcams" : Webcams.all()}]
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()],  ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()],  ["Webcams", Webcams.all()]]
   $scope.activeBuilding = ActiveBuilding
-  $scope.buldingTabName = "Select Building"
+  $scope.buldingTabName = "Select Buildings"
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states
-
-
 
 
   $scope.buildings = Buildings.all()
@@ -17,23 +15,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.transformStyle = "transform: scale(1.0)"
   $scope.topMenu = TopmenuState  
 
-  $scope.buildingTabName.getTabName = ()->
-    if TopmenuState.getComparison() == true
-      "COMPARISON MODE"
-    else
-      $scope.activeBuilding.getName()
-
-
   $scope.isBuildings = () ->
     TopmenuState.getBuildings()
 
-  $scope.isComparison = () ->
+  $scope.isComparison = () ->    
     TopmenuState.getComparison()
 
   $scope.showCompareMenu = () ->
     proceed = false
     if TopmenuState.getComparison() == true
       proceed = true
+      $scope.activeBuilding.tabName = $scope.activeBuilding.name
+    else
+      $scope.activeBuilding.tabName = "COMPARISON MODE"
     TopmenuState.setBuildings(false)
     TopmenuState.setComparison(true)
     menu = document.getElementById('ionTopMenu')
@@ -75,6 +69,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     # $scope.activeBuilding.name = undefined
     # $log.debug($scope.activeBuilding)
   
+  $scope.activeBuildingTabName = ->
+    if $scope.activeBuilding.name == undefined 
+      "SELECT BUILDING"
+    else 
+      $scope.activeBuilding.name
 
   $scope.building_is = (code, name) ->
     if code == name
@@ -85,8 +84,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     Buildings.getTemplate(name)
 
   $scope.setActiveBuilding = (name)->
-    $log.debug(name)
+    if name == undefined
+      $scope.activeBuilding.tabName = "SELECT BUILDING"
     ActiveBuilding.setName(name)
+    $scope.activeBuilding.tabName = name
 
 
   $scope.buildingCode = (name)->    
@@ -94,6 +95,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.toggleTopMenu = ->
+    TopmenuState.setBuildings(true)
+    TopmenuState.setComparison(false)
+
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
     pane = document.getElementsByTagName('ion-content')[0]
@@ -118,6 +122,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
     return 
 
+  $scope.getFillColorFor = (bld) ->
+    console.log name, $scope.activeBuilding.getName() + " YESS"
+    if $scope.activeBuilding == undefined
+      return "none"
+    else if bld.name == $scope.activeBuilding.getName()
+      console.log 'yess'
+      return "#6D6F72"
+    else 
+      return "none"
+
+
 
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.modelId)
@@ -136,11 +151,18 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 ).controller('WebcamsCtrl', ($scope, $log, $stateParams, Webcams) ->
   $scope.webcams = Webcams.all()
   $scope.activeWebcam = undefined
+  $scope.nowLive = false
   # $scope.panoramas = undefined
   # $scope.timelapses = undefined
 
   $scope.isActive = (item) ->
-    $scope.selected == item
+    console.log $scope.activeWebcam
+    if $scope.activeWebcam == undefined
+        false
+    else if $scope.activeWebcam.id == item
+      true
+    else
+      false
 
 
   $scope.setActiveWebcam = (activeWebcamId) ->   
@@ -156,11 +178,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.getActiveWebcam = (activeWebcam) ->
     $scope.activeWebcam    
 
-  $scope.showPanorama = ->
-    $log.debug("PANO")
+  $scope.isLive = ->
+    $scope.nowLive
 
-  $scope.showLive = ->
-    $log.debug("LIVE")
+  $scope.setLive = ->
+    $scope.nowLive = !$scope.nowLive
 
   $scope.toggleGroup = (group) ->
     if $scope.isGroupShown(group)
@@ -203,10 +225,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   return
 
 
-).controller('BuildingsCtrl', ($scope, Buildings, $log) ->
+).controller('BuildingsCtrl', ($scope, Buildings, $log, ActiveBuilding) ->
   $scope.buildings = Buildings.all()
   $scope.templatePath = "templates/menu/building_menu.html"
   $scope.transformStyle = "scale(1.19)"
+  $scope.activeBuilding = ActiveBuilding
 
   $scope.getTemplate = (name) ->
     Buildings.getTemplate(name)
@@ -219,11 +242,34 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.buildingCode = (name)->    
     Buildings.buildingCode(name)
 
+
+  $scope.setActiveBuilding = (name)->
+    if name == undefined
+      $scope.activeBuilding.tabName = "SELECT BUILDING"
+    ActiveBuilding.setName(name)
+    $scope.activeBuilding.tabName = name
+
+
+
+  $scope.getFillColorFor = (bld) ->
+    console.log name, $scope.activeBuilding.getName() + " YESS"
+    if $scope.activeBuilding == undefined
+      return "none"
+    else if bld.name == $scope.activeBuilding.getName()
+      console.log 'yess'
+      return "#6D6F72"
+    else 
+      return "none"
+
   return
 
 
-).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, ActiveCamera) ->
+
+
+
+).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) ->
   $scope.panorama = Panoramas.get($stateParams.panoramaId)
+  $scope.webcam_name = Panoramas.getWebcamName($stateParams.panoramaId)
 
   $scope.getPanorama =  ->
     $scope.panorama.image
@@ -231,8 +277,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.getCamera =  ->
     1
 
-
-  return
 
 ).controller('TopMenuCtrl', ($scope, $sce, Buildings,ActiveBuilding, $log, $window, $location, TopmenuState) ->
   $scope.activeBuilding = ActiveBuilding

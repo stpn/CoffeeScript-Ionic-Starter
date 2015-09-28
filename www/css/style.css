@@ -18,6 +18,8 @@
     transition: .5s linear all !important; }
   #bld_tab_wrap .building {
     position: absolute; }
+  #bld_tab_wrap span.bld_name {
+    color: white; }
   #bld_tab_wrap .M200 {
     top: 0px;
     left: 10px; }
@@ -18854,6 +18856,9 @@ progress::-webkit-progress-value {
 #webcams_view {
   margin-top: 47px; }
 
+#webcams_view > div:nth-child(4) > ion-item > a {
+  background-color: black !important; }
+
 .webcam_title {
   margin-top: 34px;
   width: 536px;
@@ -18878,6 +18883,8 @@ progress::-webkit-progress-value {
     min-width: 245px !important;
     float: left;
     margin-bottom: 10px; }
+  .camera_buttons .short_btn.active {
+    background: #999; }
   .camera_buttons .camera1,
   .camera_buttons .camera3 {
     margin-right: 5px; }
@@ -18919,9 +18926,13 @@ progress::-webkit-progress-value {
 #panorama_title {
   margin-top: 88px; }
 
+.panorama_titles {
+  font-family: "Gotham Book" !important;
+  font-size: 22px; }
+
 #panorama_view {
   height: 242px;
-  margin-top: 44px; }
+  margin-top: 14px; }
   #panorama_view img {
     max-width: 100%;
     max-height: 100%; }

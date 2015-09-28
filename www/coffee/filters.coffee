@@ -32,9 +32,9 @@ angular.module('starter.directives',[]).directive 'clickSvg', [
     link: (scope, element, attrs) ->
       element.bind 'click', ->
         name = scope.clickSvg
-        activeBuilding.setName(name)
+        #activeBuilding.setName(name)
         console.log "FUCK"
-        # console.log '$eval type:', scope.clickSvg
+        console.log '$eval type:', scope.clickSvg
         return
     }
 ]

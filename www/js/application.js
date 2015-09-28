@@ -93,7 +93,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.presentations = {};
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()], ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()], ["Webcams", Webcams.all()]];
   $scope.activeBuilding = ActiveBuilding;
-  $scope.activeBuildingName = $scope.activeBuilding.getName();
+  $scope.buldingTabName = "Select Buildings";
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states;
   $scope.buildings = Buildings.all();
@@ -113,6 +113,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     proceed = false;
     if (TopmenuState.getComparison() === true) {
       proceed = true;
+      $scope.activeBuilding.tabName = $scope.activeBuilding.name;
+    } else {
+      $scope.activeBuilding.tabName = "COMPARISON MODE";
     }
     TopmenuState.setBuildings(false);
     TopmenuState.setComparison(true);
@@ -167,14 +170,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.getTemplate(name);
   };
   $scope.setActiveBuilding = function(name) {
-    $log.debug(name);
-    return ActiveBuilding.setName(name);
+    if (name === void 0) {
+      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    }
+    ActiveBuilding.setName(name);
+    return $scope.activeBuilding.tabName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
   };
-  return $scope.toggleTopMenu = function() {
+  $scope.toggleTopMenu = function() {
     var bld, menu, pane;
+    TopmenuState.setBuildings(true);
+    TopmenuState.setComparison(false);
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
@@ -197,6 +205,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       }), 1000);
     }
   };
+  return $scope.getFillColorFor = function(bld) {
+    console.log(name, $scope.activeBuilding.getName() + " YESS");
+    if ($scope.activeBuilding === void 0) {
+      return "none";
+    } else if (bld.name === $scope.activeBuilding.getName()) {
+      console.log('yess');
+      return "#6D6F72";
+    } else {
+      return "none";
+    }
+  };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.modelId);
 }).controller('titleCtrl', function($scope, $stateParams) {
@@ -206,8 +225,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
 }).controller('WebcamsCtrl', function($scope, $log, $stateParams, Webcams) {
   $scope.webcams = Webcams.all();
   $scope.activeWebcam = void 0;
+  $scope.nowLive = false;
   $scope.isActive = function(item) {
-    return $scope.selected === item;
+    console.log($scope.activeWebcam);
+    if ($scope.activeWebcam === void 0) {
+      return false;
+    } else if ($scope.activeWebcam.id === item) {
+      return true;
+    } else {
+      return false;
+    }
   };
   $scope.setActiveWebcam = function(activeWebcamId) {
     $scope.selected = activeWebcamId;
@@ -221,11 +248,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.getActiveWebcam = function(activeWebcam) {
     return $scope.activeWebcam;
   };
-  $scope.showPanorama = function() {
-    return $log.debug("PANO");
+  $scope.isLive = function() {
+    return $scope.nowLive;
   };
-  $scope.showLive = function() {
-    return $log.debug("LIVE");
+  $scope.setLive = function() {
+    return $scope.nowLive = !$scope.nowLive;
   };
   $scope.toggleGroup = function(group) {
     if ($scope.isGroupShown(group)) {
@@ -261,10 +288,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.alertMe = function() {
     return $log.debug("FUCK");
   };
-}).controller('BuildingsCtrl', function($scope, Buildings, $log) {
+}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveBuilding) {
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.transformStyle = "scale(1.19)";
+  $scope.activeBuilding = ActiveBuilding;
   $scope.getTemplate = function(name) {
     return Buildings.getTemplate(name);
   };
@@ -276,12 +304,31 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
   };
-}).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera) {
+  $scope.setActiveBuilding = function(name) {
+    if (name === void 0) {
+      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    }
+    ActiveBuilding.setName(name);
+    return $scope.activeBuilding.tabName = name;
+  };
+  $scope.getFillColorFor = function(bld) {
+    console.log(name, $scope.activeBuilding.getName() + " YESS");
+    if ($scope.activeBuilding === void 0) {
+      return "none";
+    } else if (bld.name === $scope.activeBuilding.getName()) {
+      console.log('yess');
+      return "#6D6F72";
+    } else {
+      return "none";
+    }
+  };
+}).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
   $scope.panorama = Panoramas.get($stateParams.panoramaId);
+  $scope.webcam_name = Panoramas.getWebcamName($stateParams.panoramaId);
   $scope.getPanorama = function() {
     return $scope.panorama.image;
   };
-  $scope.getCamera = function() {
+  return $scope.getCamera = function() {
     return 1;
   };
 }).controller('TopMenuCtrl', function($scope, $sce, Buildings, ActiveBuilding, $log, $window, $location, TopmenuState) {
@@ -447,8 +494,8 @@ angular.module('starter.directives', []).directive('clickSvg', [
         return element.bind('click', function() {
           var name;
           name = scope.clickSvg;
-          activeBuilding.setName(name);
           console.log("FUCK");
+          console.log('$eval type:', scope.clickSvg);
         });
       }
     };
@@ -543,23 +590,23 @@ angular.module('starter.services', []).factory('Buildings', function() {
   models = [
     {
       id: 1,
-      name: "Mass 200",
+      name: "Massachusetts 200",
       code: "M200"
     }, {
       id: 2,
-      name: "Mass 250",
+      name: "Massachusetts 250",
       code: "M250"
     }, {
       id: 3,
-      name: "Mass 600",
+      name: "Massachusetts 600",
       code: "M600"
     }, {
       id: 4,
-      name: "Mass 201",
+      name: "Massachusetts 201",
       code: "M201"
     }, {
       id: 5,
-      name: "Fass 200",
+      name: "Fassachusetts 200",
       code: "F200"
     }
   ];
@@ -593,8 +640,9 @@ angular.module('starter.services', []).factory('Buildings', function() {
     }
   };
 }).service('ActiveBuilding', function() {
-  var name;
+  var name, tabName;
   name = void 0;
+  tabName = "SELECT BUILDING";
   return {
     setName: function(new_name) {
       return name = new_name;
@@ -616,15 +664,15 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Overview Presentation",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200',
-      project_name: "Mass 200"
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      building_name: 'Massachusetts 200',
+      project_name: "Massachusetts 200"
     }, {
       id: 2,
       name: "Sustainability Presentation",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 250',
-      project_name: "Mass 250"
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      building_name: 'Massachusetts 250',
+      project_name: "Massachusetts 250"
     }
   ];
   return {
@@ -653,19 +701,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return slides = [
         {
           id: 1,
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         }, {
           id: 2,
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         }, {
           id: 3,
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         }, {
           id: 4,
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         }, {
           id: 5,
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         }
       ];
     }
@@ -676,13 +724,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Rend1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "Rend2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 300'
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      building_name: 'Massachusetts 300'
     }
   ];
   return {
@@ -713,18 +761,18 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "View2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      building_name: 'Massachusetts 200'
     }, {
       id: 1,
       name: "View1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      building_name: 'Massachusetts 200'
     }
   ];
   return {
@@ -762,13 +810,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Floorplan1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/floorplan/image/4/200M_FP_PH_2.svg',
+      building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "Floorplan2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/floorplan/image/4/200M_FP_PH_2.svg',
+      building_name: 'Massachusetts 200'
     }
   ];
   return {
@@ -799,14 +847,14 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Video1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200',
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      building_name: 'Massachusetts 200',
       recording: 'http://www.w3schools.com/html/mov_bbb.mp4 '
     }, {
       id: 2,
       name: "Video2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200',
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      building_name: 'Massachusetts 200',
       recording: 'http://www.w3schools.com/html/mov_bbb.mp4'
     }
   ];
@@ -860,18 +908,18 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Webcam1",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      image: 'https://oxblue.com/archive/517405af56b6a32dcbb7fb3b7373378e/2048x1536.jpg?1442798939',
+      building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "Webcam2",
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png',
-      building_name: 'Mass 200'
+      image: 'https://oxblue.com/archive/276b2472bc731684941f635b7d1c2009/2048x1536.jpg?1442798939',
+      building_name: 'Massachusetts 200'
     }, {
       id: 3,
       name: "Webcam3",
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png',
-      building_name: 'Mass 200'
+      image: 'https://oxblue.com/archive/52785a2e10cf0eb8a0b097e04e35aeb5/2048x1536.jpg?1442798939',
+      building_name: 'Massachusetts 200'
     }
   ];
   return {
@@ -900,11 +948,11 @@ angular.module('starter.services', []).factory('Buildings', function() {
         {
           id: 1,
           name: "Video1",
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/15/4.jpg'
         }, {
           id: 2,
           name: "Video2",
-          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg'
         }
       ];
     },
@@ -913,11 +961,11 @@ angular.module('starter.services', []).factory('Buildings', function() {
         {
           id: 1,
           name: "Video1",
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://oxblue.com/archive/2a415640359473ad01cd8b83498f8eea/2048x1536.jpg?1442798939'
         }, {
           id: 2,
           name: "Video2",
-          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+          image: 'https://oxblue.com/archive/2a415640359473ad01cd8b83498f8eea/2048x1536.jpg?1442798939'
         }
       ];
     }
@@ -929,7 +977,8 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Pan1",
       image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg',
-      building_name: 'Mass 200'
+      building_name: 'Massachusetts 200',
+      camera_name: 'Camera 1'
     }
   ];
   return {
@@ -952,6 +1001,9 @@ angular.module('starter.services', []).factory('Buildings', function() {
         i++;
       }
       return null;
+    },
+    getWebcamName: function(panId) {
+      return models[0].camera_name;
     }
   };
 }).factory('TopmenuState', function() {
