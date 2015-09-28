@@ -3,9 +3,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 #  $scope.factories = [{"Presentations": Presentations.all()}, {"Videos" : Videos.all()},  {"Floor Plans" : Floorplans.all()}, {"Rendering":Renderings.all()}, {"Views" : Views.all()},  {"Webcams" : Webcams.all()}]
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()],  ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()],  ["Webcams", Webcams.all()]]
   $scope.activeBuilding = ActiveBuilding
-  $scope.activeBuildingName = $scope.activeBuilding.getName()
+  $scope.buldingTabName = "Select Building"
   $scope.state = $state;
   $scope.topMenu = TopmenuState.states
+
+
 
 
   $scope.buildings = Buildings.all()
@@ -14,6 +16,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.bld_style="margin-top: 5px"
   $scope.transformStyle = "transform: scale(1.0)"
   $scope.topMenu = TopmenuState  
+
+  $scope.buildingTabName.getTabName = ()->
+    if TopmenuState.getComparison() == true
+      "COMPARISON MODE"
+    else
+      $scope.activeBuilding.getName()
+
 
   $scope.isBuildings = () ->
     TopmenuState.getBuildings()
@@ -66,11 +75,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     # $scope.activeBuilding.name = undefined
     # $log.debug($scope.activeBuilding)
   
-  $scope.activeBuildingTabName = ->
-    if $scope.activeBuilding.name == undefined 
-      "SELECT BUILDING"
-    else 
-      $scope.activeBuilding.name
 
   $scope.building_is = (code, name) ->
     if code == name
