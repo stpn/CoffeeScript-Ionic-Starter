@@ -37,6 +37,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'VideoPlayerCtrl'
       }
     }
+  }).state('tab.home', {
+    url: '/home',
+    views: {
+      'tab-dash': {
+        templateUrl: 'templates/home.html',
+        controller: 'HomeCtrl'
+      }
+    }
   }).state('tab.webcams', {
     url: '/webcams',
     views: {
@@ -436,14 +444,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.videoDiv.pause();
     }
   };
-}).controller('ChatsCtrl', function($scope, Chats) {
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  };
-}).controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
-}).controller('AccountCtrl', function($scope) {
+}).controller('HomeCtrl', function($scope) {
   $scope.settings = {
     enableFriends: true
   };

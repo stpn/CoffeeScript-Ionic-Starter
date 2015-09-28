@@ -55,6 +55,12 @@ angular.module('starter', [
       controller: 'VideoPlayerCtrl'     
 
 
+    ).state('tab.home',
+    url: '/home'
+    views: 'tab-dash':
+      templateUrl: 'templates/home.html'
+      controller: 'HomeCtrl',
+
     ).state('tab.webcams',
     url: '/webcams'
     views: 'webcams':

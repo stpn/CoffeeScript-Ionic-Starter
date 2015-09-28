@@ -1,4 +1,13 @@
 @import "www/sass/custom_variables.scss";
+
+#home_bg{
+    width: 100%;
+    height: 100%;
+    background-image: url('frontpage.png');
+     background-size: cover;
+    background-repeat: no-repeat;
+
+}
 .tabs {
     top: 0px !important;
 }
