@@ -38,7 +38,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.activeBuilding.isActive(name)
 
   $scope.toggleGroup = (group) ->
-    $log.debug($scope.activeBuilding.name, "NAME")
+    #$log.debug($scope.activeBuilding.name, "NAME")
     #$log.debug("GROUP: ",$scope.activeBuilding.getName())
     if $scope.isGroupShown(group)
       $scope.shownGroup = null
@@ -58,12 +58,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     
     bld_box = document.getElementById('building_menu_wrap')
     bld_box = bld_box.getBoundingClientRect()
-    $log.debug($event.clientX,$event.clientY, bld_box)
+    #$log.debug($event.clientX,$event.clientY, bld_box)
     #if $event.target.nodeName != "SVG" # != document.getElementById('bld1') && $event.target != document.getElementById('bld2') && $event.target != document.getElementById('bld3') && $event.target != document.getElementById('bld4') && $event.target != document.getElementById('bld5') 
     if $event.clientX > bld_box.left && $event.clientX < bld_box.right && $event.clientY > bld_box.top && $event.clientY < bld_box.bottom
       return 
     else 
-      $log.debug($event.clientX, $scope.activeBuilding.name)
+      #$log.debug($event.clientX, $scope.activeBuilding.name)
       $scope.setActiveBuilding(undefined)
 
     # $scope.activeBuilding.name = undefined
@@ -123,11 +123,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     return 
 
   $scope.getFillColorFor = (bld) ->
-    console.log name, $scope.activeBuilding.getName() + " YESS"
+    #console.log name, $scope.activeBuilding.getName() + " YESS"
     if $scope.activeBuilding == undefined
       return "none"
     else if bld.name == $scope.activeBuilding.getName()
-      console.log 'yess'
+      #console.log 'yess'
       return "#6D6F72"
     else 
       return "none"
@@ -156,7 +156,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   # $scope.timelapses = undefined
 
   $scope.isActive = (item) ->
-    console.log $scope.activeWebcam
+    #console.log $scope.activeWebcam
     if $scope.activeWebcam == undefined
         false
     else if $scope.activeWebcam.id == item
@@ -252,11 +252,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.getFillColorFor = (bld) ->
-    console.log name, $scope.activeBuilding.getName() + " YESS"
+    #console.log name, $scope.activeBuilding.getName() + " YESS"
     if $scope.activeBuilding == undefined
       return "none"
     else if bld.name == $scope.activeBuilding.getName()
-      console.log 'yess'
+      #console.log 'yess'
       return "#6D6F72"
     else 
       return "none"
@@ -346,7 +346,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     # console.log 'test'
     # never calls
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
-    console.log value
+    #console.log value
     $scope.seekBar.value = value
     return
 
@@ -355,14 +355,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.videoDiv.currentTime = currentTime;
 
   $scope.volumeUp = ->
-    console.log 'UP'
+    #console.log 'UP'
     if $scope.volume.value < 100
       $scope.volume.value = $scope.volume.value + 5
     else
       $scope.volume.value = 100
 
   $scope.volumeDown = ->
-    console.log 'DOWN'
+    #console.log 'DOWN'
     if $scope.volume.value > 0 
       $scope.volume.value = $scope.volume.value - 5
     else

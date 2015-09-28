@@ -1,4 +1,13 @@
 @import "www/sass/custom_variables.scss";
+
+#home_bg{
+    width: 100%;
+    height: 100%;
+    background-image: url('frontpage.png');
+     background-size: cover;
+    background-repeat: no-repeat;
+
+}
 .tabs {
     top: 0px !important;
 }
@@ -6,7 +15,11 @@
 .item.item-stable {
     color: #999 !important;
 }
+ion-item{
+    font-family: "Gotham Book";
+    font-size: 22px;
 
+}
 .item {
     .icon {
         color: white;
@@ -112,9 +125,18 @@ ion-top-menu .item {
         margin-top: -26px;
         margin-left: auto;
         margin-right: auto;
-        width: 94px;
     }
+
 }
+#select_bld{
+    min-width: 168px;
+    text-align: center;
+
+    font-family: "Gotham Narrow Book";
+    font-size: 18px;
+}
+
+
 
 .building_wrap {
     position: relative;
@@ -194,6 +216,8 @@ ion-top-menu .item {
 
 // CUSTOMIZED SHIT:
 .image_name {
+    font-family: "Gotham Narrow Book";
+    font-size: 12px;
     color: $base-color !important;
     text-decoration: none;
 }

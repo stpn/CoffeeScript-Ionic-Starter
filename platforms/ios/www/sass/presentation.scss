@@ -1,58 +1,69 @@
 // Presentation
-.presenation_container {
-    margin-top: 53px;
-    .presentation_titles {
-        margin-left: 55px;
-        color: #DAD9D9;
-        font-family: "Gotham Light";
-    }
+.presentation_titles {
+    margin-left: 36px;
+    color: #DAD9D9;
+    font-family: "Gotham Light";
     .presentation_title {
         font-size: 22px;
     }
     .presentation_subtitle {
         font-size: 20px;
     }
+}
+
+.presenation_container {
+    margin-top: 53px;
     .presentation_gal {
-        margin-left: 43px;
+        margin-left: 25px;
         min-height: 743px;
         .col_slide {
             -webkit-box-flex: 0;
-            -webkit-flex: 0 0 215px;
+            -webkit-flex: 0 0 132px;
             -moz-box-flex: 0;
-            -moz-flex: 0 0 215px;
-            -ms-flex: 0 0 215px;
-            flex: 0 0 215px;
-            max-width: 215px;
-            max-height: 115px;
+            -moz-flex: 0 0 132px;
+            -ms-flex: 0 0 123px;
+            flex: 0 0 132px;
+            max-width: 132px;
+            max-height: 74px;
             //margin-top: 5px;
             border: none;
             margin: 5px;
             img {
-                max-height: 115px;
+                max-height: 74px;
             }
         }
     }
 }
 
 #presentation_controls {
-
+    position: absolute;
     background: black;
-    margin-left: 55px;
-    margin-top: 200px;
+    left: 29px;
+    // margin-top: 200px;
     width: 768px;
     .counter {
-        font-size: 60px;
+        font-size: 37px;
+        color: #E5E5E5;
+        font-family: "Gotham Book";
         line-height: 60px;
+        margin-top: 11px;
+        margin-left: 54px;
     }
     .pres_button {
-        width: 200px;
-        height: 89px;
+        width: 172px;
+        height: 75px;
         border: solid 1px;
+        margin-left: 5px;
+        .skipbackward_button{
+            i{
+                font-size: 80px;
+            }
+        }
         i {
             font-size: 60px;
-            margin-left: 80px;
+            margin-left: 70px;
             margin-right: auto;
-            line-height: 80px;
+            line-height: 75px;
         }
     }
     li {
@@ -64,7 +75,7 @@
 .close_button {
     float: right;
     font-size: 25px;
-    margin-right: 100px;
+    margin-right: 33px;
     .ion-close::before {
         color: #808080;
     }

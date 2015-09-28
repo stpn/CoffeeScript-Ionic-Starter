@@ -1,0 +1,91 @@
+#video_container {
+
+  .presentation_titles {
+margin-left: 11px !important;
+}
+.close_button{
+  margin-right: 3px !important;
+  margin-top:  -19px !important;
+}
+    margin-top: 55px;
+    width: 696px;
+    margin-left: auto;
+    margin-right: auto;
+    ion-content {
+        position: relative;
+    }
+    .video_controls {
+        min-width: 696px;
+        input.seekbar {
+            min-width: 696px;
+            margin-bottom: 34px;
+            margin-top: 34px;
+        }
+        .pres_button {
+            width: 172px;
+            height: 75px;
+            border: solid 1px;
+            margin-right: 2 px;
+            i.ion-rewind-back {
+                font-size: 80px;
+                line-height: 120px;
+            }
+            i {
+                font-size: 60px;
+                margin-left: 54px;
+                margin-right: auto;
+                line-height: 90px;
+            }
+        }
+        li {
+            list-style-type: none;
+            cursor: pointer;
+            float: left;
+        }
+        .volume_controls{
+          position: absolute;
+          left: 0px;
+              bottom: 70px;
+            i {
+                font-size: 30px;
+                margin-left: 40px !important;                
+                margin-right: 30px;
+                line-height: 90px;
+            }
+            i.ion-minus{
+              margin-left: 20px;
+
+            }
+
+        // progress.volume {
+        //     min-width: 450px;
+        //     margin-bottom: 34px;
+        //     margin-top: 34px;
+        // }
+
+        }
+    }
+}
+progress {
+  width: 450px;
+  height: 24px;
+  margin-top: 32px;
+  display: block;
+  /* Important Thing */
+  -webkit-appearance: none;
+  border: none;
+}
+
+/* All good till now. Now we'll style the background */
+progress::-webkit-progress-bar {
+  background: #808080;
+box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
+  padding: 5px;
+}
+
+/* Now the value part */
+progress::-webkit-progress-value {
+  background: #666667;
+  //background-size: 25px 14px, 100% 100%, 100% 100%;
+  -webkit-animation: move 5s linear 0 infinite;
+}

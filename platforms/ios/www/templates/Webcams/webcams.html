@@ -26,13 +26,13 @@
 
     <div class="camera_buttons">
     <div class ="button_columns">
-        <ion-item class="camera1 short_btn" ng-click="setActiveWebcam(1)" ng-class="{active: isActive(datalist)}">CAMERA1</ion-item>
-        <ion-item class="camera2 short_btn" ng-click="setActiveWebcam(2)" ng-class="{active: isActive(datalist)}">CAMERA2</ion-item>
-        <ion-item class="camera3 short_btn" ng-click="setActiveWebcam(3)" ng-class="{active: isActive(datalist)}">CAMERA3</ion-item>
+        <ion-item class="camera1 short_btn" ng-click="setActiveWebcam(1)" ng-class="{active: isActive(1)}">CAMERA1</ion-item>
+        <ion-item class="camera2 short_btn" ng-click="setActiveWebcam(2)" ng-class="{active: isActive(2)}">CAMERA2</ion-item>
+        <ion-item class="camera3 short_btn" ng-click="setActiveWebcam(3)" ng-class="{active: isActive(3)}">CAMERA3</ion-item>
 
-        <ion-item class="live short_btn" ng-click="setLive">LIVE FEED</ion-item>
+        <ion-item class="live short_btn" ng-click="setLive()" ng-class="{active: isLive()}">LIVE FEED</ion-item>
         </div>
-        <ion-item class="panorama" ng-click="setPanorama()">PANORAMA</ion-item>
+        <ion-item class="panorama" href="#/tab/panoramas/1">PANORAMA</ion-item>
     </div>
     <ion-content id="webcam_assets">
         <ion-list>

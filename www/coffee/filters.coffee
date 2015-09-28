@@ -17,9 +17,9 @@ angular.module('starter.filters', []).filter 'buildingFilter', [ ->
 angular.module('starter.directives',[]).directive 'clickMe', ->
   # Runs during compile
   { link: ($scope, element, iAttrs, controller) ->
-    console.log element
+    #console.log element
     element.bind 'click', ->
-      console.log 'I\'ve just been clicked!'
+      #console.log 'I\'ve just been clicked!'
       return
     return
  }
@@ -33,8 +33,8 @@ angular.module('starter.directives',[]).directive 'clickSvg', [
       element.bind 'click', ->
         name = scope.clickSvg
         #activeBuilding.setName(name)
-        console.log "FUCK"
-        console.log '$eval type:', scope.clickSvg
+        #console.log "FUCK"
+        #console.log '$eval type:', scope.clickSvg
         return
     }
 ]

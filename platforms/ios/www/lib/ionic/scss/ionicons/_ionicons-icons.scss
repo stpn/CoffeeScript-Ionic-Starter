@@ -161,6 +161,7 @@
 .#{$ionicons-prefix}at:before,
 .#{$ionicons-prefix}backspace:before,
 .#{$ionicons-prefix}backspace-outline:before,
+.#{$ionicons-prefix}backward-capxing:before,
 .#{$ionicons-prefix}bag:before,
 .#{$ionicons-prefix}battery-charging:before,
 .#{$ionicons-prefix}battery-empty:before,
@@ -586,6 +587,7 @@
 .#{$ionicons-prefix}plane:before,
 .#{$ionicons-prefix}planet:before,
 .#{$ionicons-prefix}play:before,
+.#{$ionicons-prefix}play-capxing:before,
 .#{$ionicons-prefix}playstation:before,
 .#{$ionicons-prefix}plus:before,
 .#{$ionicons-prefix}plus-circled:before,
@@ -604,6 +606,7 @@
 .#{$ionicons-prefix}refresh:before,
 .#{$ionicons-prefix}reply:before,
 .#{$ionicons-prefix}reply-all:before,
+.#{$ionicons-prefix}rewind-back:before,
 .#{$ionicons-prefix}ribbon-a:before,
 .#{$ionicons-prefix}ribbon-b:before,
 .#{$ionicons-prefix}sad:before,
@@ -613,8 +616,10 @@
 .#{$ionicons-prefix}settings:before,
 .#{$ionicons-prefix}share:before,
 .#{$ionicons-prefix}shuffle:before,
+.#{$ionicons-prefix}skip-back-capxing:before,
 .#{$ionicons-prefix}skip-backward:before,
 .#{$ionicons-prefix}skip-forward:before,
+.#{$ionicons-prefix}skip-forward-capxing:before,
 .#{$ionicons-prefix}social-android:before,
 .#{$ionicons-prefix}social-android-outline:before,
 .#{$ionicons-prefix}social-angular:before,
@@ -730,6 +735,8 @@
 .#{$ionicons-prefix}volume-mute:before,
 .#{$ionicons-prefix}wand:before,
 .#{$ionicons-prefix}waterdrop:before,
+.#{$ionicons-prefix}webcam-grid-capxing:before,
+.#{$ionicons-prefix}webcam-single-capxing:before,
 .#{$ionicons-prefix}wifi:before,
 .#{$ionicons-prefix}wineglass:before,
 .#{$ionicons-prefix}woman:before,
@@ -897,6 +904,7 @@
 .#{$ionicons-prefix}at:before { content: $ionicon-var-at; }
 .#{$ionicons-prefix}backspace:before { content: $ionicon-var-backspace; }
 .#{$ionicons-prefix}backspace-outline:before { content: $ionicon-var-backspace-outline; }
+.#{$ionicons-prefix}backward-capxing:before { content: $ionicon-var-backward-capxing; }
 .#{$ionicons-prefix}bag:before { content: $ionicon-var-bag; }
 .#{$ionicons-prefix}battery-charging:before { content: $ionicon-var-battery-charging; }
 .#{$ionicons-prefix}battery-empty:before { content: $ionicon-var-battery-empty; }
@@ -1322,6 +1330,7 @@
 .#{$ionicons-prefix}plane:before { content: $ionicon-var-plane; }
 .#{$ionicons-prefix}planet:before { content: $ionicon-var-planet; }
 .#{$ionicons-prefix}play:before { content: $ionicon-var-play; }
+.#{$ionicons-prefix}play-capxing:before { content: $ionicon-var-play-capxing; }
 .#{$ionicons-prefix}playstation:before { content: $ionicon-var-playstation; }
 .#{$ionicons-prefix}plus:before { content: $ionicon-var-plus; }
 .#{$ionicons-prefix}plus-circled:before { content: $ionicon-var-plus-circled; }
@@ -1340,6 +1349,7 @@
 .#{$ionicons-prefix}refresh:before { content: $ionicon-var-refresh; }
 .#{$ionicons-prefix}reply:before { content: $ionicon-var-reply; }
 .#{$ionicons-prefix}reply-all:before { content: $ionicon-var-reply-all; }
+.#{$ionicons-prefix}rewind-back:before { content: $ionicon-var-rewind-back; }
 .#{$ionicons-prefix}ribbon-a:before { content: $ionicon-var-ribbon-a; }
 .#{$ionicons-prefix}ribbon-b:before { content: $ionicon-var-ribbon-b; }
 .#{$ionicons-prefix}sad:before { content: $ionicon-var-sad; }
@@ -1349,8 +1359,10 @@
 .#{$ionicons-prefix}settings:before { content: $ionicon-var-settings; }
 .#{$ionicons-prefix}share:before { content: $ionicon-var-share; }
 .#{$ionicons-prefix}shuffle:before { content: $ionicon-var-shuffle; }
+.#{$ionicons-prefix}skip-back-capxing:before { content: $ionicon-var-skip-back-capxing; }
 .#{$ionicons-prefix}skip-backward:before { content: $ionicon-var-skip-backward; }
 .#{$ionicons-prefix}skip-forward:before { content: $ionicon-var-skip-forward; }
+.#{$ionicons-prefix}skip-forward-capxing:before { content: $ionicon-var-skip-forward-capxing; }
 .#{$ionicons-prefix}social-android:before { content: $ionicon-var-social-android; }
 .#{$ionicons-prefix}social-android-outline:before { content: $ionicon-var-social-android-outline; }
 .#{$ionicons-prefix}social-angular:before { content: $ionicon-var-social-angular; }
@@ -1466,6 +1478,8 @@
 .#{$ionicons-prefix}volume-mute:before { content: $ionicon-var-volume-mute; }
 .#{$ionicons-prefix}wand:before { content: $ionicon-var-wand; }
 .#{$ionicons-prefix}waterdrop:before { content: $ionicon-var-waterdrop; }
+.#{$ionicons-prefix}webcam-grid-capxing:before { content: $ionicon-var-webcam-grid-capxing; }
+.#{$ionicons-prefix}webcam-single-capxing:before { content: $ionicon-var-webcam-single-capxing; }
 .#{$ionicons-prefix}wifi:before { content: $ionicon-var-wifi; }
 .#{$ionicons-prefix}wineglass:before { content: $ionicon-var-wineglass; }
 .#{$ionicons-prefix}woman:before { content: $ionicon-var-woman; }

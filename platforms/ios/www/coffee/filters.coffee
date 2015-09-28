@@ -17,9 +17,9 @@ angular.module('starter.filters', []).filter 'buildingFilter', [ ->
 angular.module('starter.directives',[]).directive 'clickMe', ->
   # Runs during compile
   { link: ($scope, element, iAttrs, controller) ->
-    console.log element
+    #console.log element
     element.bind 'click', ->
-      console.log 'I\'ve just been clicked!'
+      #console.log 'I\'ve just been clicked!'
       return
     return
  }
@@ -32,12 +32,23 @@ angular.module('starter.directives',[]).directive 'clickSvg', [
     link: (scope, element, attrs) ->
       element.bind 'click', ->
         name = scope.clickSvg
-        activeBuilding.setName(name)
-        console.log "FUCK"
-        # console.log '$eval type:', scope.clickSvg
+        #activeBuilding.setName(name)
+        #console.log "FUCK"
+        #console.log '$eval type:', scope.clickSvg
         return
     }
 ]
+
+# angular.module('starter.directives',[]).directive 'input', ($parse) ->
+#   {
+#     restrict: 'E'
+#     require: '?ngModel'
+#     link: (scope, element, attrs) ->
+#       if attrs.ngModel and attrs.value
+#         $parse(attrs.ngModel).assign scope, attrs.value
+#       return
+
+# }
 
 angular.module('starter.directives',[]).directive 'backImg', ->
   (scope, element, attrs) ->

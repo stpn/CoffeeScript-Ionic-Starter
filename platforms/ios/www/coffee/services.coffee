@@ -2,27 +2,27 @@ angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
       id: 1
-      name: "Mass 200"
+      name: "Massachusetts 200"
       code: "M200"
     },
     {
       id: 2
-      name: "Mass 250"
+      name: "Massachusetts 250"
       code: "M250"
     },
     {
       id: 3
-      name: "Mass 600"
+      name: "Massachusetts 600"
       code: "M600"
     },
     {
       id: 4
-      name: "Mass 201"
+      name: "Massachusetts 201"
       code: "M201"
     },
     {
       id: 5
-      name: "Fass 200"
+      name: "Fassachusetts 200"
       code: "F200"
     }
   ]
@@ -50,6 +50,7 @@ angular.module('starter.services', []).factory('Buildings', ->
   }
 ).service('ActiveBuilding', ->
   name = undefined
+  tabName = "SELECT BUILDING"
 
   {
     setName: (new_name) ->
@@ -70,16 +71,16 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 1
       name: "Overview Presentation"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-      project_name: "Mass 200"
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+      building_name: 'Massachusetts 200'
+      project_name: "Massachusetts 200"
     },
     {
       id: 2
       name: "Sustainability Presentation"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 250'
-      project_name: "Mass 250"      
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg'
+      building_name: 'Massachusetts 250'
+      project_name: "Massachusetts 250"      
     }    
   ]
   {
@@ -101,16 +102,24 @@ angular.module('starter.services', []).factory('Buildings', ->
       slides = [
         {
           id: 1
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         },
         {
           id: 2
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
         },
         {
           id: 3
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-        }                
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+        },
+        {
+          id: 4
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+        },
+        {
+          id: 5
+          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+        }  
       ]
 
   }
@@ -119,14 +128,14 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 1
       name: "Rend1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+      building_name: 'Massachusetts 200'
     },
     {
       id: 2
       name: "Rend2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 300'
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg'
+      building_name: 'Massachusetts 300'
     }    
   ]
   {
@@ -151,20 +160,20 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 1
       name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+      building_name: 'Massachusetts 200'
     },
     {
       id: 2
       name: "View2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg'
+      building_name: 'Massachusetts 200'
     },   
    {
       id: 1
       name: "View1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+      building_name: 'Massachusetts 200'
     }                               
   ]
   {
@@ -193,14 +202,14 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 1
       name: "Floorplan1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/floorplan/image/4/200M_FP_PH_2.svg'
+      building_name: 'Massachusetts 200'
     },
     {
       id: 2
       name: "Floorplan2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/floorplan/image/4/200M_FP_PH_2.svg'
+      building_name: 'Massachusetts 200'
     }    
   ]
   {
@@ -225,16 +234,16 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 1
       name: "Video1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
-      recording: 'https://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200 '
+      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+      building_name: 'Massachusetts 200'
+      recording: 'http://www.w3schools.com/html/mov_bbb.mp4 '
     },
     {
       id: 2
       name: "Video2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
-      recording: 'http://oxblue.com/pro/load_movie.php?sessionID=889de4dd7946bc7fe04d745d4b22ed56&camID=7376f96cdb760c6881df67a73af5b200'
+      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg'
+      building_name: 'Massachusetts 200'
+      recording: 'http://www.w3schools.com/html/mov_bbb.mp4'
     }    
   ]
   {
@@ -278,20 +287,20 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 1
       name: "Webcam1"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
+      image: 'https://oxblue.com/archive/517405af56b6a32dcbb7fb3b7373378e/2048x1536.jpg?1442798939'
+      building_name: 'Massachusetts 200'
     },
     {
       id: 2
       name: "Webcam2"
-      image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
-      building_name: 'Mass 200'
+      image: 'https://oxblue.com/archive/276b2472bc731684941f635b7d1c2009/2048x1536.jpg?1442798939'
+      building_name: 'Massachusetts 200'
     },
     {
       id: 3
       name: "Webcam3"
-      image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
-      building_name: 'Mass 200'
+      image: 'https://oxblue.com/archive/52785a2e10cf0eb8a0b097e04e35aeb5/2048x1536.jpg?1442798939'
+      building_name: 'Massachusetts 200'
     }   
   ]
   {
@@ -314,12 +323,12 @@ angular.module('starter.services', []).factory('Buildings', ->
         {
           id: 1
           name: "Video1"
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/15/4.jpg'
         },
         {
           id: 2
           name: "Video2"
-          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+          image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg'
         }    
       ]      
 
@@ -328,12 +337,12 @@ angular.module('starter.services', []).factory('Buildings', ->
         {
           id: 1
           name: "Video1"
-          image: 'https://pbs.twimg.com/profile_images/578237281384841216/R3ae1n61.png'
+          image: 'https://oxblue.com/archive/2a415640359473ad01cd8b83498f8eea/2048x1536.jpg?1442798939'
         },
         {
           id: 2
           name: "Video2"
-          image: 'https://pbs.twimg.com/profile_images/598205061232103424/3j5HUXMY.png'
+          image: 'https://oxblue.com/archive/2a415640359473ad01cd8b83498f8eea/2048x1536.jpg?1442798939'
         }    
       ] 
   }
@@ -343,7 +352,8 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Pan1"
       image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg'
-      building_name: 'Mass 200'
+      building_name: 'Massachusetts 200'
+      camera_name: 'Camera 1'
     }    
   ]
   {
@@ -361,6 +371,8 @@ angular.module('starter.services', []).factory('Buildings', ->
           return models[i]
         i++
       null
+    getWebcamName: (panId) ->
+      models[0].camera_name
 
   }
 ).factory('TopmenuState', ->

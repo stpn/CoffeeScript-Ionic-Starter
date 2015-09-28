@@ -25,7 +25,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/presentations/:presentationId',
     views: {
       'tab-dash': {
-        templateUrl: 'templates/presentations/presentation.html',
+        templateUrl: 'templates/Presentations/presentation.html',
         controller: 'PresentationCtrl'
       }
     }
@@ -49,7 +49,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/webcams',
     views: {
       'webcams': {
-        templateUrl: 'templates/webcams/webcams.html',
+        templateUrl: 'templates/Webcams/webcams.html',
         controller: 'WebcamsCtrl'
       }
     }
@@ -57,7 +57,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/panoramas/:panoramaId',
     views: {
       'webcams': {
-        templateUrl: 'templates/panoramas/panorama.html',
+        templateUrl: 'templates/Panoramas/panorama.html',
         controller: 'PanoramasCtrl'
       }
     }
@@ -136,7 +136,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.activeBuilding.isActive(name);
   };
   $scope.toggleGroup = function(group) {
-    $log.debug($scope.activeBuilding.name, "NAME");
     if ($scope.isGroupShown(group)) {
       $scope.shownGroup = null;
     } else {
@@ -154,11 +153,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     var bld_box;
     bld_box = document.getElementById('building_menu_wrap');
     bld_box = bld_box.getBoundingClientRect();
-    $log.debug($event.clientX, $event.clientY, bld_box);
     if ($event.clientX > bld_box.left && $event.clientX < bld_box.right && $event.clientY > bld_box.top && $event.clientY < bld_box.bottom) {
 
     } else {
-      $log.debug($event.clientX, $scope.activeBuilding.name);
       return $scope.setActiveBuilding(void 0);
     }
   };
@@ -214,11 +211,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   return $scope.getFillColorFor = function(bld) {
-    console.log(name, $scope.activeBuilding.getName() + " YESS");
     if ($scope.activeBuilding === void 0) {
       return "none";
     } else if (bld.name === $scope.activeBuilding.getName()) {
-      console.log('yess');
       return "#6D6F72";
     } else {
       return "none";
@@ -235,7 +230,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
   $scope.isActive = function(item) {
-    console.log($scope.activeWebcam);
     if ($scope.activeWebcam === void 0) {
       return false;
     } else if ($scope.activeWebcam.id === item) {
@@ -320,11 +314,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.activeBuilding.tabName = name;
   };
   $scope.getFillColorFor = function(bld) {
-    console.log(name, $scope.activeBuilding.getName() + " YESS");
     if ($scope.activeBuilding === void 0) {
       return "none";
     } else if (bld.name === $scope.activeBuilding.getName()) {
-      console.log('yess');
       return "#6D6F72";
     } else {
       return "none";
@@ -404,7 +396,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
-    console.log(value);
     $scope.seekBar.value = value;
   });
   $scope.seekRelease = function() {
@@ -413,7 +404,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.videoDiv.currentTime = currentTime;
   };
   $scope.volumeUp = function() {
-    console.log('UP');
     if ($scope.volume.value < 100) {
       return $scope.volume.value = $scope.volume.value + 5;
     } else {
@@ -421,7 +411,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.volumeDown = function() {
-    console.log('DOWN');
     if ($scope.volume.value > 0) {
       return $scope.volume.value = $scope.volume.value - 5;
     } else {
@@ -477,10 +466,7 @@ angular.module('starter.filters', []).filter('buildingFilter', [
 angular.module('starter.directives', []).directive('clickMe', function() {
   return {
     link: function($scope, element, iAttrs, controller) {
-      console.log(element);
-      element.bind('click', function() {
-        console.log('I\'ve just been clicked!');
-      });
+      element.bind('click', function() {});
     }
   };
 });
@@ -495,8 +481,6 @@ angular.module('starter.directives', []).directive('clickSvg', [
         return element.bind('click', function() {
           var name;
           name = scope.clickSvg;
-          console.log("FUCK");
-          console.log('$eval type:', scope.clickSvg);
         });
       }
     };

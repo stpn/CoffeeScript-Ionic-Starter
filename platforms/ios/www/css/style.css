@@ -18,6 +18,8 @@
     transition: .5s linear all !important; }
   #bld_tab_wrap .building {
     position: absolute; }
+  #bld_tab_wrap span.bld_name {
+    color: white; }
   #bld_tab_wrap .M200 {
     top: 0px;
     left: 10px; }
@@ -301,6 +303,7 @@ $dark:                            #444 !default;
 .ion-at:before,
 .ion-backspace:before,
 .ion-backspace-outline:before,
+.ion-backward-capxing:before,
 .ion-bag:before,
 .ion-battery-charging:before,
 .ion-battery-empty:before,
@@ -726,6 +729,7 @@ $dark:                            #444 !default;
 .ion-plane:before,
 .ion-planet:before,
 .ion-play:before,
+.ion-play-capxing:before,
 .ion-playstation:before,
 .ion-plus:before,
 .ion-plus-circled:before,
@@ -744,6 +748,7 @@ $dark:                            #444 !default;
 .ion-refresh:before,
 .ion-reply:before,
 .ion-reply-all:before,
+.ion-rewind-back:before,
 .ion-ribbon-a:before,
 .ion-ribbon-b:before,
 .ion-sad:before,
@@ -753,8 +758,10 @@ $dark:                            #444 !default;
 .ion-settings:before,
 .ion-share:before,
 .ion-shuffle:before,
+.ion-skip-back-capxing:before,
 .ion-skip-backward:before,
 .ion-skip-forward:before,
+.ion-skip-forward-capxing:before,
 .ion-social-android:before,
 .ion-social-android-outline:before,
 .ion-social-angular:before,
@@ -870,6 +877,8 @@ $dark:                            #444 !default;
 .ion-volume-mute:before,
 .ion-wand:before,
 .ion-waterdrop:before,
+.ion-webcam-grid-capxing:before,
+.ion-webcam-single-capxing:before,
 .ion-wifi:before,
 .ion-wineglass:before,
 .ion-woman:before,
@@ -1363,6 +1372,9 @@ $dark:                            #444 !default;
 
 .ion-backspace-outline:before {
   content: ""; }
+
+.ion-backward-capxing:before {
+  content: ""; }
 
 .ion-bag:before {
   content: ""; }
@@ -2639,6 +2651,9 @@ $dark:                            #444 !default;
 .ion-play:before {
   content: ""; }
 
+.ion-play-capxing:before {
+  content: ""; }
+
 .ion-playstation:before {
   content: ""; }
 
@@ -2693,6 +2708,9 @@ $dark:                            #444 !default;
 .ion-reply-all:before {
   content: ""; }
 
+.ion-rewind-back:before {
+  content: ""; }
+
 .ion-ribbon-a:before {
   content: ""; }
 
@@ -2720,11 +2738,17 @@ $dark:                            #444 !default;
 .ion-shuffle:before {
   content: ""; }
 
+.ion-skip-back-capxing:before {
+  content: ""; }
+
 .ion-skip-backward:before {
   content: ""; }
 
 .ion-skip-forward:before {
   content: ""; }
+
+.ion-skip-forward-capxing:before {
+  content: ""; }
 
 .ion-social-android:before {
   content: ""; }
@@ -3070,6 +3094,12 @@ $dark:                            #444 !default;
 
 .ion-waterdrop:before {
   content: ""; }
+
+.ion-webcam-grid-capxing:before {
+  content: ""; }
+
+.ion-webcam-single-capxing:before {
+  content: ""; }
 
 .ion-wifi:before {
   content: ""; }
@@ -9275,7 +9305,7 @@ a.button {
   width: 90%;
   margin-left: auto;
   margin-right: auto;
-  margin-left: 55px; }
+  margin-left: 12px !important; }
 
 .pict {
   display: inline-block;
@@ -9308,50 +9338,58 @@ a.button {
     font-size: 12px;
     font-family: "Gotham Narrow Book"; }
 
+.presentation_titles {
+  margin-left: 36px;
+  color: #DAD9D9;
+  font-family: "Gotham Light"; }
+  .presentation_titles .presentation_title {
+    font-size: 22px; }
+  .presentation_titles .presentation_subtitle {
+    font-size: 20px; }
+
 .presenation_container {
   margin-top: 53px; }
-  .presenation_container .presentation_titles {
-    margin-left: 55px;
-    color: #DAD9D9;
-    font-family: "Gotham Light"; }
-  .presenation_container .presentation_title {
-    font-size: 22px; }
-  .presenation_container .presentation_subtitle {
-    font-size: 20px; }
   .presenation_container .presentation_gal {
-    margin-left: 43px;
+    margin-left: 25px;
     min-height: 743px; }
     .presenation_container .presentation_gal .col_slide {
       -webkit-box-flex: 0;
-      -webkit-flex: 0 0 215px;
+      -webkit-flex: 0 0 132px;
       -moz-box-flex: 0;
-      -moz-flex: 0 0 215px;
-      -ms-flex: 0 0 215px;
-      flex: 0 0 215px;
-      max-width: 215px;
-      max-height: 115px;
+      -moz-flex: 0 0 132px;
+      -ms-flex: 0 0 123px;
+      flex: 0 0 132px;
+      max-width: 132px;
+      max-height: 74px;
       border: none;
       margin: 5px; }
       .presenation_container .presentation_gal .col_slide img {
-        max-height: 115px; }
+        max-height: 74px; }
 
 #presentation_controls {
+  position: absolute;
   background: black;
-  margin-left: 55px;
-  margin-top: 200px;
+  left: 29px;
   width: 768px; }
   #presentation_controls .counter {
-    font-size: 60px;
-    line-height: 60px; }
+    font-size: 37px;
+    color: #E5E5E5;
+    font-family: "Gotham Book";
+    line-height: 60px;
+    margin-top: 11px;
+    margin-left: 54px; }
   #presentation_controls .pres_button {
-    width: 200px;
-    height: 89px;
-    border: solid 1px; }
+    width: 172px;
+    height: 75px;
+    border: solid 1px;
+    margin-left: 5px; }
+    #presentation_controls .pres_button .skipbackward_button i {
+      font-size: 80px; }
     #presentation_controls .pres_button i {
       font-size: 60px;
-      margin-left: 80px;
+      margin-left: 70px;
       margin-right: auto;
-      line-height: 80px; }
+      line-height: 75px; }
   #presentation_controls li {
     cursor: pointer;
     float: left; }
@@ -9359,7 +9397,7 @@ a.button {
 .close_button {
   float: right;
   font-size: 25px;
-  margin-right: 100px; }
+  margin-right: 33px; }
   .close_button .ion-close::before {
     color: #808080; }
 
@@ -9583,6 +9621,7 @@ $dark:                            #444 !default;
 .ion-at:before,
 .ion-backspace:before,
 .ion-backspace-outline:before,
+.ion-backward-capxing:before,
 .ion-bag:before,
 .ion-battery-charging:before,
 .ion-battery-empty:before,
@@ -10008,6 +10047,7 @@ $dark:                            #444 !default;
 .ion-plane:before,
 .ion-planet:before,
 .ion-play:before,
+.ion-play-capxing:before,
 .ion-playstation:before,
 .ion-plus:before,
 .ion-plus-circled:before,
@@ -10026,6 +10066,7 @@ $dark:                            #444 !default;
 .ion-refresh:before,
 .ion-reply:before,
 .ion-reply-all:before,
+.ion-rewind-back:before,
 .ion-ribbon-a:before,
 .ion-ribbon-b:before,
 .ion-sad:before,
@@ -10035,8 +10076,10 @@ $dark:                            #444 !default;
 .ion-settings:before,
 .ion-share:before,
 .ion-shuffle:before,
+.ion-skip-back-capxing:before,
 .ion-skip-backward:before,
 .ion-skip-forward:before,
+.ion-skip-forward-capxing:before,
 .ion-social-android:before,
 .ion-social-android-outline:before,
 .ion-social-angular:before,
@@ -10152,6 +10195,8 @@ $dark:                            #444 !default;
 .ion-volume-mute:before,
 .ion-wand:before,
 .ion-waterdrop:before,
+.ion-webcam-grid-capxing:before,
+.ion-webcam-single-capxing:before,
 .ion-wifi:before,
 .ion-wineglass:before,
 .ion-woman:before,
@@ -10645,6 +10690,9 @@ $dark:                            #444 !default;
 
 .ion-backspace-outline:before {
   content: ""; }
+
+.ion-backward-capxing:before {
+  content: ""; }
 
 .ion-bag:before {
   content: ""; }
@@ -11921,6 +11969,9 @@ $dark:                            #444 !default;
 .ion-play:before {
   content: ""; }
 
+.ion-play-capxing:before {
+  content: ""; }
+
 .ion-playstation:before {
   content: ""; }
 
@@ -11975,6 +12026,9 @@ $dark:                            #444 !default;
 .ion-reply-all:before {
   content: ""; }
 
+.ion-rewind-back:before {
+  content: ""; }
+
 .ion-ribbon-a:before {
   content: ""; }
 
@@ -12002,11 +12056,17 @@ $dark:                            #444 !default;
 .ion-shuffle:before {
   content: ""; }
 
+.ion-skip-back-capxing:before {
+  content: ""; }
+
 .ion-skip-backward:before {
   content: ""; }
 
 .ion-skip-forward:before {
   content: ""; }
+
+.ion-skip-forward-capxing:before {
+  content: ""; }
 
 .ion-social-android:before {
   content: ""; }
@@ -12352,6 +12412,12 @@ $dark:                            #444 !default;
 
 .ion-waterdrop:before {
   content: ""; }
+
+.ion-webcam-grid-capxing:before {
+  content: ""; }
+
+.ion-webcam-single-capxing:before {
+  content: ""; }
 
 .ion-wifi:before {
   content: ""; }
@@ -18553,11 +18619,22 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+#home_bg {
+  width: 100%;
+  height: 100%;
+  background-image: url("frontpage.png");
+  background-size: cover;
+  background-repeat: no-repeat; }
+
 .tabs {
   top: 0px !important; }
 
 .item.item-stable {
   color: #999 !important; }
+
+ion-item {
+  font-family: "Gotham Book";
+  font-size: 22px; }
 
 .item .icon {
   color: white; }
@@ -18646,8 +18723,13 @@ ion-top-menu .item {
   .bevel div {
     margin-top: -26px;
     margin-left: auto;
-    margin-right: auto;
-    width: 94px; }
+    margin-right: auto; }
+
+#select_bld {
+  min-width: 168px;
+  text-align: center;
+  font-family: "Gotham Narrow Book";
+  font-size: 18px; }
 
 .building_wrap {
   position: relative;
@@ -18706,11 +18788,83 @@ ion-top-menu .item {
   position: relative !important; }
 
 .image_name {
+  font-family: "Gotham Narrow Book";
+  font-size: 12px;
   color: #999999 !important;
   text-decoration: none; }
 
+#video_container {
+  margin-top: 55px;
+  width: 696px;
+  margin-left: auto;
+  margin-right: auto; }
+  #video_container .presentation_titles {
+    margin-left: 11px !important; }
+  #video_container .close_button {
+    margin-right: 3px !important;
+    margin-top: -19px !important; }
+  #video_container ion-content {
+    position: relative; }
+  #video_container .video_controls {
+    min-width: 696px; }
+    #video_container .video_controls input.seekbar {
+      min-width: 696px;
+      margin-bottom: 34px;
+      margin-top: 34px; }
+    #video_container .video_controls .pres_button {
+      width: 172px;
+      height: 75px;
+      border: solid 1px;
+      margin-right: 2 px; }
+      #video_container .video_controls .pres_button i.ion-rewind-back {
+        font-size: 80px;
+        line-height: 120px; }
+      #video_container .video_controls .pres_button i {
+        font-size: 60px;
+        margin-left: 54px;
+        margin-right: auto;
+        line-height: 90px; }
+    #video_container .video_controls li {
+      list-style-type: none;
+      cursor: pointer;
+      float: left; }
+    #video_container .video_controls .volume_controls {
+      position: absolute;
+      left: 0px;
+      bottom: 70px; }
+      #video_container .video_controls .volume_controls i {
+        font-size: 30px;
+        margin-left: 40px !important;
+        margin-right: 30px;
+        line-height: 90px; }
+      #video_container .video_controls .volume_controls i.ion-minus {
+        margin-left: 20px; }
+
+progress {
+  width: 450px;
+  height: 24px;
+  margin-top: 32px;
+  display: block;
+  /* Important Thing */
+  -webkit-appearance: none;
+  border: none; }
+
+/* All good till now. Now we'll style the background */
+progress::-webkit-progress-bar {
+  background: #808080;
+  box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
+  padding: 5px; }
+
+/* Now the value part */
+progress::-webkit-progress-value {
+  background: #666667;
+  -webkit-animation: move 5s linear 0 infinite; }
+
 #webcams_view {
   margin-top: 47px; }
+
+#webcams_view > div:nth-child(4) > ion-item > a {
+  background-color: black !important; }
 
 .webcam_title {
   margin-top: 34px;
@@ -18736,6 +18890,8 @@ ion-top-menu .item {
     min-width: 245px !important;
     float: left;
     margin-bottom: 10px; }
+  .camera_buttons .short_btn.active {
+    background: #999; }
   .camera_buttons .camera1,
   .camera_buttons .camera3 {
     margin-right: 5px; }
@@ -18777,9 +18933,13 @@ ion-top-menu .item {
 #panorama_title {
   margin-top: 88px; }
 
+.panorama_titles {
+  font-family: "Gotham Book" !important;
+  font-size: 22px; }
+
 #panorama_view {
   height: 242px;
-  margin-top: 44px; }
+  margin-top: 14px; }
   #panorama_view img {
     max-width: 100%;
     max-height: 100%; }

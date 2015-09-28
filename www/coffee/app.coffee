@@ -44,7 +44,7 @@ angular.module('starter', [
       ).state('tab.presentations',
     url: '/presentations/:presentationId'
     views: 'tab-dash':
-      templateUrl: 'templates/presentations/presentation.html'
+      templateUrl: 'templates/Presentations/presentation.html'
       controller: 'PresentationCtrl'
       
 
@@ -64,13 +64,13 @@ angular.module('starter', [
     ).state('tab.webcams',
     url: '/webcams'
     views: 'webcams':
-      templateUrl: 'templates/webcams/webcams.html'
+      templateUrl: 'templates/Webcams/webcams.html'
       controller: 'WebcamsCtrl',    
 
     ).state('tab.panoramas',
     url: '/panoramas/:panoramaId'
     views: 'webcams':
-      templateUrl: 'templates/panoramas/panorama.html'
+      templateUrl: 'templates/Panoramas/panorama.html'
       controller: 'PanoramasCtrl',          
 
     ).state('tab.buildings',
