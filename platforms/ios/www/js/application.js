@@ -94,7 +94,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   });
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/tab/home');
 });
 
 angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
@@ -102,19 +102,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()], ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()], ["Webcams", Webcams.all()]];
   $scope.activeBuilding = ActiveBuilding;
   $scope.buldingTabName = "Select Buildings";
-  $scope.comparisonState = 'building';
-  $scope.topMenu = TopmenuState.states;
+  $scope.comparisonState = false;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.compTemplate = "templates/menu/comparison_menu.html";
-  $scope.bld_style = "margin-top: 5px";
+  $scope.bld_style = "margin-top: -200px";
   $scope.transformStyle = "transform: scale(1.0)";
-  $scope.topMenu = TopmenuState;
-  $scope.isBuildings = function() {
-    return TopmenuState.getBuildings();
-  };
   $scope.isComparison = function() {
-    return TopmenuState.getComparison();
+    return $scope.comparisonState;
   };
   $scope.isActive = function(name) {
     return $scope.activeBuilding.isActive(name);
@@ -168,43 +163,42 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
   };
-  $scope.toggleTopMenu = function() {
+  $scope.toggleTopMenu = function(switchCompare) {
     var bld, menu, pane;
+    $scope.comparisonState = false;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
-    if (menu.offsetHeight === 4) {
+    if (menu.offsetHeight === 24) {
       menu.style.height = '250px';
-      pane.style.top = '450px';
+      pane.style.top = '350px';
     } else {
-      menu.style.height = '4px';
-      pane.style.top = '120px';
+      menu.style.height = '24px';
+      pane.style.top = '85px';
     }
-    if (menu.style.height === "4px") {
-      $scope.bld_style = "margin-top: -200px";
+    if (menu.style.height === "24px") {
+      return $scope.bld_style = "margin-top: -200px";
     } else {
-      $scope.bld_style = "margin-top: 50px";
-    }
-    if ($scope.activeBuilding.tabName === "COMPARISON MODE") {
-      TopmenuState.setBuildings(false);
-      TopmenuState.setComparison(true);
-    } else {
-      TopmenuState.setBuildings(true);
-      TopmenuState.setComparison(false);
+      return $scope.bld_style = "margin-top: 50px";
     }
   };
   $scope.showCompareMenu = function() {
-    var menu, proceed;
-    proceed = false;
-    if (TopmenuState.getComparison() === true) {
-      proceed = true;
-      $scope.activeBuilding.tabName = $scope.activeBuilding.name;
-    } else {
+    var bld, menu, pane;
+    if ($scope.comparisonState === false) {
+      $scope.comparisonState = true;
       $scope.activeBuilding.tabName = "COMPARISON MODE";
-    }
-    menu = document.getElementById('ionTopMenu');
-    if (menu.offsetHeight === 4 || proceed === true) {
-      return $scope.toggleTopMenu();
+      bld = document.getElementById('building_wrap');
+      menu = document.getElementById('ionTopMenu');
+      pane = document.getElementsByTagName('ion-content')[0];
+      if (menu.offsetHeight === 24) {
+        menu.style.height = '250px';
+        pane.style.top = '350px';
+      }
+      if (menu.style.height === "24px") {
+        return $scope.bld_style = "margin-top: -200px";
+      } else {
+        return $scope.bld_style = "margin-top: 50px";
+      }
     }
   };
   $scope.getFillColorFor = function(bld) {
@@ -226,8 +220,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if (name === "600") {
       return "M600";
     }
-    if (name === "201") {
-      return "M201";
+    if (name === "201F") {
+      return "F201";
     }
     if (name === "200F") {
       return "F200";
@@ -243,7 +237,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.webcams = Webcams.all();
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
-  console.log("HERE");
+  $scope.nowLive4 = false;
   $scope.isActive = function(item) {
     if ($scope.activeWebcam === void 0) {
       return false;
@@ -257,7 +251,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     $scope.selected = activeWebcamId;
     $scope.activeWebcam = Webcams.get(activeWebcamId);
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
-    return $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
+    $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
+    $scope.nowLive = false;
+    return $scope.nowLive4 = false;
   };
   $scope.isEnabled = function(model) {
     return model === void 0;
@@ -269,7 +265,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.nowLive;
   };
   $scope.setLive = function() {
-    return $scope.nowLive = !$scope.nowLive;
+    $scope.nowLive = !$scope.nowLive;
+    $scope.activeWebcam = void 0;
+    return $scope.nowLive4 = false;
+  };
+  $scope.setLive4 = function() {
+    $scope.nowLive4 = !$scope.nowLive4;
+    $scope.activeWebcam = void 0;
+    return $scope.nowLive = false;
+  };
+  $scope.isLive4 = function() {
+    return $scope.nowLive4;
   };
   $scope.toggleGroup = function(group) {
     if ($scope.isGroupShown(group)) {
@@ -357,8 +363,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if (name === "600") {
       return "M600";
     }
-    if (name === "201") {
-      return "M201";
+    if (name === "201F") {
+      return "F201";
     }
     if (name === "200F") {
       return "F200";
@@ -372,62 +378,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   return $scope.getCamera = function() {
     return 1;
-  };
-}).controller('TopMenuCtrl', function($scope, $sce, Buildings, ActiveBuilding, $log, $window, $location, TopmenuState) {
-  $scope.activeBuilding = ActiveBuilding;
-  $scope.buildings = Buildings.all();
-  $scope.templatePath = "templates/menu/building_menu.html";
-  $scope.compTemplate = "templates/menu/comparison_menu.html";
-  $scope.bld_style = "margin-top: 5px";
-  $scope.transformStyle = "transform: scale(1.0)";
-  $scope.topMenu = TopmenuState;
-  $scope.cancelActiveBuilding = function() {
-    return ActiveBuilding.name = void 0;
-  };
-  $scope.building_is = function(code, name) {
-    if (code === name) {
-      return true;
-    }
-  };
-  $scope.getTemplate = function(name) {
-    return Buildings.getTemplate(name);
-  };
-  $scope.setActiveBuilding = function(name) {
-    return $log.debug(name);
-  };
-  $scope.buildingCode = function(name) {
-    if (name === "M201") {
-      return "201";
-    }
-    if (name === "M600") {
-      return "600";
-    } else {
-      return name;
-    }
-  };
-  return $scope.toggleTopMenu = function() {
-    var bld, menu, pane;
-    bld = document.getElementById('building_wrap');
-    menu = document.getElementById('ionTopMenu');
-    pane = document.getElementsByTagName('ion-content')[0];
-    if (menu.offsetHeight === 4) {
-      menu.style.height = '350px';
-      pane.style.top = '450px';
-    } else {
-      menu.style.height = '4px';
-      pane.style.top = '120px';
-    }
-    if (menu.style.height === "4px") {
-      $scope.bld_style = "margin-top: -200px";
-    } else {
-      $scope.bld_style = "margin-top: 50px";
-    }
-    if (TopmenuState.getBuildings() === false) {
-      setTimeout((function() {
-        TopmenuState.setBuildings(true);
-        return TopmenuState.setComparison(false);
-      }), 1000);
-    }
   };
 }).controller('VideoCtrl', function($scope, $stateParams, Videos, $location) {
   $scope.video = Videos.get($stateParams.videoId);
@@ -623,7 +573,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
     }, {
       id: 4,
       name: "201 F Street",
-      code: "201"
+      code: "201F"
     }, {
       id: 5,
       name: "200 F Street",
@@ -650,7 +600,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     buildingCode: function(name) {
       if (name === "201") {
-        return "201";
+        return "201F";
       }
       if (name === "600") {
         return "600";

@@ -18,7 +18,7 @@ angular.module('starter.services', []).factory('Buildings', ->
     {
       id: 4
       name: "201 F Street"
-      code: "201"
+      code: "201F"
     },
     {
       id: 5
@@ -42,7 +42,7 @@ angular.module('starter.services', []).factory('Buildings', ->
 
     buildingCode: (name)->    
       if name == "201"    
-        return "201"
+        return "201F"
       if name == "600"
         return "600"
       else
