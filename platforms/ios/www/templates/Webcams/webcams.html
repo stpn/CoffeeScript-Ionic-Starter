@@ -1,9 +1,4 @@
-<!--
-  This template loads for the 'tab.friend-detail' state (app.js)
-  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
-  The FriendsCtrl pulls data from the Friends service (service.js)
-  The Friends service returns an array of friend data
--->
+
 <ion-view view-title="webcams" id="webcams_view">
     <div class="webcam_title">
         <span>
@@ -38,8 +33,8 @@
         <ion-list>
    
             <div ng-model="timelapses" ng-model='timelapses' class="accordion_container">
-                <ion-item class="item-stable" ng-click="isEnabled(timelapses) || toggleGroup(timelapses)" ng-class="{active: isGroupShown(timelapses) && timelapses.length > 0}">
-                    <i class="icon" ng-class="isGroupShown(timelapses) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; Timelapses
+                <ion-item class="item-stable" ng-click="isEnabled(timelapses) || toggleGroup(timelapses)" ng-class="{active: isGroupShown(timelapses) && timelapses.length > 0}" >
+                    <i class="icon" ng-class="isGroupShown(timelapses) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; <span style="color: white">TIMELAPSE</span>
                 </ion-item>
                 <div class="row responsive-md item-accordion gallery" ng-show="isGroupShown(timelapses)" ng-repeat="model in timelapses" ng-if="$index % 4 === 0">
                     <ion-item class="col cust_col" ng-if="$index < timelapses.length" href="#">

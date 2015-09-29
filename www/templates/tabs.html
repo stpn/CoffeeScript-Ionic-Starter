@@ -4,7 +4,11 @@ Each tab's child <ion-nav-view> directive will have its own
 navigation history that also transitions its views in and out.
 -->
 <ion-tabs ng-controller="titleCtrl" class="tabs-icon-top tabs-color-active-positive" tabs-style="tabs-icon-top" name="main-tab" id="header">
-    <a href="#/tab/home" id="main_title"><ng-include src="titleTemplate"></ng-include></a>
+    <ion-tab title="" href="#/tab/home" id="main_title" icon ="title_link_image">
+
+    <!-- <ng-include src="titleTemplate"></ng-include> -->
+    <ion-nav-view name="home"></ion-nav-view>
+    </ion-tab>
     <!-- Dashboard Tab -->
     <ion-tab title="12 SCREEN"  href="#/tab/dash" class="title_tab screen12_tab">
         <ion-nav-view name="tab-dash"></ion-nav-view>

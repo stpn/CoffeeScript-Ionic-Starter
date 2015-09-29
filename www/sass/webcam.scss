@@ -18,6 +18,7 @@
         margin-left: 18px;
         font-family: "Gotham Book";
         font-size: 22px;
+        color: white;
     }
 }
 
@@ -26,6 +27,9 @@
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
+    ion-item{
+        color: white;
+    }
     .item {
                 border-color: #4D4D4E;
 
@@ -66,6 +70,8 @@
     margin-left: auto;
     margin-right: auto;
     .item{
+                color: white;
+
         width: 501px !important;
     }
     .scroll {
@@ -75,6 +81,7 @@
         margin-right: auto;
     }
     ion-item.item-stable.item{
+        color: white;
         border-color: #4D4D4E;
         background-color: black;    
         margin-bottom: 10px;
@@ -82,6 +89,7 @@
     }
 
     ion-item.item-stable.item.active{
+        color: white;
         border-color: #4D4D4E;
         background-color: #4D4D4E !important;    
         margin-bottom: 10px;
@@ -119,7 +127,7 @@
 .square {
     position: absolute;
     width: 426px;
-    height: 179px;
+    height: 186px;
     border: solid 3px;
     border-color: white;
     background: rgba(255, 255, 255, 0.01);

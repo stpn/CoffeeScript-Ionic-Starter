@@ -66,6 +66,8 @@
     <true/>
     <key>NSMainNibFile</key>
     <string></string>
+    <key>NSMainNibFile~ipad</key>
+    <string></string>
     <key>UILaunchImages</key>
     <array>
       <dict>

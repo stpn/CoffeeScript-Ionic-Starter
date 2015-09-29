@@ -40,25 +40,25 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   }).state('tab.home', {
     url: '/home',
     views: {
-      'tab-dash': {
+      'home': {
         templateUrl: 'templates/home.html',
         controller: 'HomeCtrl'
-      }
-    }
-  }).state('tab.webcams', {
-    url: '/webcams',
-    views: {
-      'webcams': {
-        templateUrl: 'templates/Webcams/webcams.html',
-        controller: 'WebcamsCtrl'
       }
     }
   }).state('tab.panoramas', {
     url: '/panoramas/:panoramaId',
     views: {
       'webcams': {
-        templateUrl: 'templates/Panoramas/panorama.html',
+        templateUrl: 'templates/panoramas/panorama.html',
         controller: 'PanoramasCtrl'
+      }
+    }
+  }).state('tab.webcams', {
+    url: '/webcams',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/webcams/webcams.html',
+        controller: 'WebcamsCtrl'
       }
     }
   }).state('tab.buildings', {
@@ -102,7 +102,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()], ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()], ["Webcams", Webcams.all()]];
   $scope.activeBuilding = ActiveBuilding;
   $scope.buldingTabName = "Select Buildings";
-  $scope.state = $state;
+  $scope.comparisonState = 'building';
   $scope.topMenu = TopmenuState.states;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
@@ -115,22 +115,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.isComparison = function() {
     return TopmenuState.getComparison();
-  };
-  $scope.showCompareMenu = function() {
-    var menu, proceed;
-    proceed = false;
-    if (TopmenuState.getComparison() === true) {
-      proceed = true;
-      $scope.activeBuilding.tabName = $scope.activeBuilding.name;
-    } else {
-      $scope.activeBuilding.tabName = "COMPARISON MODE";
-    }
-    TopmenuState.setBuildings(false);
-    TopmenuState.setComparison(true);
-    menu = document.getElementById('ionTopMenu');
-    if (menu.offsetHeight === 4 || proceed === true) {
-      return $scope.toggleTopMenu();
-    }
   };
   $scope.isActive = function(name) {
     return $scope.activeBuilding.isActive(name);
@@ -186,8 +170,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.toggleTopMenu = function() {
     var bld, menu, pane;
-    TopmenuState.setBuildings(true);
-    TopmenuState.setComparison(false);
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
@@ -203,14 +185,29 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else {
       $scope.bld_style = "margin-top: 50px";
     }
-    if (TopmenuState.getBuildings() === false) {
-      setTimeout((function() {
-        TopmenuState.setBuildings(true);
-        return TopmenuState.setComparison(false);
-      }), 1000);
+    if ($scope.activeBuilding.tabName === "COMPARISON MODE") {
+      TopmenuState.setBuildings(false);
+      TopmenuState.setComparison(true);
+    } else {
+      TopmenuState.setBuildings(true);
+      TopmenuState.setComparison(false);
     }
   };
-  return $scope.getFillColorFor = function(bld) {
+  $scope.showCompareMenu = function() {
+    var menu, proceed;
+    proceed = false;
+    if (TopmenuState.getComparison() === true) {
+      proceed = true;
+      $scope.activeBuilding.tabName = $scope.activeBuilding.name;
+    } else {
+      $scope.activeBuilding.tabName = "COMPARISON MODE";
+    }
+    menu = document.getElementById('ionTopMenu');
+    if (menu.offsetHeight === 4 || proceed === true) {
+      return $scope.toggleTopMenu();
+    }
+  };
+  $scope.getFillColorFor = function(bld) {
     if ($scope.activeBuilding === void 0) {
       return "none";
     } else if (bld.name === $scope.activeBuilding.getName()) {
@@ -219,16 +216,34 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return "none";
     }
   };
+  return $scope.convertCode = function(name) {
+    if (name === "200M") {
+      return "M200";
+    }
+    if (name === "250M") {
+      return "M250";
+    }
+    if (name === "600") {
+      return "M600";
+    }
+    if (name === "201") {
+      return "M201";
+    }
+    if (name === "200F") {
+      return "F200";
+    }
+  };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.modelId);
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.modelId);
-}).controller('WebcamsCtrl', function($scope, $log, $stateParams, Webcams) {
+}).controller('WebcamsCtrl', function($scope, $log, Webcams) {
   $scope.webcams = Webcams.all();
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
+  console.log("HERE");
   $scope.isActive = function(item) {
     if ($scope.activeWebcam === void 0) {
       return false;
@@ -271,8 +286,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.slides = Presentations.getSlides($stateParams.presentationId);
   $scope.presentation_name = $scope.presentation.name;
   $scope.project_name = $scope.presentation.project_name;
-  $scope.postSlide = function(slideId) {
-    return $log.debug("FUCKYES " + slideId);
+  $scope.currentSlide = 1;
+  $scope.postSlide = function(slideIdx) {
+    if (slideIdx === $scope.slides.length) {
+      $scope.currentSlide = $scope.slides.length;
+    }
+    if (slideIdx === 1) {
+      return $scope.currentSlide = 1;
+    } else {
+      return $scope.currentSlide = slideIdx;
+    }
   };
   $scope.alertMe = function() {
     return $log.debug("FUCK");
@@ -314,12 +337,31 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.activeBuilding.tabName = name;
   };
   $scope.getFillColorFor = function(bld) {
-    if ($scope.activeBuilding === void 0) {
+    if ((bld === "all" && "all" === $scope.activeBuilding.getName())) {
+      return "#6D6F72";
+    } else if ($scope.activeBuilding === void 0) {
       return "none";
     } else if (bld.name === $scope.activeBuilding.getName()) {
       return "#6D6F72";
     } else {
       return "none";
+    }
+  };
+  $scope.convertCode = function(name) {
+    if (name === "200M") {
+      return "M200";
+    }
+    if (name === "250M") {
+      return "M250";
+    }
+    if (name === "600") {
+      return "M600";
+    }
+    if (name === "201") {
+      return "M201";
+    }
+    if (name === "200F") {
+      return "F200";
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
@@ -387,7 +429,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       }), 1000);
     }
   };
-}).controller('VideoCtrl', function($scope, $stateParams, Videos) {
+}).controller('VideoCtrl', function($scope, $stateParams, Videos, $location) {
   $scope.video = Videos.get($stateParams.videoId);
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
@@ -398,6 +440,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
     $scope.seekBar.value = value;
   });
+  $scope.closeBtn = function() {
+    $scope.videoDiv.pause();
+    return $location.path('#/dash/');
+  };
   $scope.seekRelease = function() {
     var currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
@@ -434,9 +480,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('HomeCtrl', function($scope) {
-  $scope.settings = {
-    enableFriends: true
-  };
+  $scope.home = "HOME";
 });
 
 Number.prototype.map = function(in_min, in_max, out_min, out_max) {
@@ -516,10 +560,10 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
         rotation = 0;
         last_rotation = void 0;
         dragReady = 0;
-        leftXLimit = 380;
-        rightXLimit = 1060;
+        leftXLimit = 340;
+        rightXLimit = 1080;
         fixPosXmin = 0;
-        fixPosXmax = 300;
+        fixPosXmax = 250;
         lastMaxX = 0;
         halt = false;
         max = 200;
@@ -533,24 +577,15 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
               last_rotation = rotation;
               break;
             case 'drag':
-              if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit) {
-                posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
-                lastMaxX = posX;
-                halt = false;
-              } else {
-                if (square.getBoundingClientRect().left === leftXLimit) {
-                  fixPosXmin = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
-                }
-                if (square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt === false) {
-                  fixPosXmax = lastMaxX;
-                  halt = true;
-                }
+              posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+              console.log(posX);
+              lastMaxX = posX;
+              halt = false;
+              if (posX > 249) {
+                posX = 249;
               }
-              if (fixPosXmin > e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX) {
-                posX = fixPosXmin;
-              }
-              if (e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX > 250) {
-                posX = 250;
+              if (posX <= 1) {
+                posX = 2;
               }
               break;
             case 'transform':
@@ -576,23 +611,23 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Massachusetts 200",
-      code: "M200"
+      code: "200M"
     }, {
       id: 2,
       name: "Massachusetts 250",
-      code: "M250"
+      code: "250M"
     }, {
       id: 3,
-      name: "Massachusetts 600",
-      code: "M600"
+      name: "600 Second Street",
+      code: "600"
     }, {
       id: 4,
-      name: "Massachusetts 201",
-      code: "M201"
+      name: "201 F Street",
+      code: "201"
     }, {
       id: 5,
-      name: "Fassachusetts 200",
-      code: "F200"
+      name: "200 F Street",
+      code: "200F"
     }
   ];
   return {
@@ -614,10 +649,10 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return null;
     },
     buildingCode: function(name) {
-      if (name === "M201") {
+      if (name === "201") {
         return "201";
       }
-      if (name === "M600") {
+      if (name === "600") {
         return "600";
       } else {
         return name;
@@ -649,13 +684,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Overview Presentation",
-      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      image: 'img/assets/presentations/1.png',
       building_name: 'Massachusetts 200',
       project_name: "Massachusetts 200"
     }, {
       id: 2,
       name: "Sustainability Presentation",
-      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      image: 'img/assets/presentations/2.jpg',
+      building_name: 'Massachusetts 200',
+      project_name: "Massachusetts 200"
+    }, {
+      id: 3,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
       building_name: 'Massachusetts 250',
       project_name: "Massachusetts 250"
     }
@@ -686,19 +727,34 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return slides = [
         {
           id: 1,
-          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+          image: 'img/assets/slides/1.jpg'
         }, {
           id: 2,
-          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+          image: 'img/assets/slides/2.jpg'
         }, {
           id: 3,
-          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+          image: 'img/assets/slides/3.jpg'
         }, {
           id: 4,
-          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+          image: 'img/assets/slides/4.jpg'
         }, {
           id: 5,
-          image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg'
+          image: 'img/assets/slides/5.jpg'
+        }, {
+          id: 6,
+          image: 'img/assets/slides/6.jpg'
+        }, {
+          id: 7,
+          image: 'img/assets/slides/7.jpg'
+        }, {
+          id: 8,
+          image: 'img/assets/slides/8.jpg'
+        }, {
+          id: 9,
+          image: 'img/assets/slides/9.jpg'
+        }, {
+          id: 10,
+          image: 'img/assets/slides/10.jpg'
         }
       ];
     }
@@ -709,13 +765,18 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Rend1",
-      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      image: 'img/assets/renderings/1.jpg',
       building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "Rend2",
-      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
-      building_name: 'Massachusetts 300'
+      image: 'img/assets/renderings/2.jpg',
+      building_name: 'Massachusetts 200'
+    }, {
+      id: 3,
+      name: "Rendering 3",
+      image: 'img/assets/renderings/3.jpg',
+      building_name: 'Massachusetts 250'
     }
   ];
   return {
@@ -746,18 +807,18 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "View1",
-      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      image: 'img/assets/views/1.jpg',
       building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "View2",
-      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      image: 'img/assets/views/2.jpg',
       building_name: 'Massachusetts 200'
     }, {
-      id: 1,
-      name: "View1",
-      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
-      building_name: 'Massachusetts 200'
+      id: 3,
+      name: "View3",
+      image: 'img/assets/views/3.jpg',
+      building_name: 'Massachusetts 250'
     }
   ];
   return {
@@ -795,13 +856,18 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Floorplan1",
-      image: 'https://capxing.s3.amazonaws.com/uploads/floorplan/image/4/200M_FP_PH_2.svg',
+      image: 'img/assets/floorplans/1.svg',
       building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "Floorplan2",
-      image: 'https://capxing.s3.amazonaws.com/uploads/floorplan/image/4/200M_FP_PH_2.svg',
+      image: 'img/assets/floorplans/1.svg',
       building_name: 'Massachusetts 200'
+    }, {
+      id: 3,
+      name: "Floorplan3",
+      image: 'img/assets/floorplans/3.svg',
+      building_name: 'Massachusetts 250'
     }
   ];
   return {
@@ -832,15 +898,21 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Video1",
-      image: 'https://capxing.s3.amazonaws.com/uploads/rendering/image/5/thumb_200Mass_rendering1.jpg',
+      image: 'img/assets/views/1.jpg',
       building_name: 'Massachusetts 200',
-      recording: 'http://www.w3schools.com/html/mov_bbb.mp4 '
+      recording: 'img/assets/videos/1.mp4'
     }, {
       id: 2,
       name: "Video2",
-      image: 'https://capxing.s3.amazonaws.com/uploads/view/image/2/thumb_250Mass_view1.jpg',
+      image: 'img/assets/views/2.jpg',
       building_name: 'Massachusetts 200',
-      recording: 'http://www.w3schools.com/html/mov_bbb.mp4'
+      recording: 'img/assets/videos/2.mp4'
+    }, {
+      id: 3,
+      name: "Video3",
+      image: 'img/assets/views/3.jpg',
+      building_name: 'Massachusetts 250',
+      recording: 'img/assets/videos/3.mp4'
     }
   ];
   return {
@@ -893,18 +965,18 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Webcam1",
-      image: 'https://oxblue.com/archive/517405af56b6a32dcbb7fb3b7373378e/2048x1536.jpg?1442798939',
+      image: 'img/assets/webcams/1.jpg',
       building_name: 'Massachusetts 200'
     }, {
       id: 2,
       name: "Webcam2",
-      image: 'https://oxblue.com/archive/276b2472bc731684941f635b7d1c2009/2048x1536.jpg?1442798939',
+      image: 'img/assets/webcams/2.jpg',
       building_name: 'Massachusetts 200'
     }, {
       id: 3,
       name: "Webcam3",
-      image: 'https://oxblue.com/archive/52785a2e10cf0eb8a0b097e04e35aeb5/2048x1536.jpg?1442798939',
-      building_name: 'Massachusetts 200'
+      image: 'img/assets/webcams/3.jpg',
+      building_name: 'Massachusetts 250'
     }
   ];
   return {
@@ -932,12 +1004,12 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return [
         {
           id: 1,
-          name: "Video1",
-          image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/15/4.jpg'
+          name: "Panorama1",
+          image: 'img/assets/panoramas/1.jpg'
         }, {
           id: 2,
-          name: "Video2",
-          image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg'
+          name: "Panorama2",
+          image: 'img/assets/panoramas/2.jpg'
         }
       ];
     },
@@ -946,11 +1018,11 @@ angular.module('starter.services', []).factory('Buildings', function() {
         {
           id: 1,
           name: "Video1",
-          image: 'https://oxblue.com/archive/2a415640359473ad01cd8b83498f8eea/2048x1536.jpg?1442798939'
+          image: 'img/assets/webcams/1.jpg'
         }, {
           id: 2,
           name: "Video2",
-          image: 'https://oxblue.com/archive/2a415640359473ad01cd8b83498f8eea/2048x1536.jpg?1442798939'
+          image: 'img/assets/webcams/2.jpg'
         }
       ];
     }
@@ -961,7 +1033,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
     {
       id: 1,
       name: "Pan1",
-      image: 'https://capxing.s3.amazonaws.com/uploads/panorama/image/16/4.jpg',
+      image: 'img/assets/panoramas/1.jpg',
       building_name: 'Massachusetts 200',
       camera_name: 'Camera 1'
     }

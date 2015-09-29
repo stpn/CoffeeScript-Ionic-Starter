@@ -77,10 +77,10 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
         rotation = 0
         last_rotation = undefined
         dragReady = 0
-        leftXLimit = 380
-        rightXLimit = 1060
+        leftXLimit = 340
+        rightXLimit = 1080
         fixPosXmin = 0
-        fixPosXmax = 300
+        fixPosXmax = 250
         lastMaxX = 0
         halt = false
         max = 200
@@ -92,20 +92,25 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
               lastScale = scale
               last_rotation = rotation
             when 'drag'
-              if square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit 
-                posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-                lastMaxX = posX
-                halt = false
-              else 
-                if square.getBoundingClientRect().left == leftXLimit
-                  fixPosXmin = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-                if square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt == false
-                  fixPosXmax =  lastMaxX #e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-                  halt = true
-              if fixPosXmin > e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-                posX = fixPosXmin
-              if e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX > 250
-                posX = 250
+              # if square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit 
+              posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+              console.log posX
+              lastMaxX = posX
+              halt = false
+              # else 
+              #   if square.getBoundingClientRect().left == leftXLimit
+              #     fixPosXmin = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+              #   if square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt == false
+              #     fixPosXmax =  lastMaxX #e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+              #     halt = true
+              # if fixPosXmin > e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+              #   posX = 2
+              # if e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX > fixPosXmax
+              #   posX = 249
+              if posX  > 249
+                posX = 249
+              if posX <= 1
+                posX = 2
             when 'transform'
               rotation = e.gesture.rotation + last_rotation
               scale = e.gesture.scale * lastScale

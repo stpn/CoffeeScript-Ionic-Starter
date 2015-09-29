@@ -4,7 +4,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()],  ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()],  ["Webcams", Webcams.all()]]
   $scope.activeBuilding = ActiveBuilding
   $scope.buldingTabName = "Select Buildings"
-  $scope.state = $state;
+  
+  $scope.comparisonState = 'building'
   $scope.topMenu = TopmenuState.states
 
 
@@ -21,18 +22,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.isComparison = () ->    
     TopmenuState.getComparison()
 
-  $scope.showCompareMenu = () ->
-    proceed = false
-    if TopmenuState.getComparison() == true
-      proceed = true
-      $scope.activeBuilding.tabName = $scope.activeBuilding.name
-    else
-      $scope.activeBuilding.tabName = "COMPARISON MODE"
-    TopmenuState.setBuildings(false)
-    TopmenuState.setComparison(true)
-    menu = document.getElementById('ionTopMenu')
-    if menu.offsetHeight == 4 || proceed == true
-      $scope.toggleTopMenu()   
+
 
   $scope.isActive =(name) ->
     $scope.activeBuilding.isActive(name)
@@ -95,8 +85,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.toggleTopMenu = ->
-    TopmenuState.setBuildings(true)
-    TopmenuState.setComparison(false)
+    # TopmenuState.setBuildings(true)
+    # TopmenuState.setComparison(false)
 
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
@@ -114,13 +104,30 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       $scope.bld_style = "margin-top: -200px"
     else
       $scope.bld_style = "margin-top: 50px"
-    if TopmenuState.getBuildings() == false
-      setTimeout (->
-        TopmenuState.setBuildings(true)
-        TopmenuState.setComparison(false)
-      ), 1000      
+    if $scope.activeBuilding.tabName == "COMPARISON MODE"
+      # setTimeout (->
+      # ), 1000      
+      TopmenuState.setBuildings(false)
+      TopmenuState.setComparison(true)
+    else
+      TopmenuState.setBuildings(true)
+      TopmenuState.setComparison(false)
+
 
     return 
+
+  $scope.showCompareMenu = () ->
+    proceed = false
+    if TopmenuState.getComparison() == true
+      proceed = true
+      $scope.activeBuilding.tabName = $scope.activeBuilding.name
+    else
+      $scope.activeBuilding.tabName = "COMPARISON MODE"
+      # TopmenuState.setBuildings(false)
+      # TopmenuState.setComparison(true)
+    menu = document.getElementById('ionTopMenu')
+    if menu.offsetHeight == 4 || proceed == true
+      $scope.toggleTopMenu()       
 
   $scope.getFillColorFor = (bld) ->
     #console.log name, $scope.activeBuilding.getName() + " YESS"
@@ -132,6 +139,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     else 
       return "none"
 
+  $scope.convertCode = (name) ->
+    if name == "200M"
+      return "M200"
+    if name == "250M"
+      return "M250"
+    if name == "600"
+      return "M600"
+    if name == "201"
+      return "M201"
+    if name == "200F"
+      return "F200"
 
 
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
@@ -148,10 +166,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   return
 
 
-).controller('WebcamsCtrl', ($scope, $log, $stateParams, Webcams) ->
+).controller('WebcamsCtrl', ($scope, $log, Webcams) ->
   $scope.webcams = Webcams.all()
   $scope.activeWebcam = undefined
   $scope.nowLive = false
+  console.log "HERE"
   # $scope.panoramas = undefined
   # $scope.timelapses = undefined
 
@@ -201,8 +220,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.slides = Presentations.getSlides($stateParams.presentationId)
   $scope.presentation_name = $scope.presentation.name
   $scope.project_name = $scope.presentation.project_name
-  $scope.postSlide = (slideId) ->
-    $log.debug("FUCKYES "+ slideId)
+  $scope.currentSlide = 1
+  $scope.postSlide = (slideIdx) ->
+    if slideIdx == $scope.slides.length 
+      $scope.currentSlide = $scope.slides.length  
+    if slideIdx == 1
+      $scope.currentSlide = 1
+    else
+      $scope.currentSlide = slideIdx
   $scope.alertMe = ()->
     $log.debug("FUCK")    
   return
@@ -231,6 +256,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.transformStyle = "scale(1.19)"
   $scope.activeBuilding = ActiveBuilding
 
+
   $scope.getTemplate = (name) ->
     Buildings.getTemplate(name)
 
@@ -252,14 +278,29 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.getFillColorFor = (bld) ->
+    if bld == "all" == $scope.activeBuilding.getName()
+      return "#6D6F72"
     #console.log name, $scope.activeBuilding.getName() + " YESS"
-    if $scope.activeBuilding == undefined
+    else if $scope.activeBuilding == undefined
       return "none"
     else if bld.name == $scope.activeBuilding.getName()
       #console.log 'yess'
       return "#6D6F72"
     else 
       return "none"
+
+  $scope.convertCode = (name) ->
+    if name == "200M"
+      return "M200"
+    if name == "250M"
+      return "M250"
+    if name == "600"
+      return "M600"
+    if name == "201"
+      return "M201"
+    if name == "200F"
+      return "F200"
+
 
   return
 
@@ -335,7 +376,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       ), 1000      
 
     return 
-).controller('VideoCtrl', ($scope, $stateParams, Videos) ->
+).controller('VideoCtrl', ($scope, $stateParams, Videos, $location) ->
   $scope.video = Videos.get($stateParams.videoId)
   $scope.videoDiv = document.getElementById('video')
   $scope.seekBar = document.getElementById('seekbar')
@@ -349,6 +390,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     #console.log value
     $scope.seekBar.value = value
     return
+  $scope.closeBtn =() ->
+    $scope.videoDiv.pause()
+    $location.path('#/dash/')
 
   $scope.seekRelease = ->
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
@@ -389,7 +433,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   return
 
 ).controller 'HomeCtrl', ($scope) ->
-  $scope.settings = enableFriends: true
+  $scope.home = "HOME"
   return   
 # ---
 # generated by js2coffee 2.1.0

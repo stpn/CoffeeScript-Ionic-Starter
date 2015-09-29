@@ -27,8 +27,8 @@
     <ion-content id="main_menu">
         <ion-list>
             <div ng-repeat='factory in factories' class="accordion_container">
-                <ion-item class="item-stable" ng-click="toggleGroup(factory)" ng-class="{active: isGroupShown(factory)}">
-                    <i class="icon" ng-class="isGroupShown(factory) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; {{factory[0]}}
+                <ion-item class="item-stable clicker" ng-click="toggleGroup(factory)" ng-class="{active: isGroupShown(factory)}">
+                    <i class="icon" ng-class="isGroupShown(factory) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; {{factory[0] | uppercase }}
                 </ion-item>
 <div class="row responsive-md item-accordion gallery" ng-show="isGroupShown(factory)" ng-repeat="model in factory[1] | buildingFilter: activeBuilding.getName()" ng-if="$index % 4 === 0">
     <ion-item class="col cust_col" ng-if="$index < factory[1].length && activeBuilding.isActive( factory[1][$index].building_name)" href="#/tab/{{factory[0].toLowerCase()}}/{{factory[1][$index].id}}" on-hold="showCompareMenu()">

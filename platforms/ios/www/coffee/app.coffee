@@ -57,21 +57,21 @@ angular.module('starter', [
 
     ).state('tab.home',
     url: '/home'
-    views: 'tab-dash':
+    views: 'home':
       templateUrl: 'templates/home.html'
-      controller: 'HomeCtrl',
-
-    ).state('tab.webcams',
-    url: '/webcams'
-    views: 'webcams':
-      templateUrl: 'templates/Webcams/webcams.html'
-      controller: 'WebcamsCtrl',    
+      controller: 'HomeCtrl',   
 
     ).state('tab.panoramas',
     url: '/panoramas/:panoramaId'
     views: 'webcams':
-      templateUrl: 'templates/Panoramas/panorama.html'
+      templateUrl: 'templates/panoramas/panorama.html'
       controller: 'PanoramasCtrl',          
+
+    ).state('tab.webcams',
+    url: '/webcams'
+    views: 'webcams':
+      templateUrl: 'templates/webcams/webcams.html'
+      controller: 'WebcamsCtrl',
 
     ).state('tab.buildings',
     url: '/buildings'

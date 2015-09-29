@@ -1,13 +1,22 @@
 @import "www/sass/custom_variables.scss";
+html {
+    margin-top: 20px;
+}
 
-#home_bg{
+#home_bg {
     width: 100%;
     height: 100%;
     background-image: url('frontpage.png');
-     background-size: cover;
+    background-size: cover;
     background-repeat: no-repeat;
-
 }
+
+.title_link_image {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url('capitol_crossing.svg');
+}
+
 .tabs {
     top: 0px !important;
 }
@@ -15,11 +24,12 @@
 .item.item-stable {
     color: #999 !important;
 }
-ion-item{
+
+ion-item {
     font-family: "Gotham Book";
     font-size: 22px;
-
 }
+
 .item {
     .icon {
         color: white;
@@ -43,43 +53,54 @@ ion-item{
         border-left: 1px solid #48484A;
         //border-right: 1px solid #fff;
     }
-    a.webcam_tab.tab-item-active::after {
-        content: '';
-        position: absolute;
-        left: 655px;
-        top: 23px;
-        display: inline-block;
-        height: 10px;
-        width: 86px;
-        border-bottom: 1px solid white;
-        margin-top: 5px;
-        //        max-width: 90px;
+    .tab-item-active{
+
+        text-decoration: underline;
     }
-    a.model_tab.tab-item-active::after {
-        content: '';
-        position: absolute;
-        left: 526px;
-        top: 23px;
-        display: inline-block;
-        height: 10px;
-        width: 65px;
-        border-bottom: 1px solid white;
-        margin-top: 5px;
-    }
-    a.screen12_tab.tab-item-active::after {
-        content: '';
-        position: absolute;
-        left: 371px;
-        top: 23px;
-        display: inline-block;
-        height: 10px;
-        width: 94px;
-        border-bottom: 1px solid white;
-        margin-top: 5px;
-    }
+    // DIV THING
+    // a.webcam_tab.tab-item-active::after {
+    //     content: '';
+    //     position: absolute;
+    //     left: 655px;
+    //     top: 23px;
+    //     display: inline-block;
+    //     height: 10px;
+    //     width: 86px;
+    //     border-bottom: 1px solid white;
+    //     margin-top: 5px;
+    //     //        max-width: 90px;
+    // }
+    // a.model_tab.tab-item-active::after {
+    //     content: '';
+    //     position: absolute;
+    //     left: 526px;
+    //     top: 23px;
+    //     display: inline-block;
+    //     height: 10px;
+    //     width: 65px;
+    //     border-bottom: 1px solid white;
+    //     margin-top: 5px;
+    // }
+    // a.screen12_tab.tab-item-active::after {
+    //     content: '';
+    //     position: absolute;
+    //     left: 371px;
+    //     top: 23px;
+    //     display: inline-block;
+    //     height: 10px;
+    //     width: 94px;
+    //     border-bottom: 1px solid white;
+    //     margin-top: 5px;
+    // }
     #main_title {
-        padding-right: 90px;
-        padding-left: 40px;
+        // padding-right: 90px;
+        // padding-left: 40px;
+    }
+    .tab-item:nth-of-type(1) {
+        margin-right: -10px;
+        margin-left: -30px;
+        margin-top: 5px;
+        min-width: 300px;
     }
 }
 
@@ -106,6 +127,10 @@ ion-content#main_menu {
     position: absolute;
     //    margin-top: 47px;
     transition: all .5s !important;
+.clicker{
+    padding: 60px !important;
+    font-size: 22px;
+}
 }
 
 ion-top-menu .item {
@@ -126,17 +151,14 @@ ion-top-menu .item {
         margin-left: auto;
         margin-right: auto;
     }
-
 }
-#select_bld{
+
+#select_bld {
     min-width: 168px;
     text-align: center;
-
     font-family: "Gotham Narrow Book";
     font-size: 18px;
 }
-
-
 
 .building_wrap {
     position: relative;

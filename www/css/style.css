@@ -18619,12 +18619,20 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+html {
+  margin-top: 20px; }
+
 #home_bg {
   width: 100%;
   height: 100%;
   background-image: url("frontpage.png");
   background-size: cover;
   background-repeat: no-repeat; }
+
+.title_link_image {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url("capitol_crossing.svg"); }
 
 .tabs {
   top: 0px !important; }
@@ -18652,42 +18660,14 @@ ion-item {
   padding-right: 20px;
   border-left: 1px solid #48484A; }
 
-#header a.webcam_tab.tab-item-active::after {
-  content: '';
-  position: absolute;
-  left: 655px;
-  top: 23px;
-  display: inline-block;
-  height: 10px;
-  width: 86px;
-  border-bottom: 1px solid white;
-  margin-top: 5px; }
+#header .tab-item-active {
+  text-decoration: underline; }
 
-#header a.model_tab.tab-item-active::after {
-  content: '';
-  position: absolute;
-  left: 526px;
-  top: 23px;
-  display: inline-block;
-  height: 10px;
-  width: 65px;
-  border-bottom: 1px solid white;
-  margin-top: 5px; }
-
-#header a.screen12_tab.tab-item-active::after {
-  content: '';
-  position: absolute;
-  left: 371px;
-  top: 23px;
-  display: inline-block;
-  height: 10px;
-  width: 94px;
-  border-bottom: 1px solid white;
-  margin-top: 5px; }
-
-#header #main_title {
-  padding-right: 90px;
-  padding-left: 40px; }
+#header .tab-item:nth-of-type(1) {
+  margin-right: -10px;
+  margin-left: -30px;
+  margin-top: 5px;
+  min-width: 300px; }
 
 ion-nav-view ion-nav-view {
   margin-top: 47px !important; }
@@ -18705,6 +18685,9 @@ ion-content#main_menu {
   top: 120px;
   position: absolute;
   transition: all 0.5s !important; }
+  ion-content#main_menu .clicker {
+    padding: 60px !important;
+    font-size: 22px; }
 
 ion-top-menu .item {
   background: none;
@@ -18875,13 +18858,16 @@ progress::-webkit-progress-value {
   .webcam_title span {
     margin-left: 18px;
     font-family: "Gotham Book";
-    font-size: 22px; }
+    font-size: 22px;
+    color: white; }
 
 .camera_buttons {
   margin-top: 17px;
   max-width: 500px;
   margin-left: auto;
   margin-right: auto; }
+  .camera_buttons ion-item {
+    color: white; }
   .camera_buttons .item {
     border-color: #4D4D4E;
     background: black;
@@ -18910,6 +18896,7 @@ progress::-webkit-progress-value {
   margin-left: auto;
   margin-right: auto; }
   #webcam_assets .item {
+    color: white;
     width: 501px !important; }
   #webcam_assets .scroll {
     margin-top: 10px;
@@ -18917,10 +18904,12 @@ progress::-webkit-progress-value {
     margin-left: auto;
     margin-right: auto; }
   #webcam_assets ion-item.item-stable.item {
+    color: white;
     border-color: #4D4D4E;
     background-color: black;
     margin-bottom: 10px; }
   #webcam_assets ion-item.item-stable.item.active {
+    color: white;
     border-color: #4D4D4E;
     background-color: #4D4D4E !important;
     margin-bottom: 10px; }
@@ -18947,7 +18936,7 @@ progress::-webkit-progress-value {
 .square {
   position: absolute;
   width: 426px;
-  height: 179px;
+  height: 186px;
   border: solid 3px;
   border-color: white;
   background: rgba(255, 255, 255, 0.01);
