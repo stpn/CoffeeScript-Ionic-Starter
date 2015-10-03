@@ -18738,6 +18738,18 @@ ion-top-menu .item {
     margin-left: auto;
     margin-right: auto; }
 
+.ng-hide-add, .ng-hide-remove {
+  /* ensure visibility during the transition */
+  display: block !important;
+  /* yes, important */ }
+
+.cssFade {
+  transition: 0.5s linear all;
+  opacity: 1; }
+
+.cssFade.ng-hide {
+  opacity: 0; }
+
 #overlay {
   position: absolute;
   top: 0;
@@ -18771,10 +18783,18 @@ ion-top-menu .item {
   #building_menu_wrap #all_buildings {
     position: absolute;
     margin-top: 0px;
-    margin-left: -60px; }
+    margin-left: -60px;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0, 0, 0);
+    -webkit-perspective: 1000; }
     #building_menu_wrap #all_buildings span.bld_name {
       left: 38px;
       top: 22px; }
+    #building_menu_wrap #all_buildings svg,
+    #building_menu_wrap #all_buildings span {
+      -webkit-backface-visibility: hidden;
+      -webkit-transform: translate3d(0, 0, 0);
+      -webkit-perspective: 1000; }
   #building_menu_wrap .building {
     margin-left: 80px;
     position: absolute;

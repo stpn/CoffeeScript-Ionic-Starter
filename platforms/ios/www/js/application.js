@@ -108,9 +108,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.transformStyle = "transform: scale(1.0)";
   $scope.clicker_default = "63px";
   $scope.clicker_narrow = "43px";
-  $scope.clicker_extranarrow = "16px";
+  $scope.clicker_extranarrow = "17px";
   $scope.clicker_padding = $scope.clicker_default;
   $scope.accordionHeight = "0px";
+  $scope.showOverlay = false;
   $scope.isComparison = function() {
     return $scope.comparisonState;
   };
@@ -118,6 +119,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.activeBuilding.isActive(name);
   };
   $scope.toggleGroup = function(group) {
+    var menu;
+    menu = document.getElementById('ionTopMenu');
+    if (menu.style.height === '250px') {
+      $scope.toggleTopMenu();
+    }
     if ($scope.isGroupShown(group)) {
       $scope.shownGroup = null;
       $scope.toggled = null;
@@ -156,7 +162,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if ($event.clientX > bld_box.left && $event.clientX < bld_box.right && $event.clientY > bld_box.top && $event.clientY < bld_box.bottom) {
 
     } else {
-      return $scope.setActiveBuilding(void 0);
+      $scope.setActiveBuilding(void 0);
+      return $scope.activeBuilding.cancelAll();
     }
   };
   $scope.activeBuildingTabName = function() {
@@ -178,25 +185,33 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if (name === void 0) {
       $scope.activeBuilding.tabName = "SELECT BUILDING";
     }
-    ActiveBuilding.setName(name);
+    $scope.activeBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
   };
   $scope.toggleTopMenu = function(switchCompare) {
-    var bld, menu, pane;
+    var bld, menu, pane, was_comparison;
+    was_comparison = false;
+    if ($scope.comparisonState === true) {
+      was_comparison = true;
+    }
     $scope.comparisonState = false;
+    $scope.activeBuilding.tabName = "SELECT BUILDING";
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
     if (menu.offsetHeight === 24) {
+      $scope.toggleGroup($scope.shownGroup);
       menu.style.height = '250px';
       $scope.clicker_padding = $scope.clicker_narrow;
       pane.style.top = '320px';
     } else {
       menu.style.height = '24px';
-      $scope.clicker_padding = $scope.clicker_default;
+      if (was_comparison === false) {
+        $scope.clicker_padding = $scope.clicker_default;
+      }
       pane.style.top = '85px';
     }
     if (menu.style.height === "24px") {
@@ -213,6 +228,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       bld = document.getElementById('building_wrap');
       menu = document.getElementById('ionTopMenu');
       pane = document.getElementsByTagName('ion-content')[0];
+    } else {
+      $scope.comparisonState = false;
+      $scope.activeBuilding.tabName = "SELECT BUILDING";
     }
     if (menu.offsetHeight === 24) {
       menu.style.height = '250px';
@@ -225,10 +243,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.bld_style = "margin-top: 50px";
     }
   };
-  $scope.getFillColorFor = function(bld) {
+  $scope.getFillColorFor = function(bld_name) {
     if ($scope.activeBuilding === void 0) {
       return "none";
-    } else if (bld.name === $scope.activeBuilding.getName()) {
+    } else if ($scope.activeBuilding.getName(bld_name)) {
       return "#6D6F72";
     } else {
       return "none";
@@ -378,12 +396,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     ActiveBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
-  $scope.getFillColorFor = function(bld) {
-    if ((bld === "all" && "all" === $scope.activeBuilding.getName())) {
-      return "#6D6F72";
-    } else if ($scope.activeBuilding === void 0) {
+  $scope.getFillColorFor = function(bld_name) {
+    if ($scope.activeBuilding === void 0) {
       return "none";
-    } else if (bld.name === $scope.activeBuilding.getName()) {
+    } else if ($scope.activeBuilding.getName(bld_name)) {
       return "#6D6F72";
     } else {
       return "none";
@@ -646,15 +662,24 @@ angular.module('starter.services', []).factory('Buildings', function() {
     }
   };
 }).service('ActiveBuilding', function() {
-  var name, tabName;
+  var actives, name, tabName;
   name = void 0;
   tabName = "SELECT BUILDING";
+  actives = {};
   return {
     setName: function(new_name) {
-      return name = new_name;
+      if (actives[new_name] === "active") {
+        return actives[new_name] = void 0;
+      } else {
+        return actives[new_name] = "active";
+      }
     },
     getName: function(new_name) {
-      return name;
+      if (actives[new_name] === "active") {
+        return true;
+      } else {
+        return false;
+      }
     },
     isActive: function(q_name) {
       if (angular.equals(name, q_name) || name === void 0) {
@@ -662,6 +687,15 @@ angular.module('starter.services', []).factory('Buildings', function() {
       } else {
         return false;
       }
+    },
+    cancelAll: function() {
+      var k, results, v;
+      results = [];
+      for (k in actives) {
+        v = actives[k];
+        results.push(actives[k] = void 0);
+      }
+      return results;
     }
   };
 }).factory('Presentations', function() {

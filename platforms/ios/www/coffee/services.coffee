@@ -51,19 +51,30 @@ angular.module('starter.services', []).factory('Buildings', ->
 ).service('ActiveBuilding', ->
   name = undefined
   tabName = "SELECT BUILDING"
+  actives = {}
 
   {
     setName: (new_name) ->
-      name = new_name
+      if actives[new_name] == "active"
+        actives[new_name] = undefined
+      else
+        actives[new_name] = "active"
+
 
     getName: (new_name) ->
-      name
+      if actives[new_name] == "active"
+        return true
+      else
+        return false
 
     isActive: (q_name) ->
       if angular.equals(name,q_name) || name == undefined
         return true
       else 
         return false
+    cancelAll: ->
+      for k,v of actives
+        actives[k] = undefined
   }
 
 ).factory('Presentations', ->

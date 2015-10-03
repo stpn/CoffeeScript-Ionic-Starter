@@ -123,7 +123,6 @@ ion-content#main_menu {
     //    margin-top: 47px;
     transition: all .5s !important;
     .clicker {
-
         font-size: 22px;
         transition: all .5s;
         //border-bottom: solid 2px black;
@@ -149,6 +148,16 @@ ion-top-menu .item {
         margin-left: auto;
         margin-right: auto;
     }
+}
+
+#overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1080px;
+    height: 2000px;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9;
 }
 
 #select_bld {
@@ -177,12 +186,36 @@ ion-top-menu .item {
         -webkit-backface-visibility: hidden;
         //height: 4px;
     }
+    #all_buildings {
+        position: absolute;
+        margin-top: 0px;
+        margin-left: -60px;
+        -webkit-backface-visibility: hidden;
+        -webkit-transform: translate3d(0, 0, 0);
+        -webkit-perspective: 1000;
+        span.bld_name {
+            left: 38px;
+            top: 22px;
+        }
+        svg,
+        span {
+            -webkit-backface-visibility: hidden;
+            -webkit-transform: translate3d(0, 0, 0);
+            -webkit-perspective: 1000;
+            //float: left;
+        }
+    }
     .building {
+        margin-left: 80px;
         position: absolute;
         cursor: pointer;
         -webkit-backface-visibility: hidden;
         -webkit-transform: translate3d(0, 0, 0);
         -webkit-perspective: 1000;
+        span {
+            color: #C2C1C2;
+            z-index: 999;
+        }
         svg,
         span {
             -webkit-backface-visibility: hidden;

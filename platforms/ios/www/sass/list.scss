@@ -47,6 +47,9 @@
 // .row.ng-hide-remove {
 //     display: block !important;
 // }
+.row{
+    padding: 0px 25px !important;
+}
 .animate-if {
     background: white;
     border: 1px solid black;
@@ -54,39 +57,39 @@
 }
 
 .accordion_container {
-    background-color: #333;
+    
     //transition: all .5s !important;
-    max-height: 603px;
+    //max-height: 603px;
+    // -webkit-transition: max-height 0.5s;
+    // -moz-transition: max-height 0.5s;
+    // transition: max-height 0.5s;
+    ion-scroll{
+    background-color: #333;
+    max-height: 539px;
     -webkit-transition: max-height 0.5s;
     -moz-transition: max-height 0.5s;
     transition: max-height 0.5s;
+
+    //         -webkit-transition: max-height 0.5s;
+    // -moz-transition: max-height 0.5s;
+    // transition: max-height 0.5s;
+        // transition: all .5s !important;
+
+    }
 }
 
-.animate-if.ng-enter,
-.animate-if.ng-leave {
-    transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-}
-
-.animate-if.ng-enter,
-.animate-if.ng-leave.ng-leave-active {
-    opacity: 0;
-}
-
-.animate-if.ng-leave,
-.animate-if.ng-enter.ng-enter-active {
-    opacity: 1;
-}
 
 .gallery {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: -15px;
+    //margin-top: -15px;
     //margin-left: 12px !important;
     //height: 549px;
-    -webkit-transition: max-height 0.5s;
-    -moz-transition: max-height 0.5s;
-    transition: max-height 0.5s;
+
+    // -webkit-transition: max-height 0.5s;
+    // -moz-transition: max-height 0.5s;
+    // transition: max-height 0.5s;
     //height: 549px;
     background-color: #333333;
     //transition: all .5s !important;
@@ -104,14 +107,21 @@
 
 .cust_col {
     -webkit-box-flex: 0;
-    -webkit-flex: 0 0 165px;
+    -webkit-flex: 0 0 165px !important;
     -moz-box-flex: 0;
-    -moz-flex: 0 0 165px;
-    -ms-flex: 0 0 165px;
-    flex: 0 0 165px;
-    max-width: 165px;
-    max-height: 100px;
-    margin-top: 5px;
+    -moz-flex: 0 0 165px !important;
+    -ms-flex: 0 0 165px !important;
+    flex: 0 0 180px !important;
+    min-width: 152px !important;
+    max-height: 131px;
+    margin-bottom: 6px !important;
+    -webkit-transition: max-height 0.5s;
+    -moz-transition: max-height 0.5s;
+    transition: max-height 0.5s;
+    background: none !important;
+    border: none !important;
+
+    
     img {
         max-height: 92px;
     }
