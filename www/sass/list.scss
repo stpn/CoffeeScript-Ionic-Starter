@@ -1,9 +1,7 @@
-
 // LIST:
 // .accordion_container {
 //     transition: 0.09s all linear;
 // }
-
 // .list .item.item-accordion {
 //     //line-height: 38px;
 //     //height: 20px;
@@ -16,11 +14,17 @@
 //     line-height: 0px;
 //         transition: all .5s !important;
 // }
-// .list .item.item-accordion.ng-hide-add,
-// .list .item.item-accordion.ng-hide-remove {
-//     display: block !important;
-//     transition: all .5s !important;
-// }
+.item-accordion.ng-hide-add,
+.item-accordion.ng-hide-remove {
+    display: block !important;
+    transition: all .5s !important;
+    /* this will have a 100ms delay between each successive leave animation */
+    transition-delay: 0.1s;
+    /* As of 1.4.4, this must always be set: it signals ngAnimate
+    to not accidentally inherit a delay property from another CSS class */
+    transition-duration: 0s;
+}
+
 // .row {
 //     width: 1024px;
 //     overflow: auto;
@@ -29,29 +33,66 @@
 //     padding-bottom: 0;
 //     transition: 0.09s all linear;
 // }
-
 // .row.ng-hide {
 //     line-height: 0px;
 // }
-
 // .row.ng-hide-add,
 // .row.ng-hide-remove {
 //     display: block !important;
 // }
-
 // .row.ng-hide {
 //     line-height: 0px;
 // }
-
 // .row.ng-hide-add,
 // .row.ng-hide-remove {
 //     display: block !important;
 // }
+.row{
+    padding: 0px 25px !important;
+}
+.animate-if {
+    background: white;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+.accordion_container {
+    
+    //transition: all .5s !important;
+    //max-height: 603px;
+    // -webkit-transition: max-height 0.5s;
+    // -moz-transition: max-height 0.5s;
+    // transition: max-height 0.5s;
+    ion-scroll{
+    background-color: #333;
+    max-height: 539px;
+    -webkit-transition: max-height 0.5s;
+    -moz-transition: max-height 0.5s;
+    transition: max-height 0.5s;
+
+    //         -webkit-transition: max-height 0.5s;
+    // -moz-transition: max-height 0.5s;
+    // transition: max-height 0.5s;
+        // transition: all .5s !important;
+
+    }
+}
+
+
 .gallery {
     width: 90%;
     margin-left: auto;
     margin-right: auto;
-    margin-left: 12px !important;
+    //margin-top: -15px;
+    //margin-left: 12px !important;
+    //height: 549px;
+
+    // -webkit-transition: max-height 0.5s;
+    // -moz-transition: max-height 0.5s;
+    // transition: max-height 0.5s;
+    //height: 549px;
+    background-color: #333333;
+    //transition: all .5s !important;
 }
 
 .pict {
@@ -60,19 +101,27 @@
     min-height: 300px;
 }
 
-.col{
+.col {
     padding: 0px !important;
 }
+
 .cust_col {
     -webkit-box-flex: 0;
-    -webkit-flex: 0 0 165px;
+    -webkit-flex: 0 0 165px !important;
     -moz-box-flex: 0;
-    -moz-flex: 0 0 165px;
-    -ms-flex: 0 0 165px;
-    flex: 0 0 165px;
-    max-width: 165px;
-    //    max-height: 100px;
-    margin-top: 5px;
+    -moz-flex: 0 0 165px !important;
+    -ms-flex: 0 0 165px !important;
+    flex: 0 0 180px !important;
+    min-width: 152px !important;
+    max-height: 131px;
+    margin-bottom: 6px !important;
+    -webkit-transition: max-height 0.5s;
+    -moz-transition: max-height 0.5s;
+    transition: max-height 0.5s;
+    background: none !important;
+    border: none !important;
+
+    
     img {
         max-height: 92px;
     }
@@ -86,10 +135,8 @@
     }
     background: none !important;
     border: none !important;
-
-    .image_name{
+    .image_name {
         font-size: 12px;
         font-family: "Gotham Narrow Book";
     }
 }
-

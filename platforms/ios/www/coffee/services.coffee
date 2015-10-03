@@ -2,12 +2,12 @@ angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
       id: 1
-      name: "Massachusetts 200"
+      name: "200 Massachusetts"
       code: "200M"
     },
     {
       id: 2
-      name: "Massachusetts 250"
+      name: "250 Massachusetts"
       code: "250M"
     },
     {
@@ -72,23 +72,128 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Overview Presentation"
       image: 'img/assets/presentations/1.png'
-      building_name: 'Massachusetts 200'
-      project_name: "Massachusetts 200"
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"
     },
     {
       id: 2
       name: "Sustainability Presentation"
       image: 'img/assets/presentations/2.jpg'
-      building_name: 'Massachusetts 200'
-      project_name: "Massachusetts 200"      
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"      
     },
     {
       id: 3
       name: "Building Presentation"
       image: 'img/assets/presentations/3.jpg'
-      building_name: 'Massachusetts 250'
-      project_name: "Massachusetts 250"      
-    }       
+      building_name: '250 Massachusetts'
+      project_name: "250 Massachusetts"      
+    },
+    {
+      id: 4
+      name: "Overview Presentation"
+      image: 'img/assets/presentations/1.png'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"
+    },
+    {
+      id: 5
+      name: "Sustainability Presentation"
+      image: 'img/assets/presentations/2.jpg'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"      
+    },
+    {
+      id: 6
+      name: "Building Presentation"
+      image: 'img/assets/presentations/3.jpg'
+      building_name: '250 Massachusetts'
+      project_name: "250 Massachusetts"      
+    },
+    {
+      id: 7
+      name: "Overview Presentation"
+      image: 'img/assets/presentations/1.png'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"
+    },
+    {
+      id: 8
+      name: "Sustainability Presentation"
+      image: 'img/assets/presentations/2.jpg'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"      
+    },
+    {
+      id: 9
+      name: "Building Presentation"
+      image: 'img/assets/presentations/3.jpg'
+      building_name: '250 Massachusetts'
+      project_name: "250 Massachusetts"      
+    },
+    {
+      id: 10
+      name: "Overview Presentation"
+      image: 'img/assets/presentations/1.png'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"
+    },
+    {
+      id: 11
+      name: "Sustainability Presentation"
+      image: 'img/assets/presentations/2.jpg'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"      
+    },
+    {
+      id: 12
+      name: "Building Presentation"
+      image: 'img/assets/presentations/3.jpg'
+      building_name: '250 Massachusetts'
+      project_name: "250 Massachusetts"      
+    },
+    {
+      id: 13
+      name: "Overview Presentation"
+      image: 'img/assets/presentations/1.png'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"
+    },
+    {
+      id: 14
+      name: "Sustainability Presentation"
+      image: 'img/assets/presentations/2.jpg'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"      
+    },
+    {
+      id: 15
+      name: "Building Presentation"
+      image: 'img/assets/presentations/3.jpg'
+      building_name: '250 Massachusetts'
+      project_name: "250 Massachusetts"      
+    },
+    {
+      id: 16
+      name: "Overview Presentation"
+      image: 'img/assets/presentations/1.png'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"
+    },
+    {
+      id: 17
+      name: "Sustainability Presentation"
+      image: 'img/assets/presentations/2.jpg'
+      building_name: '200 Massachusetts'
+      project_name: "200 Massachusetts"      
+    },
+    {
+      id: 18
+      name: "Building Presentation"
+      image: 'img/assets/presentations/3.jpg'
+      building_name: '250 Massachusetts'
+      project_name: "250 Massachusetts"      
+    }
   ]
   {
     name: ->
@@ -156,19 +261,19 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Rend1"
       image: 'img/assets/renderings/1.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 2
       name: "Rend2"
       image: 'img/assets/renderings/2.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 3
       name: "Rendering 3"
       image: 'img/assets/renderings/3.jpg'
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }    
   ]
   {
@@ -194,19 +299,19 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "View1"
       image: 'img/assets/views/1.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 2
       name: "View2"
       image: 'img/assets/views/2.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },   
    {
       id: 3
       name: "View3"
       image: 'img/assets/views/3.jpg'
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }                               
   ]
   {
@@ -236,19 +341,19 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Floorplan1"
       image: 'img/assets/floorplans/1.svg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 2
       name: "Floorplan2"
       image: 'img/assets/floorplans/1.svg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 3
       name: "Floorplan3"
       image: 'img/assets/floorplans/3.svg'
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }        
   ]
   {
@@ -274,21 +379,21 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Video1"
       image: 'img/assets/views/1.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
       recording: 'img/assets/videos/1.mp4'
     },
     {
       id: 2
       name: "Video2"
       image: 'img/assets/views/2.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
       recording: 'img/assets/videos/2.mp4'
     },
     {
       id: 3
       name: "Video3"
       image: 'img/assets/views/3.jpg'
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
       recording: 'img/assets/videos/3.mp4'
     }    
   ]
@@ -334,19 +439,19 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Webcam1"
       image: 'img/assets/webcams/1.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 2
       name: "Webcam2"
       image: 'img/assets/webcams/2.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     },
     {
       id: 3
       name: "Webcam3"
       image: 'img/assets/webcams/3.jpg'
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }   
   ]
   {
@@ -398,7 +503,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       id: 1
       name: "Pan1"
       image: 'img/assets/panoramas/1.jpg'
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
       camera_name: 'Camera 1'
     }    
   ]

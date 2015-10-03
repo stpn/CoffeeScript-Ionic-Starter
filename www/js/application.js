@@ -3,12 +3,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
       cordova.plugins.Keyboard.disableScroll(true);
-    }
-    if (window.StatusBar) {
-      StatusBar.styleLightContent();
+      StatusBar.hide();
     }
   });
-}).config(function($stateProvider, $urlRouterProvider) {
+}).config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
   $stateProvider.state('tab', {
     url: '/tab',
     abstract: true,
@@ -22,7 +20,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   }).state('tab.presentations', {
-    url: '/presentations/:presentationId',
+    url: '/presentations/:id',
     views: {
       'tab-dash': {
         templateUrl: 'templates/Presentations/presentation.html',
@@ -30,7 +28,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   }).state('tab.videos', {
-    url: '/videos/:videoId',
+    url: '/videos/:id',
     views: {
       'tab-dash': {
         templateUrl: 'templates/Videos/videoPlayer.html',
@@ -108,6 +106,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.compTemplate = "templates/menu/comparison_menu.html";
   $scope.bld_style = "margin-top: -200px";
   $scope.transformStyle = "transform: scale(1.0)";
+  $scope.clicker_default = "63px";
+  $scope.clicker_narrow = "43px";
+  $scope.clicker_extranarrow = "17px";
+  $scope.clicker_padding = $scope.clicker_default;
+  $scope.accordionHeight = "0px";
+  $scope.showOverlay = false;
   $scope.isComparison = function() {
     return $scope.comparisonState;
   };
@@ -115,14 +119,37 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.activeBuilding.isActive(name);
   };
   $scope.toggleGroup = function(group) {
+    var menu;
+    menu = document.getElementById('ionTopMenu');
+    if (menu.style.height === '250px') {
+      $scope.toggleTopMenu();
+    }
     if ($scope.isGroupShown(group)) {
       $scope.shownGroup = null;
+      $scope.toggled = null;
+      $scope.clicker_padding = $scope.clicker_default;
     } else {
       $scope.shownGroup = group;
+      $scope.toggled = true;
+      $scope.clicker_padding = $scope.clicker_extranarrow;
     }
   };
   $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
+  };
+  $scope.groupHeight = function(group) {
+    if ($scope.isGroupShown(group) === true) {
+      return "153px";
+    } else {
+      return "0px";
+    }
+  };
+  $scope.isGroupClicked = function(group) {
+    if ($scope.isGroupShown(group)) {
+      return "603px";
+    } else {
+      return "";
+    }
   };
   $scope.openPres = function(presId) {
     window.location = '#/tab/presentations/' + presId;
@@ -135,7 +162,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if ($event.clientX > bld_box.left && $event.clientX < bld_box.right && $event.clientY > bld_box.top && $event.clientY < bld_box.bottom) {
 
     } else {
-      return $scope.setActiveBuilding(void 0);
+      $scope.setActiveBuilding(void 0);
+      return $scope.activeBuilding.cancelAll();
     }
   };
   $scope.activeBuildingTabName = function() {
@@ -157,23 +185,33 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     if (name === void 0) {
       $scope.activeBuilding.tabName = "SELECT BUILDING";
     }
-    ActiveBuilding.setName(name);
+    $scope.activeBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
   };
   $scope.toggleTopMenu = function(switchCompare) {
-    var bld, menu, pane;
+    var bld, menu, pane, was_comparison;
+    was_comparison = false;
+    if ($scope.comparisonState === true) {
+      was_comparison = true;
+    }
     $scope.comparisonState = false;
+    $scope.activeBuilding.tabName = "SELECT BUILDING";
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
     if (menu.offsetHeight === 24) {
+      $scope.toggleGroup($scope.shownGroup);
       menu.style.height = '250px';
-      pane.style.top = '350px';
+      $scope.clicker_padding = $scope.clicker_narrow;
+      pane.style.top = '320px';
     } else {
       menu.style.height = '24px';
+      if (was_comparison === false) {
+        $scope.clicker_padding = $scope.clicker_default;
+      }
       pane.style.top = '85px';
     }
     if (menu.style.height === "24px") {
@@ -190,21 +228,25 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       bld = document.getElementById('building_wrap');
       menu = document.getElementById('ionTopMenu');
       pane = document.getElementsByTagName('ion-content')[0];
-      if (menu.offsetHeight === 24) {
-        menu.style.height = '250px';
-        pane.style.top = '350px';
-      }
-      if (menu.style.height === "24px") {
-        return $scope.bld_style = "margin-top: -200px";
-      } else {
-        return $scope.bld_style = "margin-top: 50px";
-      }
+    } else {
+      $scope.comparisonState = false;
+      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    }
+    if (menu.offsetHeight === 24) {
+      menu.style.height = '250px';
+    } else {
+      menu.style.height = '24px';
+    }
+    if (menu.style.height === "24px") {
+      return $scope.bld_style = "margin-top: -200px";
+    } else {
+      return $scope.bld_style = "margin-top: 50px";
     }
   };
-  $scope.getFillColorFor = function(bld) {
+  $scope.getFillColorFor = function(bld_name) {
     if ($scope.activeBuilding === void 0) {
       return "none";
-    } else if (bld.name === $scope.activeBuilding.getName()) {
+    } else if ($scope.activeBuilding.getName(bld_name)) {
       return "#6D6F72";
     } else {
       return "none";
@@ -228,11 +270,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
-  $scope.video = Videos.get($stateParams.modelId);
+  $scope.video = Videos.get($stateParams.id);
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
+  $scope.home = '#/tab/home';
+  $scope.dash = "#/tab/dash";
+  $scope.buildings = "#/tab/buildings";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
-  $scope.floorplan = Floorplans.get($stateParams.modelId);
+  $scope.floorplan = Floorplans.get($stateParams.id);
 }).controller('WebcamsCtrl', function($scope, $log, Webcams) {
   $scope.webcams = Webcams.all();
   $scope.activeWebcam = void 0;
@@ -253,7 +298,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
     $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
     $scope.nowLive = false;
-    return $scope.nowLive4 = false;
+    $scope.nowLive4 = false;
+    return $scope.nowPano = false;
   };
   $scope.isEnabled = function(model) {
     return model === void 0;
@@ -277,19 +323,27 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isLive4 = function() {
     return $scope.nowLive4;
   };
+  $scope.isPano = function() {
+    return $scope.nowPano;
+  };
+  $scope.setPano = function() {
+    return $scope.nowPano = true;
+  };
   $scope.toggleGroup = function(group) {
     if ($scope.isGroupShown(group)) {
       $scope.shownGroup = null;
+      $scope.accordionHeight = "0px";
     } else {
       $scope.shownGroup = group;
+      $scope.accordionHeight = "593px";
     }
   };
   $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
   };
 }).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
-  $scope.presentation = Presentations.get($stateParams.presentationId);
-  $scope.slides = Presentations.getSlides($stateParams.presentationId);
+  $scope.presentation = Presentations.get($stateParams.id);
+  $scope.slides = Presentations.getSlides($stateParams.id);
   $scope.presentation_name = $scope.presentation.name;
   $scope.project_name = $scope.presentation.project_name;
   $scope.currentSlide = 1;
@@ -307,7 +361,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $log.debug("FUCK");
   };
 }).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
-  $scope.video = Videos.get($stateParams.videoId);
+  $scope.video = Videos.get($stateParams.id);
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
   $scope.building_name = $scope.video.building_name;
   $scope.trustSrc = function(src) {
@@ -342,12 +396,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     ActiveBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
-  $scope.getFillColorFor = function(bld) {
-    if ((bld === "all" && "all" === $scope.activeBuilding.getName())) {
-      return "#6D6F72";
-    } else if ($scope.activeBuilding === void 0) {
+  $scope.getFillColorFor = function(bld_name) {
+    if ($scope.activeBuilding === void 0) {
       return "none";
-    } else if (bld.name === $scope.activeBuilding.getName()) {
+    } else if ($scope.activeBuilding.getName(bld_name)) {
       return "#6D6F72";
     } else {
       return "none";
@@ -371,8 +423,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
-  $scope.panorama = Panoramas.get($stateParams.panoramaId);
-  $scope.webcam_name = Panoramas.getWebcamName($stateParams.panoramaId);
+  $scope.panorama = Panoramas.get($stateParams.id);
+  $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
   $scope.getPanorama = function() {
     return $scope.panorama.image;
   };
@@ -380,7 +432,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return 1;
   };
 }).controller('VideoCtrl', function($scope, $stateParams, Videos, $location) {
-  $scope.video = Videos.get($stateParams.videoId);
+  $scope.video = Videos.get($stateParams.id);
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
@@ -560,11 +612,11 @@ angular.module('starter.services', []).factory('Buildings', function() {
   models = [
     {
       id: 1,
-      name: "Massachusetts 200",
+      name: "200 Massachusetts",
       code: "200M"
     }, {
       id: 2,
-      name: "Massachusetts 250",
+      name: "250 Massachusetts",
       code: "250M"
     }, {
       id: 3,
@@ -610,15 +662,24 @@ angular.module('starter.services', []).factory('Buildings', function() {
     }
   };
 }).service('ActiveBuilding', function() {
-  var name, tabName;
+  var actives, name, tabName;
   name = void 0;
   tabName = "SELECT BUILDING";
+  actives = {};
   return {
     setName: function(new_name) {
-      return name = new_name;
+      if (actives[new_name] === "active") {
+        return actives[new_name] = void 0;
+      } else {
+        return actives[new_name] = "active";
+      }
     },
     getName: function(new_name) {
-      return name;
+      if (actives[new_name] === "active") {
+        return true;
+      } else {
+        return false;
+      }
     },
     isActive: function(q_name) {
       if (angular.equals(name, q_name) || name === void 0) {
@@ -626,6 +687,15 @@ angular.module('starter.services', []).factory('Buildings', function() {
       } else {
         return false;
       }
+    },
+    cancelAll: function() {
+      var k, results, v;
+      results = [];
+      for (k in actives) {
+        v = actives[k];
+        results.push(actives[k] = void 0);
+      }
+      return results;
     }
   };
 }).factory('Presentations', function() {
@@ -635,20 +705,110 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Overview Presentation",
       image: 'img/assets/presentations/1.png',
-      building_name: 'Massachusetts 200',
-      project_name: "Massachusetts 200"
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
     }, {
       id: 2,
       name: "Sustainability Presentation",
       image: 'img/assets/presentations/2.jpg',
-      building_name: 'Massachusetts 200',
-      project_name: "Massachusetts 200"
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
     }, {
       id: 3,
       name: "Building Presentation",
       image: 'img/assets/presentations/3.jpg',
-      building_name: 'Massachusetts 250',
-      project_name: "Massachusetts 250"
+      building_name: '250 Massachusetts',
+      project_name: "250 Massachusetts"
+    }, {
+      id: 4,
+      name: "Overview Presentation",
+      image: 'img/assets/presentations/1.png',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 5,
+      name: "Sustainability Presentation",
+      image: 'img/assets/presentations/2.jpg',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 6,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
+      building_name: '250 Massachusetts',
+      project_name: "250 Massachusetts"
+    }, {
+      id: 7,
+      name: "Overview Presentation",
+      image: 'img/assets/presentations/1.png',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 8,
+      name: "Sustainability Presentation",
+      image: 'img/assets/presentations/2.jpg',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 9,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
+      building_name: '250 Massachusetts',
+      project_name: "250 Massachusetts"
+    }, {
+      id: 10,
+      name: "Overview Presentation",
+      image: 'img/assets/presentations/1.png',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 11,
+      name: "Sustainability Presentation",
+      image: 'img/assets/presentations/2.jpg',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 12,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
+      building_name: '250 Massachusetts',
+      project_name: "250 Massachusetts"
+    }, {
+      id: 13,
+      name: "Overview Presentation",
+      image: 'img/assets/presentations/1.png',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 14,
+      name: "Sustainability Presentation",
+      image: 'img/assets/presentations/2.jpg',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 15,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
+      building_name: '250 Massachusetts',
+      project_name: "250 Massachusetts"
+    }, {
+      id: 16,
+      name: "Overview Presentation",
+      image: 'img/assets/presentations/1.png',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 17,
+      name: "Sustainability Presentation",
+      image: 'img/assets/presentations/2.jpg',
+      building_name: '200 Massachusetts',
+      project_name: "200 Massachusetts"
+    }, {
+      id: 18,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
+      building_name: '250 Massachusetts',
+      project_name: "250 Massachusetts"
     }
   ];
   return {
@@ -716,17 +876,17 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Rend1",
       image: 'img/assets/renderings/1.jpg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 2,
       name: "Rend2",
       image: 'img/assets/renderings/2.jpg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 3,
       name: "Rendering 3",
       image: 'img/assets/renderings/3.jpg',
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }
   ];
   return {
@@ -758,17 +918,17 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "View1",
       image: 'img/assets/views/1.jpg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 2,
       name: "View2",
       image: 'img/assets/views/2.jpg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 3,
       name: "View3",
       image: 'img/assets/views/3.jpg',
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }
   ];
   return {
@@ -807,17 +967,17 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Floorplan1",
       image: 'img/assets/floorplans/1.svg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 2,
       name: "Floorplan2",
       image: 'img/assets/floorplans/1.svg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 3,
       name: "Floorplan3",
       image: 'img/assets/floorplans/3.svg',
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }
   ];
   return {
@@ -849,19 +1009,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Video1",
       image: 'img/assets/views/1.jpg',
-      building_name: 'Massachusetts 200',
+      building_name: '200 Massachusetts',
       recording: 'img/assets/videos/1.mp4'
     }, {
       id: 2,
       name: "Video2",
       image: 'img/assets/views/2.jpg',
-      building_name: 'Massachusetts 200',
+      building_name: '200 Massachusetts',
       recording: 'img/assets/videos/2.mp4'
     }, {
       id: 3,
       name: "Video3",
       image: 'img/assets/views/3.jpg',
-      building_name: 'Massachusetts 250',
+      building_name: '250 Massachusetts',
       recording: 'img/assets/videos/3.mp4'
     }
   ];
@@ -916,17 +1076,17 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Webcam1",
       image: 'img/assets/webcams/1.jpg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 2,
       name: "Webcam2",
       image: 'img/assets/webcams/2.jpg',
-      building_name: 'Massachusetts 200'
+      building_name: '200 Massachusetts'
     }, {
       id: 3,
       name: "Webcam3",
       image: 'img/assets/webcams/3.jpg',
-      building_name: 'Massachusetts 250'
+      building_name: '250 Massachusetts'
     }
   ];
   return {
@@ -984,7 +1144,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "Pan1",
       image: 'img/assets/panoramas/1.jpg',
-      building_name: 'Massachusetts 200',
+      building_name: '200 Massachusetts',
       camera_name: 'Camera 1'
     }
   ];

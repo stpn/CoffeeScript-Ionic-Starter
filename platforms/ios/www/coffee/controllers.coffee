@@ -14,6 +14,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.bld_style="margin-top: -200px"
   $scope.transformStyle = "transform: scale(1.0)"
 
+  $scope.clicker_default = "63px"
+  $scope.clicker_narrow = "43px"
+  $scope.clicker_extranarrow = "16px"
+  $scope.clicker_padding = $scope.clicker_default
+  $scope.accordionHeight = "0px"
+
   # $scope.isBuildings = () ->
   #   TopmenuState.getBuildings()
 
@@ -32,12 +38,30 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     #$log.debug("GROUP: ",$scope.activeBuilding.getName())
     if $scope.isGroupShown(group)
       $scope.shownGroup = null
+      $scope.toggled = null
+      $scope.clicker_padding = $scope.clicker_default
     else
       $scope.shownGroup = group
+      $scope.toggled = true
+      $scope.clicker_padding = $scope.clicker_extranarrow
     return
 
   $scope.isGroupShown = (group) ->
+
     $scope.shownGroup == group    
+
+  $scope.groupHeight = (group) ->
+    if $scope.isGroupShown(group) == true
+      "153px"
+    else
+      "0px"
+
+  $scope.isGroupClicked = (group) ->
+    if $scope.isGroupShown(group)
+      "603px"
+    else
+      ""
+  
   
   $scope.openPres = (presId) ->
     window.location = '#/tab/presentations/' + presId
@@ -90,18 +114,27 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
     pane = document.getElementsByTagName('ion-content')[0]
+
      
-    if menu.offsetHeight == 24 
+    if menu.offsetHeight == 24       
       menu.style.height = '250px' 
-      pane.style.top = '350px'
+      $scope.clicker_padding = $scope.clicker_narrow
+      pane.style.top = '320px'
+
+      #$scope.toggleGroup($scope.shownGroup)
+      
+      
     else 
       menu.style.height =  '24px' 
+      $scope.clicker_padding = $scope.clicker_default
       pane.style.top = '85px'
+
 
     if menu.style.height == "24px"
       $scope.bld_style = "margin-top: -200px"
     else
       $scope.bld_style = "margin-top: 50px"
+
 
   $scope.showCompareMenu = () ->
     if $scope.comparisonState == false
@@ -113,14 +146,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       menu = document.getElementById('ionTopMenu')
       pane = document.getElementsByTagName('ion-content')[0]
 
-      if menu.offsetHeight == 24 
-        menu.style.height = '250px' 
-        pane.style.top = '350px'
 
-      if menu.style.height == "24px"
-        $scope.bld_style = "margin-top: -200px"
-      else
-        $scope.bld_style = "margin-top: 50px"
+
+    if menu.offsetHeight == 24 
+      menu.style.height = '250px' 
+ #     pane.style.top = '350px'
+    else 
+      menu.style.height =  '24px' 
+#      pane.style.top = '85px'
+
+    if menu.style.height == "24px"
+      $scope.bld_style = "margin-top: -200px"
+    else
+      $scope.bld_style = "margin-top: 50px"
    
 
   $scope.getFillColorFor = (bld) ->
@@ -147,16 +185,20 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
-  $scope.video = Videos.get($stateParams.modelId)
+  $scope.video = Videos.get($stateParams.id)
   return
 
 ).controller('titleCtrl', ($scope, $stateParams) ->
   $scope.titleTemplate = "templates/menu/title.html"
+  $scope.home = '#/tab/home'
+  $scope.dash = "#/tab/dash"
+  $scope.buildings ="#/tab/buildings"
+
   return
 
 
 ).controller('FloorplanDetailCtrl', ($scope, $stateParams, Floorplans) ->
-  $scope.floorplan = Floorplans.get($stateParams.modelId)
+  $scope.floorplan = Floorplans.get($stateParams.id)
   return
 
 
@@ -186,6 +228,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.timelapses = Webcams.getTimelapses(activeWebcamId)
     $scope.nowLive = false
     $scope.nowLive4 = false
+    $scope.nowPano = false
 
     #$log.debug($scope.panoramas)
 
@@ -212,12 +255,20 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.isLive4 = ->
     $scope.nowLive4
 
+  $scope.isPano = ->
+    $scope.nowPano
+
+  $scope.setPano = ->
+    $scope.nowPano = true
+
 
   $scope.toggleGroup = (group) ->
     if $scope.isGroupShown(group)
       $scope.shownGroup = null
+      $scope.accordionHeight = "0px"
     else
       $scope.shownGroup = group
+      $scope.accordionHeight = "593px"
     return
 
   $scope.isGroupShown = (group) ->
@@ -226,8 +277,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
 ).controller('PresentationCtrl', ($scope,$log, $stateParams, Presentations) ->
-  $scope.presentation = Presentations.get($stateParams.presentationId)
-  $scope.slides = Presentations.getSlides($stateParams.presentationId)
+  $scope.presentation = Presentations.get($stateParams.id)
+  $scope.slides = Presentations.getSlides($stateParams.id)
   $scope.presentation_name = $scope.presentation.name
   $scope.project_name = $scope.presentation.project_name
   $scope.currentSlide = 1
@@ -244,7 +295,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
 ).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
-  $scope.video = Videos.get($stateParams.videoId)
+  $scope.video = Videos.get($stateParams.id)
   #$log.debug($scope.video.recording);
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
   $scope.building_name = $scope.video.building_name 
@@ -319,8 +370,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
 ).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) ->
-  $scope.panorama = Panoramas.get($stateParams.panoramaId)
-  $scope.webcam_name = Panoramas.getWebcamName($stateParams.panoramaId)
+  $scope.panorama = Panoramas.get($stateParams.id)
+  $scope.webcam_name = Panoramas.getWebcamName($stateParams.id)
 
   $scope.getPanorama =  ->
     $scope.panorama.image
@@ -387,7 +438,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 #     return 
 ).controller('VideoCtrl', ($scope, $stateParams, Videos, $location) ->
-  $scope.video = Videos.get($stateParams.videoId)
+  $scope.video = Videos.get($stateParams.id)
   $scope.videoDiv = document.getElementById('video')
   $scope.seekBar = document.getElementById('seekbar')
   $scope.volume = document.getElementById('volume')

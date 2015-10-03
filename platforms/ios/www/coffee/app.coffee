@@ -12,17 +12,21 @@ angular.module('starter', [
   'starter.directives'  
 ]).run(($ionicPlatform) ->
   $ionicPlatform.ready ->
+
     # Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     # for form inputs)
     if window.cordova and window.cordova.plugins and window.cordova.plugins.Keyboard
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar true
       cordova.plugins.Keyboard.disableScroll true
-    if window.StatusBar
-      # org.apache.cordova.statusbar required
-      StatusBar.styleLightContent()
+      StatusBar.hide()
+    # if window.StatusBar
+    #   # org.apache.cordova.statusbar required
+      
     return
   return
-).config ($stateProvider, $urlRouterProvider) ->
+).config ($stateProvider, $urlRouterProvider, $ionicConfigProvider) ->
+  #$ionicConfigProvider.views.transition('none')
+  #$animate.enabled(false)
   # Ionic uses AngularUI Router which uses the concept of states
   # Learn more here: https://github.com/angular-ui/ui-router
   # Set up the various states which the app can be in.
@@ -42,14 +46,14 @@ angular.module('starter', [
 
 
       ).state('tab.presentations',
-    url: '/presentations/:presentationId'
+    url: '/presentations/:id'
     views: 'tab-dash':
       templateUrl: 'templates/Presentations/presentation.html'
       controller: 'PresentationCtrl'
       
 
       ).state('tab.videos',
-    url: '/videos/:videoId'
+    url: '/videos/:id'
     views: 'tab-dash':
       templateUrl: 'templates/Videos/videoPlayer.html'
       controller: 'VideoPlayerCtrl'     

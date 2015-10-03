@@ -2,10 +2,9 @@
 #webcams_view {
     margin-top: 47px;
 }
-#webcams_view > div:nth-child(4) > ion-item > a{
-    background-color: black !important;
 
-
+#webcams_view > div:nth-child(4) > ion-item > a {
+    //background: black;
 }
 
 .webcam_title {
@@ -23,19 +22,29 @@
 }
 
 .camera_buttons {
+    .item-complex .item-content, .item-radio .item-content{
+                background-color: rgba(0,0,0,0);
+
+    }
+    //     .item-complex .item-content.active, .item-radio .item-content.active{
+    //             background-color: #999;
+
+    // }
     margin-top: 17px;
     max-width: 500px;
     margin-left: auto;
     margin-right: auto;
-    ion-item{
+    ion-item {
         color: white;
     }
-    ion-item.active{
+    ion-item.active {
+        background: #999;
+    }
+    item.active{
         background: #999;
     }
     .item {
-                border-color: #4D4D4E;
-
+        border-color: #4D4D4E;
         background: black;
         min-width: 500px;
     }
@@ -46,7 +55,7 @@
         //margin-top: 5px;
         margin-bottom: 10px;
     }
-    .short_btn.active{
+    .short_btn.active {
         background: #999;
     }
     .camera1,
@@ -57,8 +66,13 @@
     .live {
         margin-left: 5px;
     }
-    .panorama{
+    .panorama {
+        
         max-width: 500px;
+    }
+    .panorama.active {
+
+        background: #999 !important;
     }
 }
 
@@ -69,12 +83,10 @@
 }
 
 #webcam_assets {
-    
     margin-left: auto;
     margin-right: auto;
-    .item{
-                color: white;
-
+    .item {
+        color: white;
         width: 501px !important;
     }
     .scroll {
@@ -83,37 +95,32 @@
         margin-left: auto;
         margin-right: auto;
     }
-    ion-item.item-stable.item{
+    ion-item.item-stable.item {
         color: white;
         border-color: #4D4D4E;
-        background-color: black;    
+        background-color: black;
         margin-bottom: 10px;
-
     }
-
-    ion-item.item-stable.item.active{
+    ion-item.item-stable.item.active {
         color: white;
         border-color: #4D4D4E;
-        background-color: #4D4D4E !important;    
+        background-color: #4D4D4E !important;
         margin-bottom: 10px;
-
     }
-    .accordion_container{
-
-                background-color: #333 !important;    
-
+    .accordion_container {
+        background-color: #333 !important;
     }
-    .image_name{
+    .image_name {
         font-family: "Gotham Narrow Book";
         font-size: 12.5px;
     }
-
 }
 
 #panorama_title {
     margin-top: 88px;
 }
-.panorama_titles{
+
+.panorama_titles {
     font-family: "Gotham Book" !important;
     font-size: 22px;
 }
