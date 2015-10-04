@@ -311,18 +311,21 @@ angular.module('starter.services', []).factory('Buildings', ->
       name: "View1"
       image: 'img/assets/views/1.jpg'
       building_name: '200 Massachusetts'
+      camera_name: '1'
     },
     {
       id: 2
       name: "View2"
       image: 'img/assets/views/2.jpg'
       building_name: '200 Massachusetts'
+      camera_name: '2'
     },   
    {
       id: 3
       name: "View3"
       image: 'img/assets/views/3.jpg'
       building_name: '250 Massachusetts'
+      camera_name: '3'
     }                               
   ]
   {
@@ -344,6 +347,9 @@ angular.module('starter.services', []).factory('Buildings', ->
           return models[i]
         i++
       null
+    getWebcamName: (panId) ->
+      models[0].camera_name
+
 
   }
 ).factory('Floorplans', ->

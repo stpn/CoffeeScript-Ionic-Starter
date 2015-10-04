@@ -10,7 +10,7 @@
     </div>
     <div class="camera_buttons">
 
-            <ion-item  ng-click="setLive4()" ng-class="{active: isLive4()}">LIVE</ion-item>
+            <ion-item  ng-click="setLive4()" ng-class="{active: isLive4()}" >LIVE</ion-item>
 </div>
     <div class="webcam_title">
         <span>
@@ -23,11 +23,11 @@
     <div class ="button_columns">
         <ion-item class="camera1 short_btn" ng-click="setActiveWebcam(1)" ng-class="{active: isActive(1)}">CAMERA1</ion-item>
         <ion-item class="camera2 short_btn" ng-click="setActiveWebcam(2)" ng-class="{active: isActive(2)}">CAMERA2</ion-item>
-        <ion-item class="camera3 short_btn" ng-click="setActiveWebcam(3)" ng-class="{active: isActive(3)}">CAMERA3</ion-item>
+        <ion-item class="camera3 short_btn" ng-click="setActiveWebcam(3)" ng-class="{active: isActive(3)}" >CAMERA3</ion-item>
 
         <ion-item class="live short_btn" ng-click="setLive()" ng-class="{active: isLive()}">LIVE FEED</ion-item>
         </div>
-        <ion-item class="panorama" href="#/tab/panoramas/1" ng-click='setPano()' ng-class="{active: isPano()}">PANORAMA</ion-item>
+        <ion-item class="panorama" ui-sref="tab.panoramas({id : 1})"  ng-class="{active: isPano()}">PANORAMA</ion-item>
     </div>
     <ion-content id="webcam_assets">
         <ion-list>

@@ -22,13 +22,12 @@
 }
 
 .camera_buttons {
-    .item-complex .item-content, .item-radio .item-content{
-                background-color: rgba(0,0,0,0);
-
+    .item-complex .item-content,
+    .item-radio .item-content {
+        background-color: rgba(0, 0, 0, 0);
     }
     //     .item-complex .item-content.active, .item-radio .item-content.active{
     //             background-color: #999;
-
     // }
     margin-top: 17px;
     max-width: 500px;
@@ -40,7 +39,7 @@
     ion-item.active {
         background: #999;
     }
-    item.active{
+    item.active {
         background: #999;
     }
     .item {
@@ -67,11 +66,9 @@
         margin-left: 5px;
     }
     .panorama {
-        
         max-width: 500px;
     }
     .panorama.active {
-
         background: #999 !important;
     }
 }
@@ -126,12 +123,17 @@
 }
 
 #panorama_view {
-    height: 242px;
+    height: 186px;
     margin-top: 14px;
-    img {
-        max-width: 100%;
-        max-height: 100%;
-    }
+    overflow: hidden;
+}
+
+#panorama_view img {
+    max-width: 100%;
+    max-height: 100%;
+    -moz-transition: all 0.3s;
+    -webkit-transition: all 0.3s;
+    transition: all 0.3s;
 }
 
 .square {
@@ -142,4 +144,24 @@
     border-color: white;
     background: rgba(255, 255, 255, 0.01);
     z-index: 99999999;
+}
+
+.zoom_buttons {
+    width: 400px;
+    height: 400px;
+    margin-top: 20px;
+    //margin-right: 800px;
+    float: right;
+    div {
+        width: 172px;
+        height: 76px;
+        float: right;
+        margin-left: 5px;
+        border: solid 1px;
+        border-color: #999;
+        color: white;
+        font-size: 60px;
+        text-align: center;
+        line-height: 60px;
+    }
 }

@@ -1,0 +1,28 @@
+
+#view_title {
+    margin-top: 88px;
+}
+
+.panorama_titles {
+    font-family: "Gotham Book" !important;
+    font-size: 22px;
+}
+
+#views_view {
+    height: 522px;
+    margin-top: 14px;
+    img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+}
+
+.square {
+    position: absolute;
+    width: 426px;
+    height: 186px;
+    border: solid 3px;
+    border-color: white;
+    background: rgba(255, 255, 255, 0.01);
+    z-index: 99999999;
+}

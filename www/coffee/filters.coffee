@@ -14,15 +14,7 @@ angular.module('starter.filters', []).filter 'buildingFilter', [ ->
     else
       models
  ]
-angular.module('starter.directives',[]).directive 'clickMe', ->
-  # Runs during compile
-  { link: ($scope, element, iAttrs, controller) ->
-    #console.log element
-    element.bind 'click', ->
-      #console.log 'I\'ve just been clicked!'
-      return
-    return
- }
+
 
 angular.module('starter.directives',[]).directive 'clickSvg', [
   'ActiveBuilding'
@@ -59,10 +51,17 @@ angular.module('starter.directives',[]).directive 'backImg', ->
       return
     return
     # }
-angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
+
+
+
+
+
+angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
   {
-    restrict: 'A'
+    restrict: 'E'
     link: ($scope, $element, attrs) ->
+      if $element[0].classList[0] != "square"
+        return      
       $timeout ->        
         square = $element[0]
         #console.log(square.getBoundingClientRect().left, square.getBoundingClientRect().right)
@@ -84,17 +83,16 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
         lastMaxX = 0
         halt = false
         max = 200
-        ionic.onGesture 'touch drag transform dragend', ((e) ->
+        ionic.onGesture 'drag dragend', ((e) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
           switch e.type
-            when 'touch'
-              lastScale = scale
-              last_rotation = rotation
+            # when 'touch'
+            #   lastScale = scale
+            #   last_rotation = rotation
             when 'drag'
               # if square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit 
               posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-              console.log posX
               lastMaxX = posX
               halt = false
               # else 
@@ -111,23 +109,38 @@ angular.module('starter.directives',[]).directive 'ionPinch', ($timeout) ->
                 posX = 249
               if posX <= 1
                 posX = 2
-            when 'transform'
-              rotation = e.gesture.rotation + last_rotation
-              scale = e.gesture.scale * lastScale
+            # when 'transform'
+            #   rotation = e.gesture.rotation + last_rotation
+            #   scale = e.gesture.scale * lastScale
             when 'dragend'
               lastPosX = posX
-              lastScale = scale
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) '
+#              lastScale = scale
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ' #+ 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) '
           e.target.style.transform = transform
           e.target.style.webkitTransform = transform
 
-          return
+          # return
         ), $element[0]
-        return
-      return
+      #   return
+      # return
 
   }
 
+# angular.module('starter.directives',[]).directive 'zoomIn', ->
+#   {
+#     restrict: 'A'
+#     scope: false
+#     #scope: curZoom: '='
+#     link: (scope, ele, attr) ->
+#       toZoom = document.getElementById(attr.zoomIn)      
+#       ele.bind 'click', ->
+#         scope.currentZoom = scope.currentZoom + 0.2
+#         toZoom.style.transfrom = "scale("+scope.currentZoom+")"
+#         toZoom.style.webkitTransform= "scale("+scope.currentZoom+")"
+#         return
+#       return
+
+#   }
 # angular.module('starter.directives',[]).directive 'click-svg', ->
 #   {
 #     scope: click-svg: '='

@@ -1,0 +1,16 @@
+<ion-view view-title="image">
+    <ion-content padding="true" id="webcam_content" style="margin-top: 50px">
+        <a class="close_button" ui-sref="tab.dash" >
+            <i class="ion-close"></i>
+        </a>
+        <div class="presentation_titles panorama_titles" style = "margin-left:1px;">
+            <div id="presentation_title">PANORAMA</div>
+            <div id="presentation_subtitle">{{webcam_name | uppercase}}</div>
+        </div>
+        <!-- <div back-img="getPanorama" id= "panorama_view"></img> -->
+        <div id="image_view">
+            <div class="image_square" ion-pinch xpos=""></div>
+            <img ng-src={{image.image}} id="image_image" />
+        </div>
+    </ion-content>
+</ion-view>

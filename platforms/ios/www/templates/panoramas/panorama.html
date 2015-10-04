@@ -1,6 +1,6 @@
 <ion-view view-title="Panorama">
     <ion-content padding="true" id="webcam_content" style="margin-top: 50px">
-        <a class="close_button" href="#/tab/webcams" ng-click="closeBtn()">
+        <a class="close_button" ui-sref="tab.webcams" ng-click="closeBtn()">
             <i class="ion-close"></i>
         </a>
         <div class="presentation_titles panorama_titles" style = "margin-left:1px;">
@@ -9,8 +9,18 @@
         </div>
         <!-- <div back-img="getPanorama" id= "panorama_view"></img> -->
         <div id="panorama_view">
-            <div class="square" ion-pinch xpos=""></div>
-            <img ng-src={{panorama.image}} id="panorama_image" />
+            <ion-Ppinch class="square"  xpos=""></ion-Ppinch>
+            <img ng-src={{panorama.image}} id="panorama_image" width="676" height="186"/>
         </div>
+        <div class="zoom_buttons">
+
+            <div class ="zoom_in" ng-click="zoomIn('panorama_image')" >
+                +
+            </div>
+            <div class ="zoom_out" ng-click="zoomOut('panorama_image')" >
+                -
+            </div>
+        </div>
+
     </ion-content>
 </ion-view>

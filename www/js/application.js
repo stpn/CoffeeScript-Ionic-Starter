@@ -35,6 +35,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'VideoPlayerCtrl'
       }
     }
+  }).state('tab.views', {
+    url: '/views/:id',
+    views: {
+      'tab-dash': {
+        templateUrl: 'templates/views/view.html',
+        controller: 'ViewsCtrl'
+      }
+    }
   }).state('tab.home', {
     url: '/home',
     views: {
@@ -44,7 +52,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   }).state('tab.panoramas', {
-    url: '/panoramas/:panoramaId',
+    url: '/panoramas/:id',
     views: {
       'webcams': {
         templateUrl: 'templates/panoramas/panorama.html',
@@ -65,30 +73,6 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       'buildings': {
         templateUrl: 'templates/buildings/building_tab.html',
         controller: 'BuildingsCtrl'
-      }
-    }
-  }).state('tab.chats', {
-    url: '/chats',
-    views: {
-      'tab-chats': {
-        templateUrl: 'templates/tab-chats.html',
-        controller: 'ChatsCtrl'
-      }
-    }
-  }).state('tab.chat-detail', {
-    url: '/chats/:chatId',
-    views: {
-      'tab-chats': {
-        templateUrl: 'templates/chat-detail.html',
-        controller: 'ChatDetailCtrl'
-      }
-    }
-  }).state('tab.account', {
-    url: '/account',
-    views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
       }
     }
   });
@@ -292,6 +276,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return false;
     }
   };
+  $scope.getZoom = function() {
+    return $scope.currentZoom;
+  };
+  $scope.setZoom = function(val) {
+    return $scope.currentZoom = val;
+  };
   $scope.setActiveWebcam = function(activeWebcamId) {
     $scope.selected = activeWebcamId;
     $scope.activeWebcam = Webcams.get(activeWebcamId);
@@ -299,7 +289,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
     $scope.nowLive = false;
     $scope.nowLive4 = false;
-    return $scope.nowPano = false;
+    $scope.nowPano = false;
+    return $log.debug($scope.panoramas);
   };
   $scope.isEnabled = function(model) {
     return model === void 0;
@@ -425,6 +416,24 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
   $scope.panorama = Panoramas.get($stateParams.id);
   $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
+  $scope.currentZoom = 1.2;
+  $scope.zoomIn = function(name) {
+    var toZoom;
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom + 0.2;
+    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
+    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+  };
+  $scope.zoomOut = function() {
+    var toZoom;
+    if ($scope.currentZoom === 1.0) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom - 0.2;
+    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
+    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+  };
   $scope.getPanorama = function() {
     return $scope.panorama.image;
   };
@@ -483,6 +492,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 }).controller('HomeCtrl', function($scope) {
   $scope.home = "HOME";
+}).controller('ViewsCtrl', function($scope, $stateParams, Views, ActiveCamera, $ionicHistory) {
+  $scope.view = Views.get($stateParams.id);
+  $scope.webcam_name = Views.getWebcamName($stateParams.id);
+  $scope.getView = function() {
+    return $scope.view.image;
+  };
+  return $scope.getCamera = function() {
+    return 1;
+  };
 });
 
 Number.prototype.map = function(in_min, in_max, out_min, out_max) {
@@ -508,14 +526,6 @@ angular.module('starter.filters', []).filter('buildingFilter', [
     };
   }
 ]);
-
-angular.module('starter.directives', []).directive('clickMe', function() {
-  return {
-    link: function($scope, element, iAttrs, controller) {
-      element.bind('click', function() {});
-    }
-  };
-});
 
 angular.module('starter.directives', []).directive('clickSvg', [
   'ActiveBuilding', function(activeBuilding) {
@@ -544,11 +554,14 @@ angular.module('starter.directives', []).directive('backImg', function() {
   };
 });
 
-angular.module('starter.directives', []).directive('ionPinch', function($timeout) {
+angular.module('starter.directives', []).directive('ionPpinch', function($timeout) {
   return {
-    restrict: 'A',
+    restrict: 'E',
     link: function($scope, $element, attrs) {
-      $timeout(function() {
+      if ($element[0].classList[0] !== "square") {
+        return;
+      }
+      return $timeout(function() {
         var bufferX, bufferY, dragReady, fixPosXmax, fixPosXmin, halt, lastMaxX, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square;
         square = $element[0];
         posX = 0;
@@ -569,18 +582,13 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
         lastMaxX = 0;
         halt = false;
         max = 200;
-        ionic.onGesture('touch drag transform dragend', (function(e) {
+        return ionic.onGesture('drag dragend', (function(e) {
           var transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
           switch (e.type) {
-            case 'touch':
-              lastScale = scale;
-              last_rotation = rotation;
-              break;
             case 'drag':
               posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
-              console.log(posX);
               lastMaxX = posX;
               halt = false;
               if (posX > 249) {
@@ -590,17 +598,12 @@ angular.module('starter.directives', []).directive('ionPinch', function($timeout
                 posX = 2;
               }
               break;
-            case 'transform':
-              rotation = e.gesture.rotation + last_rotation;
-              scale = e.gesture.scale * lastScale;
-              break;
             case 'dragend':
               lastPosX = posX;
-              lastScale = scale;
           }
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) ';
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ';
           e.target.style.transform = transform;
-          e.target.style.webkitTransform = transform;
+          return e.target.style.webkitTransform = transform;
         }), $element[0]);
       });
     }
@@ -918,17 +921,20 @@ angular.module('starter.services', []).factory('Buildings', function() {
       id: 1,
       name: "View1",
       image: 'img/assets/views/1.jpg',
-      building_name: '200 Massachusetts'
+      building_name: '200 Massachusetts',
+      camera_name: '1'
     }, {
       id: 2,
       name: "View2",
       image: 'img/assets/views/2.jpg',
-      building_name: '200 Massachusetts'
+      building_name: '200 Massachusetts',
+      camera_name: '2'
     }, {
       id: 3,
       name: "View3",
       image: 'img/assets/views/3.jpg',
-      building_name: '250 Massachusetts'
+      building_name: '250 Massachusetts',
+      camera_name: '3'
     }
   ];
   return {
@@ -958,6 +964,9 @@ angular.module('starter.services', []).factory('Buildings', function() {
         i++;
       }
       return null;
+    },
+    getWebcamName: function(panId) {
+      return models[0].camera_name;
     }
   };
 }).factory('Floorplans', function() {
