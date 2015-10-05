@@ -1,4 +1,9 @@
 @import "www/sass/custom_variables.scss";
+
+#home_tab{
+    display: none;
+    
+}
 #home_bg {
     width: 100%;
     height: 100%;
@@ -91,7 +96,7 @@ ion-item {
         // padding-right: 90px;
         // padding-left: 40px;
     }
-    .tab-item:nth-of-type(1) {
+    .tab-item:nth-of-type(2) {
         margin-right: -10px;
         margin-left: -30px;
         margin-top: 5px;
@@ -296,4 +301,27 @@ ion-top-menu .item {
     font-size: 12px;
     color: $base-color !important;
     text-decoration: none;
+}
+
+// RESET
+.reset_buttons{
+margin-top: 380px !important;
+    margin-right: auto;
+    margin-left: auto;
+    width: 490px;
+    .zoom_buttons{
+        margin-top: 40px !important;
+    width: 500px !important;
+    }
+}
+.reset{
+    font-size: 32px !important;
+    width: 238px !important;
+    height: 76px !important;
+
+    
+}
+.reset_title{
+    border: none !important;
+    font-size: 32px !important;
 }

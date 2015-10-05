@@ -204,11 +204,33 @@ angular.module('starter.services', []).factory('Buildings', ->
       image: 'img/assets/presentations/3.jpg'
       building_name: '250 Massachusetts'
       project_name: "250 Massachusetts"      
+    },    
+    {
+      id: 19
+      name: "Building Presentation"
+      image: 'img/assets/presentations/3.jpg'
+      building_name: '600 Second Street'
+      project_name: "600 Second Street"      
     }
   ]
   {
     name: ->
      "Presentation"
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
     all: ->
       models
     remove: (chat) ->
@@ -290,6 +312,23 @@ angular.module('starter.services', []).factory('Buildings', ->
   {
     name: ->
      "Rendering"
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
+
     all: ->
       models
     remove: (chat) ->
@@ -330,7 +369,23 @@ angular.module('starter.services', []).factory('Buildings', ->
   ]
   {
     name: ->
-     "View"    
+     "View"  
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
     all: ->
       newMod = []
       for model in models
@@ -375,7 +430,23 @@ angular.module('starter.services', []).factory('Buildings', ->
   ]
   {
     name: ->
-     "Floorplan"        
+     "Floorplan"  
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
     all: ->
       models
     remove: (chat) ->
@@ -423,7 +494,23 @@ angular.module('starter.services', []).factory('Buildings', ->
         i++
       null
     name: ->
-     "Video"        
+     "Video"
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
     all: ->
       models
     remove: (chat) ->
@@ -474,6 +561,22 @@ angular.module('starter.services', []).factory('Buildings', ->
   {
     name: ->
      "Webcam"        
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
     all: ->
       models
     remove: (chat) ->
