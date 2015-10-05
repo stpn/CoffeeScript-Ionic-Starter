@@ -9396,7 +9396,7 @@ a.button {
   margin-top: 53px; }
   .presenation_container .presentation_gal {
     background-color: black !important;
-    margin-left: 25px;
+    margin-left: 0px;
     min-height: 743px; }
     .presenation_container .presentation_gal .col_slide {
       -webkit-box-flex: 0;

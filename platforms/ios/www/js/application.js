@@ -75,13 +75,21 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'BuildingsCtrl'
       }
     }
+  }).state('tab.reset', {
+    url: '/reset',
+    views: {
+      'reset': {
+        templateUrl: 'templates/reset.html',
+        controller: 'ResetCtrl'
+      }
+    }
   });
   $urlRouterProvider.otherwise('/tab/home');
 });
 
 angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
   $scope.presentations = {};
-  $scope.factories = [["Presentations", Presentations.all()], ["Videos", Videos.all()], ["Floor Plans", Floorplans.all()], ["Rendering", Renderings.all()], ["Views", Views.all()], ["Webcams", Webcams.all()]];
+  $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()], ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()], ["Webcams", Webcams.sorted()]];
   $scope.activeBuilding = ActiveBuilding;
   $scope.buldingTabName = "Select Buildings";
   $scope.comparisonState = false;
@@ -492,6 +500,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 }).controller('HomeCtrl', function($scope) {
   $scope.home = "HOME";
+}).controller('ResetCtrl', function($scope, $ionicHistory) {
+  $scope.goBack = function() {
+    return window.history.back();
+  };
+  $scope.go = function(path) {
+    return $location.path(path);
+  };
 }).controller('ViewsCtrl', function($scope, $stateParams, Views, ActiveCamera, $ionicHistory) {
   $scope.view = Views.get($stateParams.id);
   $scope.webcam_name = Views.getWebcamName($stateParams.id);
@@ -812,11 +827,36 @@ angular.module('starter.services', []).factory('Buildings', function() {
       image: 'img/assets/presentations/3.jpg',
       building_name: '250 Massachusetts',
       project_name: "250 Massachusetts"
+    }, {
+      id: 19,
+      name: "Building Presentation",
+      image: 'img/assets/presentations/3.jpg',
+      building_name: '600 Second Street',
+      project_name: "600 Second Street"
     }
   ];
   return {
     name: function() {
       return "Presentation";
+    },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
     },
     all: function() {
       return models;
@@ -896,6 +936,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
     name: function() {
       return "Rendering";
     },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
+    },
     all: function() {
       return models;
     },
@@ -940,6 +999,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
   return {
     name: function() {
       return "View";
+    },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
     },
     all: function() {
       var j, len, model, newMod;
@@ -992,6 +1070,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
   return {
     name: function() {
       return "Floorplan";
+    },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
     },
     all: function() {
       return models;
@@ -1049,6 +1146,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
     name: function() {
       return "Video";
     },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
+    },
     all: function() {
       return models;
     },
@@ -1101,6 +1217,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
   return {
     name: function() {
       return "Webcam";
+    },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
     },
     all: function() {
       return models;

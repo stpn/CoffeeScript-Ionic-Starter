@@ -47,9 +47,10 @@
 // .row.ng-hide-remove {
 //     display: block !important;
 // }
-.row{
-    padding: 0px 25px !important;
+.row {
+    padding: 0px 30px !important;
 }
+
 .animate-if {
     background: white;
     border: 1px solid black;
@@ -57,27 +58,39 @@
 }
 
 .accordion_container {
-    
     //transition: all .5s !important;
     //max-height: 603px;
     // -webkit-transition: max-height 0.5s;
     // -moz-transition: max-height 0.5s;
     // transition: max-height 0.5s;
-    ion-scroll{
-    background-color: #333;
-    max-height: 539px;
-    -webkit-transition: max-height 0.5s;
-    -moz-transition: max-height 0.5s;
-    transition: max-height 0.5s;
-
-    //         -webkit-transition: max-height 0.5s;
-    // -moz-transition: max-height 0.5s;
-    // transition: max-height 0.5s;
+    ion-scroll {
+        background-color: #333;
+        max-height: 539px;
+        -webkit-transition: max-height 0.5s;
+        -moz-transition: max-height 0.5s;
+        transition: max-height 0.5s;
+        //         -webkit-transition: max-height 0.5s;
+        // -moz-transition: max-height 0.5s;
+        // transition: max-height 0.5s;
         // transition: all .5s !important;
-
     }
 }
 
+.list_title {
+    position: absolute;
+    font-family: "Gotham Book";
+    font-size: 20px;
+    width: 712px;
+    padding-bottom: 10px;
+    border-bottom: solid 1px #999;
+}
+
+.first_row {
+    margin-top: 40px !important;
+}
+.first_row_row {
+    margin-top: 50px !important;
+}
 
 .gallery {
     width: 90%;
@@ -86,7 +99,6 @@
     //margin-top: -15px;
     //margin-left: 12px !important;
     //height: 549px;
-
     // -webkit-transition: max-height 0.5s;
     // -moz-transition: max-height 0.5s;
     // transition: max-height 0.5s;
@@ -120,8 +132,6 @@
     transition: max-height 0.5s;
     background: none !important;
     border: none !important;
-
-    
     img {
         max-height: 92px;
     }

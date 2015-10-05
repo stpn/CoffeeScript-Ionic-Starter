@@ -51,12 +51,17 @@ angular.module('starter', [
     url: '/webcams'
     views: 'webcams':
       templateUrl: 'templates/webcams/webcams.html'
-      controller: 'WebcamsCtrl').state 'tab.buildings',
+      controller: 'WebcamsCtrl').state('tab.buildings',
     
     url: '/buildings'
     views: 'buildings':
       templateUrl: 'templates/buildings/building_tab.html'
-      controller: 'BuildingsCtrl'
+      controller: 'BuildingsCtrl').state 'tab.reset',
+
+    url: '/reset'
+    views: 'reset':
+      templateUrl: 'templates/reset.html'
+      controller: 'ResetCtrl'
       
   $urlRouterProvider.otherwise '/tab/home'
   return
