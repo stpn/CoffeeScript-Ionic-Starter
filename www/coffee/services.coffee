@@ -230,6 +230,7 @@ angular.module('starter.services', []).factory('Buildings', ->
         i++
       for k,v of hash
         result.push(v)
+      console.log result, "PRES"        
       result
 
     all: ->
@@ -290,26 +291,26 @@ angular.module('starter.services', []).factory('Buildings', ->
 
   }
 ).factory('Renderings', ($http, Buildings) ->
-  models = [
-    {
-      id: 1
-      name: "Rend1"
-      image: 'img/assets/renderings/1.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 2
-      name: "Rend2"
-      image: 'img/assets/renderings/2.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 3
-      name: "Rendering 3"
-      image: 'img/assets/renderings/3.jpg'
-      building_name: '250 Massachusetts'
-    }    
- ]
+  models = []
+    # {
+    #   id: 1
+    #   name: "Rend1"
+    #   image: 'img/assets/renderings/1.jpg'
+    #   building_name: '200 Massachusetts'
+    # },
+    # {
+    #   id: 2
+    #   name: "Rend2"
+    #   image: 'img/assets/renderings/2.jpg'
+    #   building_name: '200 Massachusetts'
+    # },
+    # {
+    #   id: 3
+    #   name: "Rendering 3"
+    #   image: 'img/assets/renderings/3.jpg'
+    #   building_name: '250 Massachusetts'
+    # }    
+#  ]
   {
     name: ->
      "Rendering"
@@ -318,47 +319,33 @@ angular.module('starter.services', []).factory('Buildings', ->
       hash = {}
       result = []
       i = 0
-      while i < models.length        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-
-    # sorted: ->
-    #   hash = {}
-    #   result = []
-    #   i = 0
-    #   $http.get('http://localhost:3000/renderings.json').then (response) ->
+      $http.get('http://localhost:3000/renderings.json').then (response) ->
         
-    #     models = response.data
-    #     console.log models
-    #     while i < models.length
-    #       bld_name =  Buildings.get(models[i].building_id).name
-    #       if hash[bld_name] == undefined
-    #         hash[bld_name] = [models[i]]
-    #       else
-    #         hash[bld_name].push models[i]
-    #       # if hash[models[i].building_name] == undefined
-    #       #   hash[models[i].building_name] = [models[i]]
-    #       # else
-    #       #   hash[models[i].building_name].push(models[i])
-    #       i++
-    #     for k,v of hash
-    #       result.push(v)    
-
-    #     result
+        models = response.data
+        while i < models.length
+          bld_name =  Buildings.get(models[i].building_id).name
+          models[i].building_name = bld_name
+          models[i].image.url = "http://localhost:3000/"+models[i].image.url
+          if hash[bld_name] == undefined
+            hash[bld_name] = [models[i]]
+          else
+            hash[bld_name].push models[i]
+          # if hash[models[i].building_name] == undefined
+          #   hash[models[i].building_name] = [models[i]]
+          # else
+          #   hash[models[i].building_name].push(models[i])
+          i++
+        for k,v of hash
+          result.push(v)    
+        console.log result, "RENDER"
+        result
 
 
     all: ->
-      # $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
-      #   console.log response
-      #   models = response
-      models
+      $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
+        console.log response
+        models = response
+        models
 
     remove: (chat) ->
       models.splice models.indexOf(chat), 1

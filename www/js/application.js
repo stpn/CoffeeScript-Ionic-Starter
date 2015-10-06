@@ -867,6 +867,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
         v = hash[k];
         result.push(v);
       }
+      console.log(result, "PRES");
       return result;
     },
     all: function() {
@@ -925,49 +926,44 @@ angular.module('starter.services', []).factory('Buildings', function() {
   };
 }).factory('Renderings', function($http, Buildings) {
   var models;
-  models = [
-    {
-      id: 1,
-      name: "Rend1",
-      image: 'img/assets/renderings/1.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 2,
-      name: "Rend2",
-      image: 'img/assets/renderings/2.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 3,
-      name: "Rendering 3",
-      image: 'img/assets/renderings/3.jpg',
-      building_name: '250 Massachusetts'
-    }
-  ];
+  models = [];
   return {
     name: function() {
       return "Rendering";
     },
     sorted: function() {
-      var hash, i, k, result, v;
+      var hash, i, result;
       hash = {};
       result = [];
       i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
+      return $http.get('http://localhost:3000/renderings.json').then(function(response) {
+        var bld_name, k, v;
+        models = response.data;
+        while (i < models.length) {
+          bld_name = Buildings.get(models[i].building_id).name;
+          models[i].building_name = bld_name;
+          models[i].image.url = "http://localhost:3000/" + models[i].image.url;
+          if (hash[bld_name] === void 0) {
+            hash[bld_name] = [models[i]];
+          } else {
+            hash[bld_name].push(models[i]);
+          }
+          i++;
         }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
+        for (k in hash) {
+          v = hash[k];
+          result.push(v);
+        }
+        console.log(result, "RENDER");
+        return result;
+      });
     },
     all: function() {
-      return models;
+      return $http.get('http://localhost:3000/admin/renderings.json').then(function(response) {
+        console.log(response);
+        models = response;
+        return models;
+      });
     },
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);
