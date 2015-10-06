@@ -98,9 +98,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.compTemplate = "templates/menu/comparison_menu.html";
   $scope.bld_style = "margin-top: -200px";
   $scope.transformStyle = "transform: scale(1.0)";
-  $scope.clicker_default = "63px";
-  $scope.clicker_narrow = "43px";
-  $scope.clicker_extranarrow = "17px";
+  $scope.clicker_default = "61px";
+  $scope.clicker_narrow = "40px";
+  $scope.clicker_extranarrow = "16px";
   $scope.clicker_padding = $scope.clicker_default;
   $scope.accordionHeight = "0px";
   $scope.showOverlay = false;
@@ -204,7 +204,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       if (was_comparison === false) {
         $scope.clicker_padding = $scope.clicker_default;
       }
-      pane.style.top = '85px';
+      pane.style.top = '70px';
     }
     if (menu.style.height === "24px") {
       return $scope.bld_style = "margin-top: -200px";
@@ -357,7 +357,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.alertMe = function() {
-    return $log.debug("FUCK");
+    return $log.debug("...");
   };
 }).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.id);
@@ -367,10 +367,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
   $scope.postVideoId = function(videoId) {
-    return $log.debug("FUCKYES " + videoId);
+    return $log.debug("....  " + videoId);
   };
   $scope.alertMe = function() {
-    return $log.debug("FUCK");
+    return $log.debug("...");
   };
 }).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveBuilding) {
   $scope.buildings = Buildings.all();
@@ -597,11 +597,14 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         lastMaxX = 0;
         halt = false;
         max = 200;
-        return ionic.onGesture('drag dragend', (function(e) {
+        return ionic.onGesture('touch drag dragend transform', (function(e) {
           var transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
           switch (e.type) {
+            case 'touch':
+              lastScale = scale;
+              break;
             case 'drag':
               posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
               lastMaxX = posX;
@@ -613,10 +616,14 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
                 posX = 2;
               }
               break;
+            case 'transform':
+              scale = e.gesture.scale * lastScale;
+              break;
             case 'dragend':
               lastPosX = posX;
+              lastScale = scale;
           }
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ';
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')';
           e.target.style.transform = transform;
           return e.target.style.webkitTransform = transform;
         }), $element[0]);

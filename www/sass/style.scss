@@ -20,6 +20,7 @@
 
 .tabs {
     top: 0px !important;
+    height: 84px !important;
 }
 
 .item.item-stable {
@@ -43,12 +44,12 @@ ion-item {
             color: white;
             font-family: "Gotham Book";
             font-size: 17px;
-            line-height: 47px;
+            line-height: 77px;
             height: 10px;
         }
     }
     a.title_tab {
-        height: 47px;
+        height: 86px;
         padding-left: 20px;
         padding-right: 20px;
         border-left: 1px solid #48484A;
@@ -98,15 +99,24 @@ ion-item {
     }
     .tab-item:nth-of-type(2) {
         margin-right: -10px;
-        margin-left: -30px;
+        margin-left: -80px;
         margin-top: 5px;
         min-width: 300px;
+        .icon{
+
+
+    margin-top: 17px !important;
+    height: 32px;
+    font-size: 32px;
+    margin-right: 80px !important;
+
+        }
     }
 }
 
 ion-nav-view {
     ion-nav-view {
-        margin-top: 47px !important;
+        margin-top: 83px !important;
     }
 }
 
@@ -123,7 +133,7 @@ ion-top-menu {
 }
 
 ion-content#main_menu {
-    top: 85px;
+    top: 70px;
     position: absolute;
     //    margin-top: 47px;
     transition: all .5s !important;
@@ -213,6 +223,8 @@ ion-top-menu .item {
         span.bld_name {
             left: 38px;
             top: 22px;
+            color: #C2C1C2 !important;
+            z-index: 999;
         }
         svg,
         span {

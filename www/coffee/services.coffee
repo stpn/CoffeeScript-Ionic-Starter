@@ -1,3 +1,4 @@
+current_server  ="http://localhost:3000"
 angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
@@ -288,7 +289,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       ]
 
   }
-).factory('Renderings', ->
+).factory('Renderings', ($http, Buildings) ->
   models = [
     {
       id: 1
@@ -308,7 +309,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       image: 'img/assets/renderings/3.jpg'
       building_name: '250 Massachusetts'
     }    
-  ]
+ ]
   {
     name: ->
      "Rendering"
@@ -317,8 +318,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       hash = {}
       result = []
       i = 0
-      while i < models.length
-        
+      while i < models.length        
         if hash[models[i].building_name] == undefined
           hash[models[i].building_name] = [models[i]]
         else
@@ -329,8 +329,37 @@ angular.module('starter.services', []).factory('Buildings', ->
       result
 
 
+    # sorted: ->
+    #   hash = {}
+    #   result = []
+    #   i = 0
+    #   $http.get('http://localhost:3000/renderings.json').then (response) ->
+        
+    #     models = response.data
+    #     console.log models
+    #     while i < models.length
+    #       bld_name =  Buildings.get(models[i].building_id).name
+    #       if hash[bld_name] == undefined
+    #         hash[bld_name] = [models[i]]
+    #       else
+    #         hash[bld_name].push models[i]
+    #       # if hash[models[i].building_name] == undefined
+    #       #   hash[models[i].building_name] = [models[i]]
+    #       # else
+    #       #   hash[models[i].building_name].push(models[i])
+    #       i++
+    #     for k,v of hash
+    #       result.push(v)    
+
+    #     result
+
+
     all: ->
+      # $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
+      #   console.log response
+      #   models = response
       models
+
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return

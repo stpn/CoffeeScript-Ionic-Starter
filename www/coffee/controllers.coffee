@@ -16,9 +16,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.bld_style="margin-top: -200px"
   $scope.transformStyle = "transform: scale(1.0)"
 
-  $scope.clicker_default = "63px"
-  $scope.clicker_narrow = "43px"
-  $scope.clicker_extranarrow = "17px"
+  $scope.clicker_default = "61px"
+  $scope.clicker_narrow = "40px"
+  $scope.clicker_extranarrow = "16px"
   $scope.clicker_padding = $scope.clicker_default
   $scope.accordionHeight = "0px"
 
@@ -135,7 +135,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       menu.style.height =  '24px' 
       if was_comparison == false
         $scope.clicker_padding = $scope.clicker_default
-      pane.style.top = '85px'
+      pane.style.top = '70px'
 
     if menu.style.height == "24px"
       $scope.bld_style = "margin-top: -200px"
@@ -305,7 +305,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     else
       $scope.currentSlide = slideIdx
   $scope.alertMe = ()->
-    $log.debug("FUCK")    
+    $log.debug("...")    
   return
 
 
@@ -319,10 +319,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.videos = $sce.getTrustedResourceUrl(src);
 
   $scope.postVideoId = (videoId) ->
-    $log.debug("FUCKYES "+ videoId)
+    $log.debug("....  "+ videoId)
   
   $scope.alertMe = ()->
-    $log.debug("FUCK")    
+    $log.debug("...")    
   return
 
 

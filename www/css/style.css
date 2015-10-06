@@ -18,8 +18,6 @@
     transition: .5s linear all !important; }
   #bld_tab_wrap .building {
     position: absolute; }
-  #bld_tab_wrap span.bld_name {
-    color: white; }
   #bld_tab_wrap .M200 {
     top: 0px;
     left: 10px; }
@@ -9360,7 +9358,7 @@ a.button {
   -moz-box-flex: 0;
   -moz-flex: 0 0 165px !important;
   -ms-flex: 0 0 165px !important;
-  flex: 0 0 180px !important;
+  flex: 0 0 165px !important;
   min-width: 152px !important;
   max-height: 131px;
   margin-bottom: 6px !important;
@@ -18681,7 +18679,8 @@ a.button {
   background-image: url("capitol_crossing.svg"); }
 
 .tabs {
-  top: 0px !important; }
+  top: 0px !important;
+  height: 84px !important; }
 
 .item.item-stable {
   color: #999 !important; }
@@ -18697,11 +18696,11 @@ ion-item {
   color: white;
   font-family: "Gotham Book";
   font-size: 17px;
-  line-height: 47px;
+  line-height: 77px;
   height: 10px; }
 
 #header a.title_tab {
-  height: 47px;
+  height: 86px;
   padding-left: 20px;
   padding-right: 20px;
   border-left: 1px solid #48484A; }
@@ -18711,12 +18710,17 @@ ion-item {
 
 #header .tab-item:nth-of-type(2) {
   margin-right: -10px;
-  margin-left: -30px;
+  margin-left: -80px;
   margin-top: 5px;
   min-width: 300px; }
+  #header .tab-item:nth-of-type(2) .icon {
+    margin-top: 17px !important;
+    height: 32px;
+    font-size: 32px;
+    margin-right: 80px !important; }
 
 ion-nav-view ion-nav-view {
-  margin-top: 47px !important; }
+  margin-top: 83px !important; }
 
 ion-top-menu {
   position: absolute;
@@ -18728,7 +18732,7 @@ ion-top-menu {
   transition: all 0.5s; }
 
 ion-content#main_menu {
-  top: 85px;
+  top: 70px;
   position: absolute;
   transition: all 0.5s !important; }
   ion-content#main_menu .clicker {
@@ -18806,7 +18810,9 @@ ion-top-menu .item {
     -webkit-perspective: 1000; }
     #building_menu_wrap #all_buildings span.bld_name {
       left: 38px;
-      top: 22px; }
+      top: 22px;
+      color: #C2C1C2 !important;
+      z-index: 999; }
     #building_menu_wrap #all_buildings svg,
     #building_menu_wrap #all_buildings span {
       -webkit-backface-visibility: hidden;
@@ -18900,7 +18906,7 @@ ion-top-menu .item {
     margin-left: 11px !important; }
   #video_container .close_button {
     margin-right: 3px !important;
-    margin-top: -19px !important; }
+    margin-top: 0px !important; }
   #video_container ion-content {
     position: relative; }
   #video_container .video_controls {

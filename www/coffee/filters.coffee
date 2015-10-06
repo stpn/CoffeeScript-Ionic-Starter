@@ -83,13 +83,13 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
         lastMaxX = 0
         halt = false
         max = 200
-        ionic.onGesture 'drag dragend', ((e) ->
+        ionic.onGesture 'touch drag dragend transform', ((e) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
           switch e.type
-            # when 'touch'
-            #   lastScale = scale
-            #   last_rotation = rotation
+            when 'touch'
+              lastScale = scale
+#              last_rotation = rotation
             when 'drag'
               # if square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit 
               posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
@@ -109,13 +109,13 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
                 posX = 249
               if posX <= 1
                 posX = 2
-            # when 'transform'
-            #   rotation = e.gesture.rotation + last_rotation
-            #   scale = e.gesture.scale * lastScale
+            when 'transform'
+              #rotation = e.gesture.rotation + last_rotation
+              scale = e.gesture.scale * lastScale
             when 'dragend'
               lastPosX = posX
-#              lastScale = scale
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ' #+ 'scale(' + scale + ')' + 'rotate(' + rotation + 'deg) '
+              lastScale = scale
+          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')'  #+ 'rotate(' + rotation + 'deg) '
           e.target.style.transform = transform
           e.target.style.webkitTransform = transform
 
