@@ -73,6 +73,43 @@ angular.module('starter.services', []).factory('Buildings', ->
         return true
       else 
         return false
+    # getActive: ->
+    #   if actives.size > 0
+    #     for k,v of actives
+    #       if actives[k] != undefined
+    #         actives[k]
+    cancelAll: ->
+      for k,v of actives
+        actives[k] = undefined
+  }
+
+).service('ActiveCrestron', ->
+  name = undefined
+  tabName = "SELECT BUILDING"
+  actives = {}
+
+  {
+    setName: (new_name) ->
+      if actives[new_name] == "active"
+        actives[new_name] = undefined
+      else
+        actives[new_name] = "active"
+
+
+    getName: (new_name) ->
+      if actives[new_name] == "active"
+        return true
+      else
+        return false
+
+    isActive: (q_name) ->
+      if actives[q_name] == 'active'
+        return true
+    # getActive: ->
+    #   if actives.size > 0
+    #     for k,v of actives
+    #       if actives[k] != undefined
+    #         actives[k]
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined

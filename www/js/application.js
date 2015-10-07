@@ -91,6 +91,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.presentations = {};
   $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()], ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()], ["Webcams", Webcams.sorted()]];
   $scope.activeBuilding = ActiveBuilding;
+  $scope.lastActiveName = void 0;
   $scope.buldingTabName = "Select Buildings";
   $scope.comparisonState = false;
   $scope.buildings = Buildings.all();
@@ -158,13 +159,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.activeBuilding.cancelAll();
     }
   };
-  $scope.activeBuildingTabName = function() {
-    if ($scope.activeBuilding.name === void 0) {
-      return "SELECT BUILDING";
-    } else {
-      return $scope.activeBuilding.name;
-    }
-  };
   $scope.building_is = function(code, name) {
     if (code === name) {
       return true;
@@ -174,11 +168,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.getTemplate(name);
   };
   $scope.setActiveBuilding = function(name) {
+    $scope.activeBuilding.cancelAll();
     if (name === void 0) {
       $scope.activeBuilding.tabName = "SELECT BUILDING";
     }
     $scope.activeBuilding.setName(name);
-    return $scope.activeBuilding.tabName = name;
+    $scope.activeBuilding.tabName = name;
+    return $scope.lastActiveName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
@@ -190,7 +186,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       was_comparison = true;
     }
     $scope.comparisonState = false;
-    $scope.activeBuilding.tabName = "SELECT BUILDING";
+    if ($scope.lastActiveName === void 0) {
+      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    }
+    $scope.activeBuilding.tabName = $scope.lastActiveName;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
@@ -372,11 +371,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.alertMe = function() {
     return $log.debug("...");
   };
-}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveBuilding) {
+}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveCrestron) {
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.transformStyle = "scale(1.19)";
-  $scope.activeBuilding = ActiveBuilding;
+  $scope.activeBuilding = ActiveCrestron;
   $scope.getTemplate = function(name) {
     return Buildings.getTemplate(name);
   };
@@ -391,8 +390,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setActiveBuilding = function(name) {
     if (name === void 0) {
       $scope.activeBuilding.tabName = "SELECT BUILDING";
+    } else if (name === "all") {
+      $scope.activeBuilding.cancelAll();
+    } else {
+      if ($scope.activeBuilding.isActive("all")) {
+        console.log("ALL");
+        $scope.activeBuilding.setName("all");
+      }
     }
-    ActiveBuilding.setName(name);
+    $scope.activeBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
   $scope.getFillColorFor = function(bld_name) {
@@ -715,6 +721,41 @@ angular.module('starter.services', []).factory('Buildings', function() {
         return true;
       } else {
         return false;
+      }
+    },
+    cancelAll: function() {
+      var k, results, v;
+      results = [];
+      for (k in actives) {
+        v = actives[k];
+        results.push(actives[k] = void 0);
+      }
+      return results;
+    }
+  };
+}).service('ActiveCrestron', function() {
+  var actives, name, tabName;
+  name = void 0;
+  tabName = "SELECT BUILDING";
+  actives = {};
+  return {
+    setName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return actives[new_name] = void 0;
+      } else {
+        return actives[new_name] = "active";
+      }
+    },
+    getName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isActive: function(q_name) {
+      if (actives[q_name] === 'active') {
+        return true;
       }
     },
     cancelAll: function() {

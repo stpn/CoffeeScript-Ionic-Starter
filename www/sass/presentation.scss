@@ -12,11 +12,15 @@
 }
 
 .presenation_container {
+
     margin-top: 53px;
     .presentation_gal {
         background-color: black !important;
         margin-left: 0px;
         min-height: 743px;
+        .item{
+            background-color: black !important;
+        }
         .col_slide {
             -webkit-box-flex: 0;
             -webkit-flex: 0 0 132px;
@@ -32,6 +36,12 @@
             img {
                 max-height: 74px;
             }
+        }
+        .col_slide.active{
+            border-color: white;
+            border-width:  3px;
+            border: solid;
+            color: white;
         }
     }
 }
