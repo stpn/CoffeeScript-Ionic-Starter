@@ -9,6 +9,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
   $scope.buldingTabName = "Select Buildings"
   
+  $scope.activeComparison = undefined
+
   $scope.comparisonState = false
   # $scope.topMenu = TopmenuState.states
 
@@ -186,6 +188,18 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       return "F200"
 
 
+  $scope.setActiveComparison = (comparison) ->
+    if comparison == $scope.activeComparison
+      comparison = undefined
+    $scope.activeComparison = comparison
+
+  $scope.getComparisonStroke = (comparison) ->
+    if comparison == $scope.activeComparison
+      return "#FFF"
+    else
+      return "#808080"      
+
+
 ).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.id)
   return
@@ -294,13 +308,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
   $scope.postSlide = (slideIdx) ->
     if slideIdx >= $scope.slides.length 
-      console.log "HERE"
       $scope.currentSlide = $scope.slides.length  
     else if slideIdx <= 1
-      console.log "HERE2"
       $scope.currentSlide = 1
     else
-      console.log "HERE3"
+
       $scope.currentSlide = slideIdx
       
   $scope.alertMe = ()->
@@ -367,6 +379,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       return "#6D6F72"
     else 
       return "none"
+
+
 
   # $scope.getFillColorFor = (bld) ->
   #   if bld == "all" == $scope.activeBuilding.getName()

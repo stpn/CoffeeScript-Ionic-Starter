@@ -94,6 +94,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.activeBuildingName = void 0;
   $scope.lastActiveName = void 0;
   $scope.buldingTabName = "Select Buildings";
+  $scope.activeComparison = void 0;
   $scope.comparisonState = false;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
@@ -243,7 +244,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return "none";
     }
   };
-  return $scope.convertCode = function(name) {
+  $scope.convertCode = function(name) {
     if (name === "200M") {
       return "M200";
     }
@@ -258,6 +259,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
     if (name === "200F") {
       return "F200";
+    }
+  };
+  $scope.setActiveComparison = function(comparison) {
+    if (comparison === $scope.activeComparison) {
+      comparison = void 0;
+    }
+    return $scope.activeComparison = comparison;
+  };
+  return $scope.getComparisonStroke = function(comparison) {
+    if (comparison === $scope.activeComparison) {
+      return "#FFF";
+    } else {
+      return "#808080";
     }
   };
 }).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
@@ -347,13 +361,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.currentSlide = 1;
   $scope.postSlide = function(slideIdx) {
     if (slideIdx >= $scope.slides.length) {
-      console.log("HERE");
       return $scope.currentSlide = $scope.slides.length;
     } else if (slideIdx <= 1) {
-      console.log("HERE2");
       return $scope.currentSlide = 1;
     } else {
-      console.log("HERE3");
       return $scope.currentSlide = slideIdx;
     }
   };
