@@ -293,7 +293,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.currentSlide = 1
 
   $scope.postSlide = (slideIdx) ->
-    if slideIdx == $scope.slides.length 
+    if slideIdx >= $scope.slides.length 
       $scope.currentSlide = $scope.slides.length  
     if slideIdx == 1
       $scope.currentSlide = 1
