@@ -5,11 +5,13 @@
   The Friends service returns an array of friend data
 -->
 <ion-view view-title="{{video_name}}" ng-controller="VideoCtrl" has-bouncing="false">
+
+
+    <div id="video_container">
+
         <a class="close_button" ui-sref="tab.dash">
             <i class="ion-close"></i>
         </a>
-
-    <div id="video_container">
 
         <div class="presentation_titles">
             <div id="presentation_title">{{camera_name | uppercase}}</div>

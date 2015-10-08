@@ -9427,8 +9427,7 @@ a.button {
     position: absolute;
     right: 6px;
     top: 0px;
-    font-size: 25px;
-    margin-right: 33px; }
+    font-size: 25px; }
     .presenation_container .close_button .ion-close::before {
       color: #808080; }
 
@@ -18912,16 +18911,18 @@ ion-top-menu .item {
   border: none !important;
   font-size: 32px !important; }
 
-.close_button {
-  margin-right: 3px !important;
-  margin-top: 0px !important;
-  padding: 30px; }
-
 #video_container {
-  margin-top: 55px;
+  margin-top: 85px;
   width: 696px;
   margin-left: auto;
   margin-right: auto; }
+  #video_container .close_button {
+    position: absolute;
+    right: 36px;
+    top: 30px;
+    font-size: 25px; }
+    #video_container .close_button .ion-close::before {
+      color: #808080; }
   #video_container .presentation_titles {
     margin-left: 11px !important; }
   #video_container ion-content {
@@ -19087,6 +19088,13 @@ progress::-webkit-progress-value {
   width: 696px;
   margin-left: auto;
   margin-right: auto; }
+  #webcam_content .close_button {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    font-size: 25px; }
+    #webcam_content .close_button .ion-close::before {
+      color: #808080; }
 
 #webcam_assets {
   width: 501px;

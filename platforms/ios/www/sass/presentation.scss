@@ -3,22 +3,22 @@
     margin-left: 36px;
     color: #DAD9D9;
     font-family: "Gotham Light";
-    .presentation_title {
+    #presentation_title {
         font-size: 22px;
     }
-    .presentation_subtitle {
+    #presentation_subtitle {
         font-size: 20px;
+        margin-top: 5px;
     }
 }
 
 .presenation_container {
-
     margin-top: 53px;
     .presentation_gal {
         background-color: black !important;
         margin-left: 0px;
         min-height: 743px;
-        .item{
+        .item {
             background-color: black !important;
         }
         .col_slide {
@@ -37,11 +37,20 @@
                 max-height: 74px;
             }
         }
-        .col_slide.active{
+        .col_slide.active {
             border-color: white;
-            border-width:  3px;
+            border-width: 3px;
             border: solid;
             color: white;
+        }
+    }
+    .close_button {
+        position: absolute;
+        right: 6px;
+        top: 0px;
+        font-size: 25px;
+        .ion-close::before {
+            color: #808080;
         }
     }
 }
@@ -65,8 +74,8 @@
         height: 75px;
         border: solid 1px;
         margin-left: 5px;
-        .skipbackward_button{
-            i{
+        .skipbackward_button {
+            i {
                 font-size: 80px;
             }
         }
@@ -80,14 +89,5 @@
     li {
         cursor: pointer;
         float: left;
-    }
-}
-
-.close_button {
-    float: right;
-    font-size: 25px;
-    margin-right: 33px;
-    .ion-close::before {
-        color: #808080;
     }
 }

@@ -9391,10 +9391,11 @@ a.button {
   margin-left: 36px;
   color: #DAD9D9;
   font-family: "Gotham Light"; }
-  .presentation_titles .presentation_title {
+  .presentation_titles #presentation_title {
     font-size: 22px; }
-  .presentation_titles .presentation_subtitle {
-    font-size: 20px; }
+  .presentation_titles #presentation_subtitle {
+    font-size: 20px;
+    margin-top: 5px; }
 
 .presenation_container {
   margin-top: 53px; }
@@ -9422,6 +9423,13 @@ a.button {
       border-width: 3px;
       border: solid;
       color: white; }
+  .presenation_container .close_button {
+    position: absolute;
+    right: 6px;
+    top: 0px;
+    font-size: 25px; }
+    .presenation_container .close_button .ion-close::before {
+      color: #808080; }
 
 #presentation_controls {
   position: absolute;
@@ -9450,13 +9458,6 @@ a.button {
   #presentation_controls li {
     cursor: pointer;
     float: left; }
-
-.close_button {
-  float: right;
-  font-size: 25px;
-  margin-right: 33px; }
-  .close_button .ion-close::before {
-    color: #808080; }
 
 @charset "UTF-8";
 /*
@@ -18910,16 +18911,18 @@ ion-top-menu .item {
   border: none !important;
   font-size: 32px !important; }
 
-.close_button {
-  margin-right: 3px !important;
-  margin-top: 0px !important;
-  padding: 30px; }
-
 #video_container {
-  margin-top: 55px;
+  margin-top: 85px;
   width: 696px;
   margin-left: auto;
   margin-right: auto; }
+  #video_container .close_button {
+    position: absolute;
+    right: 36px;
+    top: 39px;
+    font-size: 25px; }
+    #video_container .close_button .ion-close::before {
+      color: #808080; }
   #video_container .presentation_titles {
     margin-left: 11px !important; }
   #video_container ion-content {
