@@ -4,14 +4,16 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="{{video.name}}" ng-controller="VideoCtrl" has-bouncing="false">
-    <div id="video_container">
+<ion-view view-title="{{video_name}}" ng-controller="VideoCtrl" has-bouncing="false">
         <a class="close_button" ui-sref="tab.dash">
             <i class="ion-close"></i>
         </a>
+
+    <div id="video_container">
+
         <div class="presentation_titles">
-            <div id="presentation_title">{{building_name | uppercase}}</div>
-            <div id="presentation_subtitle">{{video.name}}</div>
+            <div id="presentation_title">{{camera_name | uppercase}}</div>
+            <div id="presentation_subtitle">{{video_name}}</div>
         </div>
         <ion-content overflow-scroll="true">
             <video preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px" id="video" autoplay="true">
@@ -33,7 +35,9 @@
                 <i class="ion-skip-forward-capxing"></i>
             </li>
             <div class="volume_controls">
-                <li><i ng-click="setMute()" ng-class="isMute() ? 'ion-volume-mute' : 'ion-volume-high' "></i></li>
+                <li id ="volume_btn" ng-click="setMute()">
+                <i ng-class="isMute() ? 'ion-android-volume-mute' : 'ion-volume-high' "></i>
+                </li>
                 <li ng-click="volumeDown()"><i class="ion-minus"></i></li>
                 <li>
                     <!-- <input type="range" id="volume" class="volume" min="0" max="1" step="0.1" value="1"> </li> -->

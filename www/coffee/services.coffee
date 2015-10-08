@@ -590,6 +590,71 @@ angular.module('starter.services', []).factory('Buildings', ->
 
   }
 
+).factory('Timelapses', ->
+  models = [
+    {
+      id: 1
+      name: "Timelapse 1"
+      image: 'img/assets/views/1.jpg'
+      building_name: '200 Massachusetts'
+      recording: 'img/assets/videos/1.mp4'
+    },
+    {
+      id: 2
+      name: "Timelapse 2"
+      image: 'img/assets/views/2.jpg'
+      building_name: '200 Massachusetts'
+      recording: 'img/assets/videos/2.mp4'
+    },
+    {
+      id: 3
+      name: "Timelapse 3"
+      image: 'img/assets/views/3.jpg'
+      building_name: '250 Massachusetts'
+      recording: 'img/assets/videos/3.mp4'
+    }    
+  ]
+  {
+    getRecording: (videoId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(videoId)
+          return models[i].recording
+        i++
+      null
+    name: ->
+     "Timelapse"
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+    get: (chatId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(chatId)
+          return models[i]
+        i++
+      null
+
+  }
+
 ).service('ActiveCamera', ->
   name = undefined
 

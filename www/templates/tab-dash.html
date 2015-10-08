@@ -17,7 +17,7 @@
             </div>
         </div>
     </ion-top-menu>
-    <ion-content id="main_menu">
+    <ion-content id="main_menu" has-bouncing="false">
         <ion-list>
             <div ng-repeat='factory in factories' class="accordion_container">
                 <ion-item class="item-stable clicker" ng-click="toggleGroup(factory)" ng-class="{active: isGroupShown(factory)}" ng-style="{'padding-top': clicker_padding, 'padding-bottom':clicker_padding}">

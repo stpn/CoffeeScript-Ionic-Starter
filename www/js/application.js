@@ -35,6 +35,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'VideoPlayerCtrl'
       }
     }
+  }).state('tab.timelapses', {
+    url: '/timelapses/:id',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/videos/timelapsePlayer.html',
+        controller: 'TimelapsesCtrl'
+      }
+    }
   }).state('tab.views', {
     url: '/views/:id',
     views: {
@@ -274,8 +282,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return "#808080";
     }
   };
-}).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
-  $scope.video = Videos.get($stateParams.id);
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
   $scope.home = '#/tab/home';
@@ -480,6 +486,90 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
+  $scope.videoDiv.addEventListener('timeupdate', function() {
+    var value;
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    $scope.seekBar.value = value;
+  });
+  $scope.closeBtn = function() {
+    $scope.videoDiv.pause();
+    return $location.path('#/dash/');
+  };
+  $scope.seekRelease = function() {
+    var currentTime;
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    return $scope.videoDiv.currentTime = currentTime;
+  };
+  $scope.volumeUp = function() {
+    if ($scope.volume.value < 100) {
+      return $scope.volume.value = $scope.volume.value + 5;
+    } else {
+      return $scope.volume.value = 100;
+    }
+  };
+  $scope.volumeDown = function() {
+    if ($scope.volume.value > 0) {
+      return $scope.volume.value = $scope.volume.value - 5;
+    } else {
+      return $scope.volume.value = 0;
+    }
+  };
+  $scope.videoBack = function() {
+    return $scope.videoDiv.currentTime = 0;
+  };
+  $scope.videoBw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+  };
+  $scope.videoFw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+  };
+  $scope.videoPlay = function() {
+    if ($scope.videoDiv.paused) {
+      return $scope.videoDiv.play();
+    } else {
+      return $scope.videoDiv.pause();
+    }
+  };
+  $scope.isMute = function() {
+    return $scope.mute;
+  };
+  $scope.setMute = function() {
+    return $scope.mute = !$scope.mute;
+  };
+  $scope.progressRelease = function($event) {
+    if ($event.gesture.deltaX > 0) {
+      if ($scope.volume.value >= 100) {
+        return $scope.volume.value = 100;
+      } else {
+        return $scope.volume.value = $scope.volume.value + 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    } else {
+      if ($scope.volume.value <= 0) {
+        return $scope.volume.value = 0;
+      } else {
+        return $scope.volume.value = $scope.volume.value - 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    }
+  };
+}).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location) {
+  $scope.video = Timelapses.get($stateParams.id);
+  $scope.videoDiv = document.getElementById('video');
+  $scope.seekBar = document.getElementById('seekbar');
+  $scope.volume = document.getElementById('volume');
+  $scope.skipValue = 0;
+  $scope.mute = false;
+  $scope.max = 80;
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.building_name = $scope.video.building_name;
+  $scope.trustSrc = function(src) {
+    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  };
+  $scope.postVideoId = function(videoId) {
+    return $log.debug("....  " + videoId);
+  };
+  $scope.alertMe = function() {
+    return $log.debug("...");
+  };
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -1345,6 +1435,81 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     name: function() {
       return "Video";
+    },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Timelapses', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Timelapse 1",
+      image: 'img/assets/views/1.jpg',
+      building_name: '200 Massachusetts',
+      recording: 'img/assets/videos/1.mp4'
+    }, {
+      id: 2,
+      name: "Timelapse 2",
+      image: 'img/assets/views/2.jpg',
+      building_name: '200 Massachusetts',
+      recording: 'img/assets/videos/2.mp4'
+    }, {
+      id: 3,
+      name: "Timelapse 3",
+      image: 'img/assets/views/3.jpg',
+      building_name: '250 Massachusetts',
+      recording: 'img/assets/videos/3.mp4'
+    }
+  ];
+  return {
+    getRecording: function(videoId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(videoId)) {
+          return models[i].recording;
+        }
+        i++;
+      }
+      return null;
+    },
+    name: function() {
+      return "Timelapse";
     },
     sorted: function() {
       var hash, i, k, result, v;

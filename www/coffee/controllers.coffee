@@ -200,9 +200,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       return "#808080"      
 
 
-).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
-  $scope.video = Videos.get($stateParams.id)
-  return
 
 ).controller('titleCtrl', ($scope, $stateParams) ->
   $scope.titleTemplate = "templates/menu/title.html"
@@ -323,7 +320,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 ).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.id)
   #$log.debug($scope.video.recording);
+
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+
   $scope.building_name = $scope.video.building_name 
   
   $scope.trustSrc = (src) ->
@@ -520,6 +519,95 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   return
+
+).controller('TimelapsesCtrl', ($scope, $sce, $log, $stateParams,  Timelapses, $location) ->
+  $scope.video = Timelapses.get($stateParams.id)
+  $scope.videoDiv = document.getElementById('video')
+  $scope.seekBar = document.getElementById('seekbar')
+  $scope.volume = document.getElementById('volume')
+  $scope.skipValue = 0
+  $scope.mute = false
+  $scope.max = 80
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+  $scope.building_name = $scope.video.building_name 
+  
+  $scope.trustSrc = (src) ->
+    $scope.videos = $sce.getTrustedResourceUrl(src);
+
+  $scope.postVideoId = (videoId) ->
+    $log.debug("....  "+ videoId)
+  
+  $scope.alertMe = ()->
+    $log.debug("...")    
+  
+
+  $scope.videoDiv.addEventListener 'timeupdate', ->
+    # console.log 'test'
+    # never calls
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    #console.log value
+    $scope.seekBar.value = value
+    return
+  $scope.closeBtn =() ->
+    $scope.videoDiv.pause()
+    $location.path('#/dash/')
+
+  $scope.seekRelease = ->
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    $scope.videoDiv.currentTime = currentTime;
+
+  $scope.volumeUp = ->
+    #console.log 'UP'
+    if $scope.volume.value < 100
+      $scope.volume.value = $scope.volume.value + 5
+    else
+      $scope.volume.value = 100
+
+  $scope.volumeDown = ->
+    #console.log 'DOWN'
+    if $scope.volume.value > 0 
+      $scope.volume.value = $scope.volume.value - 5
+    else
+      $scope.volume.value = 0    
+
+
+  $scope.videoBack =  ->
+    $scope.videoDiv.currentTime = 0
+
+  $scope.videoBw =  ->
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5
+
+  $scope.videoFw =  ->
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5
+
+  $scope.videoPlay =  ->
+    if $scope.videoDiv.paused
+      $scope.videoDiv.play()
+    else
+      $scope.videoDiv.pause()
+
+  $scope.isMute = ->
+    $scope.mute
+
+  $scope.setMute = ->
+    $scope.mute = !$scope.mute
+
+  $scope.progressRelease = ($event) ->
+    if $event.gesture.deltaX > 0          
+      if $scope.volume.value >= 100
+        $scope.volume.value = 100
+      else
+        $scope.volume.value = $scope.volume.value + 5/$scope.volume.getBoundingClientRect().width * $scope.max
+      #$scope.volumeUp()
+    else
+      if $scope.volume.value <= 0
+        $scope.volume.value = 0
+      else
+        $scope.volume.value = $scope.volume.value - 5/$scope.volume.getBoundingClientRect().width * $scope.max
+
+
+  return
+
 
 ).controller('HomeCtrl', ($scope) ->
   $scope.home = "HOME"
