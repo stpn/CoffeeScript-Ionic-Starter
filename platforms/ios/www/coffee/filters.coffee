@@ -76,12 +76,14 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
         rotation = 0
         last_rotation = undefined
         dragReady = 0
-        leftXLimit = 340
-        rightXLimit = 1080
-        fixPosXmin = 0
-        fixPosXmax = 250
+        leftXLimit = 44
+        rightXLimit = 720
+        topYLimit = 197
+        bottomYLimit = 385     
         lastMaxX = 0
-        halt = false
+        lastMinX = 0
+        lastMaxY = 0
+        lastMinY = 0
         max = 200
         ionic.onGesture 'touch drag dragend transform', ((e) ->
           e.gesture.srcEvent.preventDefault()
@@ -91,33 +93,62 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
               lastScale = scale
 #              last_rotation = rotation
             when 'drag'
-              # if square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().right < rightXLimit 
-              posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-              lastMaxX = posX
-              halt = false
-              # else 
-              #   if square.getBoundingClientRect().left == leftXLimit
-              #     fixPosXmin = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-              #   if square.getBoundingClientRect().left + square.getBoundingClientRect().width >= rightXLimit && halt == false
-              #     fixPosXmax =  lastMaxX #e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-              #     halt = true
-              # if fixPosXmin > e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
-              #   posX = 2
-              # if e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX > fixPosXmax
-              #   posX = 249
-              if posX  > 249
-                posX = 249
-              if posX <= 1
-                posX = 2
+              if square.getBoundingClientRect().left > leftXLimit  && square.getBoundingClientRect().top > topYLimit && square.getBoundingClientRect().bottom < bottomYLimit  && square.getBoundingClientRect().right < rightXLimit 
+
+                posX = e.gesture.deltaX/square.getBoundingClientRect().width * max + lastPosX
+                posY = e.gesture.deltaY/square.getBoundingClientRect().height * max + lastPosY   
+                if posX < lastMinX
+                  posX = lastMinX
+                if posX > lastMaxX && lastMaxX > 0
+                  posX = lastMaxX 
+                if posY < lastMinY
+                  posY = lastMinY
+                if posY > lastMaxY && lastMaxY > 0
+                  posY = lastMaxY 
+                console.log square.getBoundingClientRect().top, " < TOP", square.getBoundingClientRect().left, " <LEFT", posX, " < POSX", lastMaxX , " <LASTMAX"                                      
+              else 
+                if square.getBoundingClientRect().left < leftXLimit                
+                  lastPosX = lastPosX + 1
+                  lastMinX = lastPosX
+                if square.getBoundingClientRect().right > rightXLimit              
+                  lastPosX = posX - 1
+                  lastMaxX = lastPosX
+                  posX = lastMaxX
+                if square.getBoundingClientRect().top < topYLimit  
+
+                  lastMinY = lastPosY + 1
+                  lastMinY = lastPosY
+                if square.getBoundingClientRect().bottom > bottomYLimit              
+                  lastPosY = posY - 1
+                  lastMaxY = lastPosY
+                  posY = lastMaxY
+
             when 'transform'
               #rotation = e.gesture.rotation + last_rotation
               scale = e.gesture.scale * lastScale
+              lastMaxX = 0
+              lastMinX = 0
+              lastMaxY = 0
+              lastMinY = 0              
             when 'dragend'
               lastPosX = posX
+              lastPosY = posY
               lastScale = scale
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')'  #+ 'rotate(' + rotation + 'deg) '
-          e.target.style.transform = transform
-          e.target.style.webkitTransform = transform
+          scalRgxp = /scale\(\d{1,}\.\d{1,}\)/
+          # match = e.target.style.transform.match(scalRgxp)
+          # if !match
+          #   match = [""]
+          # else
+          #   console.log match[0]
+          #   lastMaxX = 0
+          #   lastMinX = 0
+          #   lastMaxY = 0
+          #   lastMinY = 0     
+          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')'  #+ 'rotate(' + rotation + 'deg) '
+          # e.target.style.height = String(e.target.offsetHeight * scale)+"px"
+          # e.target.style.width = String(e.target.offsetWidth * scale)+"px"
+          e.target.style.transform = transform #+  " " + match[0]
+          e.target.style.webkitTransform = e.target.style.transform #+ " " + match[0]
 
           # return
         ), $element[0]

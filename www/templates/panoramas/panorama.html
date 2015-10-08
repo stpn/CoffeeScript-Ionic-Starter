@@ -9,15 +9,16 @@
         </div>
         <!-- <div back-img="getPanorama" id= "panorama_view"></img> -->
         <div id="panorama_view">
-            <ion-Ppinch class="square"  xpos=""></ion-Ppinch>
+            <ion-Ppinchh class="square"  xpos="" id="square"></ion-Ppinchh>
+
             <img ng-src={{panorama.image}} id="panorama_image" width="676" height="186"/>
         </div>
         <div class="zoom_buttons">
 
-            <div class ="zoom_in" ng-click="zoomIn('panorama_image')" >
+            <div class ="zoom_in" ng-click="zoomIn('square')" >
                 +
             </div>
-            <div class ="zoom_out" ng-click="zoomOut('panorama_image')" >
+            <div class ="zoom_out" ng-click="zoomOut('square')" >
                 -
             </div>
         </div>

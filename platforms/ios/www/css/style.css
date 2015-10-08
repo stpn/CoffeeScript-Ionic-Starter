@@ -9396,6 +9396,8 @@ a.button {
     background-color: black !important;
     margin-left: 0px;
     min-height: 743px; }
+    .presenation_container .presentation_gal .item {
+      background-color: black !important; }
     .presenation_container .presentation_gal .col_slide {
       -webkit-box-flex: 0;
       -webkit-flex: 0 0 132px;
@@ -9409,6 +9411,11 @@ a.button {
       margin: 5px; }
       .presenation_container .presentation_gal .col_slide img {
         max-height: 74px; }
+    .presenation_container .presentation_gal .col_slide.active {
+      border-color: white;
+      border-width: 3px;
+      border: solid;
+      color: white; }
 
 #presentation_controls {
   position: absolute;
@@ -19078,6 +19085,7 @@ progress::-webkit-progress-value {
 
 #panorama_view {
   height: 186px;
+  width: 676px;
   margin-top: 14px;
   overflow: hidden; }
 

@@ -19085,6 +19085,7 @@ progress::-webkit-progress-value {
 
 #panorama_view {
   height: 186px;
+  width: 676px;
   margin-top: 14px;
   overflow: hidden; }
 

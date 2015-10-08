@@ -4,6 +4,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   # [["Presentation"], [models]] 
   $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()],  ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()],  ["Webcams", Webcams.sorted()]]
   $scope.activeBuilding = ActiveBuilding
+  $scope.lastActiveName = undefined
 
   $scope.buldingTabName = "Select Buildings"
   
@@ -91,11 +92,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     # $scope.activeBuilding.name = undefined
     # $log.debug($scope.activeBuilding)
   
-  $scope.activeBuildingTabName = ->
-    if $scope.activeBuilding.name == undefined 
-      "SELECT BUILDING"
-    else 
-      $scope.activeBuilding.name
+  # $scope.activeBuildingTabName = ->
+  #   if $scope.activeBuilding.name == undefined 
+  #     "SELECT BUILDING"
+  #   else 
+  #     $scope.activeBuilding.name
 
   $scope.building_is = (code, name) ->
     if code == name
@@ -106,10 +107,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     Buildings.getTemplate(name)
 
   $scope.setActiveBuilding = (name)->
+    $scope.activeBuilding.cancelAll()
     if name == undefined
       $scope.activeBuilding.tabName = "SELECT BUILDING"
     $scope.activeBuilding.setName(name)
     $scope.activeBuilding.tabName = name
+    $scope.lastActiveName = name
 
 
   $scope.buildingCode = (name)->    
@@ -121,7 +124,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     if $scope.comparisonState == true
       was_comparison = true
     $scope.comparisonState = false
-    $scope.activeBuilding.tabName = "SELECT BUILDING"
+    if $scope.lastActiveName == undefined
+      $scope.activeBuilding.tabName = "SELECT BUILDING"
+    $scope.activeBuilding.tabName = $scope.lastActiveName
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
     pane = document.getElementsByTagName('ion-content')[0]
@@ -297,6 +302,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.presentation_name = $scope.presentation.name
   $scope.project_name = $scope.presentation.project_name
   $scope.currentSlide = 1
+
   $scope.postSlide = (slideIdx) ->
     if slideIdx == $scope.slides.length 
       $scope.currentSlide = $scope.slides.length  
@@ -304,6 +310,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       $scope.currentSlide = 1
     else
       $scope.currentSlide = slideIdx
+      
   $scope.alertMe = ()->
     $log.debug("...")    
   return
@@ -326,11 +333,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   return
 
 
-).controller('BuildingsCtrl', ($scope, Buildings, $log, ActiveBuilding) ->
+).controller('BuildingsCtrl', ($scope, Buildings, $log, ActiveCrestron) ->
   $scope.buildings = Buildings.all()
   $scope.templatePath = "templates/menu/building_menu.html"
   $scope.transformStyle = "scale(1.19)"
-  $scope.activeBuilding = ActiveBuilding
+  $scope.activeBuilding = ActiveCrestron
 
 
   $scope.getTemplate = (name) ->
@@ -348,8 +355,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.setActiveBuilding = (name)->
     if name == undefined
       $scope.activeBuilding.tabName = "SELECT BUILDING"
-    ActiveBuilding.setName(name)
+    else if name == "all"
+      $scope.activeBuilding.cancelAll()
+    else 
+      if $scope.activeBuilding.isActive("all")
+        console.log "ALL"
+        $scope.activeBuilding.setName("all")
+
+    $scope.activeBuilding.setName(name)
     $scope.activeBuilding.tabName = name
+
 
   $scope.getFillColorFor = (bld_name) ->
     #console.log name, $scope.activeBuilding.getName() + " YESS"
@@ -396,20 +411,24 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.panorama = Panoramas.get($stateParams.id)
   $scope.webcam_name = Panoramas.getWebcamName($stateParams.id)
   #console.log $scope.panorama.image
-  $scope.currentZoom = 1.2
+  $scope.currentZoom = 1.0
 
 
   $scope.zoomIn = (name) ->
+    console.log $scope.currentZoom
+    if $scope.currentZoom <= 0.4 
+      return             
     toZoom = document.getElementById(name)
-    $scope.currentZoom = $scope.currentZoom + 0.2
+    $scope.currentZoom = $scope.currentZoom - 0.2
     toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
     toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
 
-  $scope.zoomOut = () ->    
-    if $scope.currentZoom == 1.0 
+  $scope.zoomOut = (name) ->
+    console.log $scope.currentZoom 
+    if $scope.currentZoom >= 1.0 
       return
     toZoom = document.getElementById(name)
-    $scope.currentZoom = $scope.currentZoom - 0.2
+    $scope.currentZoom = $scope.currentZoom + 0.2
     toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
     toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
 
@@ -426,6 +445,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.seekBar = document.getElementById('seekbar')
   $scope.volume = document.getElementById('volume')
   $scope.skipValue = 0
+  $scope.mute = false
+  $scope.max = 80
 
   $scope.videoDiv.addEventListener 'timeupdate', ->
     # console.log 'test'
@@ -471,6 +492,26 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       $scope.videoDiv.play()
     else
       $scope.videoDiv.pause()
+
+  $scope.isMute = ->
+    $scope.mute
+
+  $scope.setMute = ->
+    $scope.mute = !$scope.mute
+
+  $scope.progressRelease = ($event) ->
+    if $event.gesture.deltaX > 0          
+      if $scope.volume.value >= 100
+        $scope.volume.value = 100
+      else
+        $scope.volume.value = $scope.volume.value + 5/$scope.volume.getBoundingClientRect().width * $scope.max
+      #$scope.volumeUp()
+    else
+      if $scope.volume.value <= 0
+        $scope.volume.value = 0
+      else
+        $scope.volume.value = $scope.volume.value - 5/$scope.volume.getBoundingClientRect().width * $scope.max
+
 
   return
 

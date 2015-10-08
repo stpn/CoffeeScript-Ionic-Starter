@@ -14,7 +14,7 @@
             <div id="presentation_subtitle">{{video.name}}</div>
         </div>
         <ion-content overflow-scroll="true">
-            <video preload="metadata"  webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px" id="video" autoplay="true">
+            <video preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px" id="video" autoplay="true">
                 <source ng-src={{recording}} type="video/mp4" />
             </video>
         </ion-content>
@@ -33,16 +33,14 @@
                 <i class="ion-skip-forward-capxing"></i>
             </li>
             <div class="volume_controls">
-                <li ><i class="ion-volume-high" ></i></li>
-                                <li ng-click="volumeDown()"><i class="ion-minus"></i></li>
-
+                <li><i ng-click="setMute()" ng-class="isMute() ? 'ion-volume-mute' : 'ion-volume-high' "></i></li>
+                <li ng-click="volumeDown()"><i class="ion-minus"></i></li>
                 <li>
                     <!-- <input type="range" id="volume" class="volume" min="0" max="1" step="0.1" value="1"> </li> -->
-<progress value="22" max="100"  id="volume">
-</progress>
-</li>
-                <li ng-click="volumeUp()"><i class="ion-plus" ></i></li>
-
+                    <progress value="22" max="100" id="volume" on-drag="progressRelease($event)">
+                    </progress>
+                </li>
+                <li ng-click="volumeUp()"><i class="ion-plus"></i></li>
             </div>
         </div>
     </div>

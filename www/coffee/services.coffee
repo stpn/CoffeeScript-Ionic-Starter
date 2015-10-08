@@ -69,10 +69,8 @@ angular.module('starter.services', []).factory('Buildings', ->
         return false
 
     isActive: (q_name) ->
-      if angular.equals(name,q_name) || name == undefined
+      if actives[q_name] == 'active'
         return true
-      else 
-        return false
     # getActive: ->
     #   if actives.size > 0
     #     for k,v of actives

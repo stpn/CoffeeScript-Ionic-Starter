@@ -91,6 +91,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.presentations = {};
   $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()], ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()], ["Webcams", Webcams.sorted()]];
   $scope.activeBuilding = ActiveBuilding;
+  $scope.lastActiveName = void 0;
   $scope.buldingTabName = "Select Buildings";
   $scope.comparisonState = false;
   $scope.buildings = Buildings.all();
@@ -158,13 +159,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.activeBuilding.cancelAll();
     }
   };
-  $scope.activeBuildingTabName = function() {
-    if ($scope.activeBuilding.name === void 0) {
-      return "SELECT BUILDING";
-    } else {
-      return $scope.activeBuilding.name;
-    }
-  };
   $scope.building_is = function(code, name) {
     if (code === name) {
       return true;
@@ -174,11 +168,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.getTemplate(name);
   };
   $scope.setActiveBuilding = function(name) {
+    $scope.activeBuilding.cancelAll();
     if (name === void 0) {
       $scope.activeBuilding.tabName = "SELECT BUILDING";
     }
     $scope.activeBuilding.setName(name);
-    return $scope.activeBuilding.tabName = name;
+    $scope.activeBuilding.tabName = name;
+    return $scope.lastActiveName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
@@ -190,7 +186,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       was_comparison = true;
     }
     $scope.comparisonState = false;
-    $scope.activeBuilding.tabName = "SELECT BUILDING";
+    if ($scope.lastActiveName === void 0) {
+      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    }
+    $scope.activeBuilding.tabName = $scope.lastActiveName;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
@@ -372,11 +371,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.alertMe = function() {
     return $log.debug("...");
   };
-}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveBuilding) {
+}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveCrestron) {
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.transformStyle = "scale(1.19)";
-  $scope.activeBuilding = ActiveBuilding;
+  $scope.activeBuilding = ActiveCrestron;
   $scope.getTemplate = function(name) {
     return Buildings.getTemplate(name);
   };
@@ -391,8 +390,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setActiveBuilding = function(name) {
     if (name === void 0) {
       $scope.activeBuilding.tabName = "SELECT BUILDING";
+    } else if (name === "all") {
+      $scope.activeBuilding.cancelAll();
+    } else {
+      if ($scope.activeBuilding.isActive("all")) {
+        console.log("ALL");
+        $scope.activeBuilding.setName("all");
+      }
     }
-    ActiveBuilding.setName(name);
+    $scope.activeBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
   $scope.getFillColorFor = function(bld_name) {
@@ -424,21 +430,26 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
   $scope.panorama = Panoramas.get($stateParams.id);
   $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
-  $scope.currentZoom = 1.2;
+  $scope.currentZoom = 1.0;
   $scope.zoomIn = function(name) {
     var toZoom;
-    toZoom = document.getElementById(name);
-    $scope.currentZoom = $scope.currentZoom + 0.2;
-    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
-    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
-  };
-  $scope.zoomOut = function() {
-    var toZoom;
-    if ($scope.currentZoom === 1.0) {
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom <= 0.4) {
       return;
     }
     toZoom = document.getElementById(name);
     $scope.currentZoom = $scope.currentZoom - 0.2;
+    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
+    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+  };
+  $scope.zoomOut = function(name) {
+    var toZoom;
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom >= 1.0) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom + 0.2;
     toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
     return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
   };
@@ -454,6 +465,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
   $scope.skipValue = 0;
+  $scope.mute = false;
+  $scope.max = 80;
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -496,6 +509,27 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.videoDiv.play();
     } else {
       return $scope.videoDiv.pause();
+    }
+  };
+  $scope.isMute = function() {
+    return $scope.mute;
+  };
+  $scope.setMute = function() {
+    return $scope.mute = !$scope.mute;
+  };
+  $scope.progressRelease = function($event) {
+    if ($event.gesture.deltaX > 0) {
+      if ($scope.volume.value >= 100) {
+        return $scope.volume.value = 100;
+      } else {
+        return $scope.volume.value = $scope.volume.value + 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    } else {
+      if ($scope.volume.value <= 0) {
+        return $scope.volume.value = 0;
+      } else {
+        return $scope.volume.value = $scope.volume.value - 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
     }
   };
 }).controller('HomeCtrl', function($scope) {
@@ -577,7 +611,7 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         return;
       }
       return $timeout(function() {
-        var bufferX, bufferY, dragReady, fixPosXmax, fixPosXmin, halt, lastMaxX, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square;
+        var bottomYLimit, bufferX, bufferY, dragReady, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square, topYLimit;
         square = $element[0];
         posX = 0;
         posY = 0;
@@ -590,15 +624,17 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         rotation = 0;
         last_rotation = void 0;
         dragReady = 0;
-        leftXLimit = 340;
-        rightXLimit = 1080;
-        fixPosXmin = 0;
-        fixPosXmax = 250;
+        leftXLimit = 44;
+        rightXLimit = 720;
+        topYLimit = 197;
+        bottomYLimit = 385;
         lastMaxX = 0;
-        halt = false;
+        lastMinX = 0;
+        lastMaxY = 0;
+        lastMinY = 0;
         max = 200;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var transform;
+          var scalRgxp, transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
           switch (e.type) {
@@ -606,31 +642,68 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               lastScale = scale;
               break;
             case 'drag':
-              posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
-              lastMaxX = posX;
-              halt = false;
-              if (posX > 249) {
-                posX = 249;
-              }
-              if (posX <= 1) {
-                posX = 2;
+              if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().top > topYLimit && square.getBoundingClientRect().bottom < bottomYLimit && square.getBoundingClientRect().right < rightXLimit) {
+                posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+                posY = e.gesture.deltaY / square.getBoundingClientRect().height * max + lastPosY;
+                if (posX < lastMinX) {
+                  posX = lastMinX;
+                }
+                if (posX > lastMaxX && lastMaxX > 0) {
+                  posX = lastMaxX;
+                }
+                if (posY < lastMinY) {
+                  posY = lastMinY;
+                }
+                if (posY > lastMaxY && lastMaxY > 0) {
+                  posY = lastMaxY;
+                }
+                console.log(square.getBoundingClientRect().top, " < TOP", square.getBoundingClientRect().left, " <LEFT", posX, " < POSX", lastMaxX, " <LASTMAX");
+              } else {
+                if (square.getBoundingClientRect().left < leftXLimit) {
+                  lastPosX = lastPosX + 1;
+                  lastMinX = lastPosX;
+                }
+                if (square.getBoundingClientRect().right > rightXLimit) {
+                  lastPosX = posX - 1;
+                  lastMaxX = lastPosX;
+                  posX = lastMaxX;
+                }
+                if (square.getBoundingClientRect().top < topYLimit) {
+                  lastMinY = lastPosY + 1;
+                  lastMinY = lastPosY;
+                }
+                if (square.getBoundingClientRect().bottom > bottomYLimit) {
+                  lastPosY = posY - 1;
+                  lastMaxY = lastPosY;
+                  posY = lastMaxY;
+                }
               }
               break;
             case 'transform':
               scale = e.gesture.scale * lastScale;
+              lastMaxX = 0;
+              lastMinX = 0;
+              lastMaxY = 0;
+              lastMinY = 0;
               break;
             case 'dragend':
               lastPosX = posX;
+              lastPosY = posY;
               lastScale = scale;
           }
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')';
+          scalRgxp = /scale\(\d{1,}\.\d{1,}\)/;
+          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')';
           e.target.style.transform = transform;
-          return e.target.style.webkitTransform = transform;
+          return e.target.style.webkitTransform = e.target.style.transform;
         }), $element[0]);
       });
     }
   };
 });
+
+var current_server;
+
+current_server = "http://localhost:3000";
 
 angular.module('starter.services', []).factory('Buildings', function() {
   var models;
@@ -711,6 +784,41 @@ angular.module('starter.services', []).factory('Buildings', function() {
         return true;
       } else {
         return false;
+      }
+    },
+    cancelAll: function() {
+      var k, results, v;
+      results = [];
+      for (k in actives) {
+        v = actives[k];
+        results.push(actives[k] = void 0);
+      }
+      return results;
+    }
+  };
+}).service('ActiveCrestron', function() {
+  var actives, name, tabName;
+  name = void 0;
+  tabName = "SELECT BUILDING";
+  actives = {};
+  return {
+    setName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return actives[new_name] = void 0;
+      } else {
+        return actives[new_name] = "active";
+      }
+    },
+    getName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isActive: function(q_name) {
+      if (actives[q_name] === 'active') {
+        return true;
       }
     },
     cancelAll: function() {
@@ -919,7 +1027,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       ];
     }
   };
-}).factory('Renderings', function() {
+}).factory('Renderings', function($http, Buildings) {
   var models;
   models = [
     {
