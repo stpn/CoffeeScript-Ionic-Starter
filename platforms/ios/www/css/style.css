@@ -18919,7 +18919,7 @@ ion-top-menu .item {
   #video_container .close_button {
     position: absolute;
     right: 36px;
-    top: 39px;
+    top: 30px;
     font-size: 25px; }
     #video_container .close_button .ion-close::before {
       color: #808080; }
@@ -19088,6 +19088,13 @@ progress::-webkit-progress-value {
   width: 696px;
   margin-left: auto;
   margin-right: auto; }
+  #webcam_content .close_button {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    font-size: 25px; }
+    #webcam_content .close_button .ion-close::before {
+      color: #808080; }
 
 #webcam_assets {
   width: 501px;

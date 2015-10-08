@@ -77,6 +77,15 @@
     width: 696px;
     margin-left: auto;
     margin-right: auto;
+          .close_button {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    font-size: 25px;
+        .ion-close::before {
+            color: #808080;
+        }
+    }
 }
 
 #webcam_assets {

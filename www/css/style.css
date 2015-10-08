@@ -9425,8 +9425,8 @@ a.button {
       color: white; }
   .presenation_container .close_button {
     position: absolute;
-    right: 6px;
-    top: 0px;
+    right: 40px;
+    top: 30px;
     font-size: 25px; }
     .presenation_container .close_button .ion-close::before {
       color: #808080; }
@@ -18892,6 +18892,14 @@ ion-top-menu .item {
   font-size: 12px;
   color: #999999 !important;
   text-decoration: none; }
+
+#home_view .close_button {
+  position: absolute;
+  right: 40px;
+  top: 30px;
+  font-size: 25px; }
+  #home_view .close_button .ion-close::before {
+    color: #808080; }
 
 .reset_buttons {
   margin-top: 380px !important;

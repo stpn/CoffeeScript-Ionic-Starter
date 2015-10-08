@@ -315,6 +315,17 @@ ion-top-menu .item {
     text-decoration: none;
 }
 
+#home_view{
+        .close_button {
+        position: absolute;
+    right: 40px;
+    top: 30px;
+        font-size: 25px;
+        .ion-close::before {
+            color: #808080;
+        }
+    }
+}
 // RESET
 .reset_buttons{
 margin-top: 380px !important;
