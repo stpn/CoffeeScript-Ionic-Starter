@@ -69,10 +69,8 @@ angular.module('starter.services', []).factory('Buildings', ->
         return false
 
     isActive: (q_name) ->
-      if angular.equals(name,q_name) || name == undefined
+      if actives[q_name] == 'active'
         return true
-      else 
-        return false
     # getActive: ->
     #   if actives.size > 0
     #     for k,v of actives
@@ -113,6 +111,15 @@ angular.module('starter.services', []).factory('Buildings', ->
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
+    
+    setAll: ->
+      actives['200 Massachusetts'] = 'active'
+      actives['250 Massachusetts'] = 'active'
+      actives['600 Second Street'] = 'active'
+      actives['201 F Street'] = 'active'
+      actives['200 F Street'] = 'active'
+      
+
   }
 
 ).factory('Presentations', ->
@@ -561,6 +568,71 @@ angular.module('starter.services', []).factory('Buildings', ->
       null
     name: ->
      "Video"
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+    get: (chatId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(chatId)
+          return models[i]
+        i++
+      null
+
+  }
+
+).factory('Timelapses', ->
+  models = [
+    {
+      id: 1
+      name: "Timelapse 1"
+      image: 'img/assets/views/1.jpg'
+      building_name: '200 Massachusetts'
+      recording: 'img/assets/videos/1.mp4'
+    },
+    {
+      id: 2
+      name: "Timelapse 2"
+      image: 'img/assets/views/2.jpg'
+      building_name: '200 Massachusetts'
+      recording: 'img/assets/videos/2.mp4'
+    },
+    {
+      id: 3
+      name: "Timelapse 3"
+      image: 'img/assets/views/3.jpg'
+      building_name: '250 Massachusetts'
+      recording: 'img/assets/videos/3.mp4'
+    }    
+  ]
+  {
+    getRecording: (videoId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(videoId)
+          return models[i].recording
+        i++
+      null
+    name: ->
+     "Timelapse"
 
     sorted: ->
       hash = {}

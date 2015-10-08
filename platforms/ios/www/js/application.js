@@ -35,6 +35,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'VideoPlayerCtrl'
       }
     }
+  }).state('tab.timelapses', {
+    url: '/timelapses/:id',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/Videos/timelapsePlayer.html',
+        controller: 'TimelapsesCtrl'
+      }
+    }
   }).state('tab.views', {
     url: '/views/:id',
     views: {
@@ -91,8 +99,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.presentations = {};
   $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()], ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()], ["Webcams", Webcams.sorted()]];
   $scope.activeBuilding = ActiveBuilding;
+  $scope.activeBuildingName = void 0;
   $scope.lastActiveName = void 0;
   $scope.buldingTabName = "Select Buildings";
+  $scope.activeComparison = void 0;
   $scope.comparisonState = false;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
@@ -108,8 +118,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isComparison = function() {
     return $scope.comparisonState;
   };
-  $scope.isActive = function(name) {
-    return $scope.activeBuilding.isActive(name);
+  $scope.isActiveBuilding = function(name) {
+    if ($scope.activeBuildingName === void 0) {
+      return true;
+    }
+    return $scope.activeBuildingName === name;
   };
   $scope.toggleGroup = function(group) {
     var menu;
@@ -168,13 +181,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.getTemplate(name);
   };
   $scope.setActiveBuilding = function(name) {
-    $scope.activeBuilding.cancelAll();
-    if (name === void 0) {
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    if ($scope.activeBuildingName === name) {
+      name = void 0;
     }
-    $scope.activeBuilding.setName(name);
-    $scope.activeBuilding.tabName = name;
-    return $scope.lastActiveName = name;
+    $scope.activeBuildingName = name;
+    return $scope.buldingTabName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
@@ -186,9 +197,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       was_comparison = true;
     }
     $scope.comparisonState = false;
-    if ($scope.lastActiveName === void 0) {
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
-    }
+    $scope.buldingTabName = $scope.activeBuildingName;
     $scope.activeBuilding.tabName = $scope.lastActiveName;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
@@ -215,13 +224,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     var bld, menu, pane;
     if ($scope.comparisonState === false) {
       $scope.comparisonState = true;
-      $scope.activeBuilding.tabName = "COMPARISON MODE";
+      $scope.buldingTabName = "COMPARISON MODE";
       bld = document.getElementById('building_wrap');
       menu = document.getElementById('ionTopMenu');
       pane = document.getElementsByTagName('ion-content')[0];
     } else {
       $scope.comparisonState = false;
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
+      $scope.buldingTabName = $scope.activeBuildingName;
     }
     if (menu.offsetHeight === 24) {
       menu.style.height = '250px';
@@ -235,15 +244,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.getFillColorFor = function(bld_name) {
-    if ($scope.activeBuilding === void 0) {
+    if ($scope.activeBuildingName === void 0) {
       return "none";
-    } else if ($scope.activeBuilding.getName(bld_name)) {
+    } else if ($scope.activeBuildingName === bld_name || $scope.activeBuildingName === "all") {
       return "#6D6F72";
     } else {
       return "none";
     }
   };
-  return $scope.convertCode = function(name) {
+  $scope.convertCode = function(name) {
     if (name === "200M") {
       return "M200";
     }
@@ -260,8 +269,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return "F200";
     }
   };
-}).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
-  $scope.video = Videos.get($stateParams.id);
+  $scope.setActiveComparison = function(comparison) {
+    if (comparison === $scope.activeComparison) {
+      comparison = void 0;
+    }
+    return $scope.activeComparison = comparison;
+  };
+  return $scope.getComparisonStroke = function(comparison) {
+    if (comparison === $scope.activeComparison) {
+      return "#FFF";
+    } else {
+      return "#808080";
+    }
+  };
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
   $scope.home = '#/tab/home';
@@ -346,10 +366,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.project_name = $scope.presentation.project_name;
   $scope.currentSlide = 1;
   $scope.postSlide = function(slideIdx) {
-    if (slideIdx === $scope.slides.length) {
-      $scope.currentSlide = $scope.slides.length;
-    }
-    if (slideIdx === 1) {
+    if (slideIdx >= $scope.slides.length) {
+      return $scope.currentSlide = $scope.slides.length;
+    } else if (slideIdx <= 1) {
       return $scope.currentSlide = 1;
     } else {
       return $scope.currentSlide = slideIdx;
@@ -388,13 +407,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.buildingCode(name);
   };
   $scope.setActiveBuilding = function(name) {
-    if (name === void 0) {
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
-    } else if (name === "all") {
-      $scope.activeBuilding.cancelAll();
+    if (name === "all") {
+      if ($scope.activeBuilding.isActive("all")) {
+        $scope.activeBuilding.cancelAll();
+        $scope.activeBuilding.setName("all");
+      } else {
+        $scope.activeBuilding.setAll();
+      }
     } else {
       if ($scope.activeBuilding.isActive("all")) {
-        console.log("ALL");
         $scope.activeBuilding.setName("all");
       }
     }
@@ -467,6 +488,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
+  $scope.videoState = true;
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -476,10 +498,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     $scope.videoDiv.pause();
     return $location.path('#/dash/');
   };
+  $scope.update = function() {
+    return $scope.videoDiv.pause();
+  };
   $scope.seekRelease = function() {
     var currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
-    return $scope.videoDiv.currentTime = currentTime;
+    $scope.videoDiv.currentTime = currentTime;
+    if ($scope.videoState) {
+      return $scope.videoDiv.play();
+    }
   };
   $scope.volumeUp = function() {
     if ($scope.volume.value < 100) {
@@ -506,9 +534,99 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.videoPlay = function() {
     if ($scope.videoDiv.paused) {
-      return $scope.videoDiv.play();
+      $scope.videoDiv.play();
+      return $scope.videoState = true;
     } else {
-      return $scope.videoDiv.pause();
+      $scope.videoDiv.pause();
+      return $scope.videoState = false;
+    }
+  };
+  $scope.isMute = function() {
+    return $scope.mute;
+  };
+  $scope.setMute = function() {
+    return $scope.mute = !$scope.mute;
+  };
+  $scope.progressRelease = function($event) {
+    if ($event.gesture.deltaX > 0) {
+      if ($scope.volume.value >= 100) {
+        return $scope.volume.value = 100;
+      } else {
+        return $scope.volume.value = $scope.volume.value + 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    } else {
+      if ($scope.volume.value <= 0) {
+        return $scope.volume.value = 0;
+      } else {
+        return $scope.volume.value = $scope.volume.value - 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    }
+  };
+}).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location) {
+  $scope.video = Timelapses.get($stateParams.id);
+  $scope.videoDiv = document.getElementById('video');
+  $scope.seekBar = document.getElementById('seekbar');
+  $scope.volume = document.getElementById('volume');
+  $scope.skipValue = 0;
+  $scope.mute = false;
+  $scope.max = 80;
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.building_name = $scope.video.building_name;
+  $scope.videoState = true;
+  $scope.trustSrc = function(src) {
+    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  };
+  $scope.update = function() {
+    $scope.videoDiv.pause();
+    return $scope.videoState = true;
+  };
+  $scope.videoDiv.addEventListener('timeupdate', function() {
+    var value;
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    $scope.seekBar.value = value;
+  });
+  $scope.closeBtn = function() {
+    $scope.videoDiv.pause();
+    return $location.path('#/dash/');
+  };
+  $scope.seekRelease = function() {
+    var currentTime;
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    $scope.videoDiv.currentTime = currentTime;
+    if ($scope.videoState) {
+      return $scope.videoDiv.play();
+    }
+  };
+  $scope.volumeUp = function() {
+    if ($scope.volume.value < 100) {
+      return $scope.volume.value = $scope.volume.value + 5;
+    } else {
+      return $scope.volume.value = 100;
+    }
+  };
+  $scope.volumeDown = function() {
+    if ($scope.volume.value > 0) {
+      return $scope.volume.value = $scope.volume.value - 5;
+    } else {
+      return $scope.volume.value = 0;
+    }
+  };
+  $scope.videoBack = function() {
+    return $scope.videoDiv.currentTime = 0;
+  };
+  $scope.videoBw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+  };
+  $scope.videoFw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+  };
+  $scope.videoPlay = function() {
+    if ($scope.videoDiv.paused) {
+      $scope.videoDiv.play();
+      return $scope.videoState = true;
+    } else {
+      $scope.videoDiv.pause();
+      return $scope.videoState = false;
     }
   };
   $scope.isMute = function() {
@@ -611,7 +729,7 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         return;
       }
       return $timeout(function() {
-        var bottomYLimit, bufferX, bufferY, dragReady, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square, topYLimit;
+        var bottomYLimit, bufferX, bufferY, dragReady, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, posX, posY, rightXLimit, rotation, scale, square, topYLimit;
         square = $element[0];
         posX = 0;
         posY = 0;
@@ -629,14 +747,25 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         topYLimit = 197;
         bottomYLimit = 385;
         lastMaxX = 0;
-        lastMinX = 0;
+        lastMinX = void 0;
         lastMaxY = 0;
         lastMinY = 0;
         max = 200;
+        oldScale = 0;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var scalRgxp, transform;
+          var LastMinX, match, scalRgxp, transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
+          scalRgxp = /scale\((\d{1,}\.\d{1,})\)/;
+          match = e.target.style.transform.match(scalRgxp);
+          if (!match) {
+            match = [""];
+          } else {
+            if (oldScale !== match[1]) {
+              LastMinX = void 0;
+              oldScale = match[1];
+            }
+          }
           switch (e.type) {
             case 'touch':
               lastScale = scale;
@@ -645,8 +774,10 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().top > topYLimit && square.getBoundingClientRect().bottom < bottomYLimit && square.getBoundingClientRect().right < rightXLimit) {
                 posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
                 posY = e.gesture.deltaY / square.getBoundingClientRect().height * max + lastPosY;
-                if (posX < lastMinX) {
-                  posX = lastMinX;
+                if (lastMinX !== void 0) {
+                  if (posX < lastMinX) {
+                    posX = lastMinX;
+                  }
                 }
                 if (posX > lastMaxX && lastMaxX > 0) {
                   posX = lastMaxX;
@@ -657,11 +788,13 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
                 if (posY > lastMaxY && lastMaxY > 0) {
                   posY = lastMaxY;
                 }
-                console.log(square.getBoundingClientRect().top, " < TOP", square.getBoundingClientRect().left, " <LEFT", posX, " < POSX", lastMaxX, " <LASTMAX");
+                console.log(square.getBoundingClientRect().top, " < TOP", square.getBoundingClientRect().left, " <LEFT", posX, " < posX", lastMinX, " <LastMinX");
               } else {
-                if (square.getBoundingClientRect().left < leftXLimit) {
+                if (square.getBoundingClientRect().left <= leftXLimit) {
                   lastPosX = lastPosX + 1;
                   lastMinX = lastPosX;
+                  posX = lastMinX;
+                  console.log("AFTER ", lastMinX);
                 }
                 if (square.getBoundingClientRect().right > rightXLimit) {
                   lastPosX = posX - 1;
@@ -682,19 +815,78 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
             case 'transform':
               scale = e.gesture.scale * lastScale;
               lastMaxX = 0;
-              lastMinX = 0;
+              lastMinX = void 0;
               lastMaxY = 0;
-              lastMinY = 0;
               break;
             case 'dragend':
               lastPosX = posX;
               lastPosY = posY;
               lastScale = scale;
           }
-          scalRgxp = /scale\(\d{1,}\.\d{1,}\)/;
-          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + 'scale(' + scale + ')';
-          e.target.style.transform = transform;
-          return e.target.style.webkitTransform = e.target.style.transform;
+          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ';
+          e.target.style.transform = transform + " " + match[0];
+          return e.target.style.webkitTransform = e.target.style.transform + " " + match[0];
+        }), $element[0]);
+      });
+    }
+  };
+});
+
+angular.module('starter.directives', []).directive('ionPpinchh', function($timeout) {
+  return {
+    restrict: 'E',
+    link: function($scope, $element, attrs) {
+      if ($element[0].classList[0] !== "square") {
+        return;
+      }
+      return $timeout(function() {
+        var bottomYLimit, bufferX, bufferY, dragReady, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, posX, posY, rightXLimit, rotation, scale, square, topYLimit;
+        square = $element[0];
+        posX = 0;
+        posY = 0;
+        lastPosX = 0;
+        lastPosY = 0;
+        bufferX = 0;
+        bufferY = 0;
+        scale = 1;
+        lastScale = void 0;
+        rotation = 0;
+        last_rotation = void 0;
+        dragReady = 0;
+        leftXLimit = 0;
+        rightXLimit = 720;
+        topYLimit = 197;
+        bottomYLimit = 385;
+        lastMaxX = 0;
+        lastMinX = void 0;
+        lastMaxY = 0;
+        lastMinY = 0;
+        max = 200;
+        oldScale = 0;
+        return ionic.onGesture('touch drag dragend transform', (function(e) {
+          var curTransform, realLeft;
+          e.gesture.srcEvent.preventDefault();
+          e.gesture.preventDefault();
+          switch (e.type) {
+            case 'touch':
+              lastScale = scale;
+              break;
+            case 'drag':
+              posX = e.gesture.deltaX + lastPosX;
+              break;
+            case 'transform':
+              scale = e.gesture.scale * lastScale;
+              break;
+            case 'dragend':
+              lastScale = scale;
+              lastPosX = posX;
+          }
+          square.style.left = String(posX) + "px";
+          curTransform = new WebKitCSSMatrix(window.getComputedStyle(e.target).webkitTransform);
+          realLeft = e.target.offsetLeft + curTransform.m41;
+          if (realLeft <= document.getElementById("panorama_image").getBoundingClientRect().left) {
+            return e.target.style.left = String(document.getElementById("panorama_image").getBoundingClientRect().left) + "px";
+          }
         }), $element[0]);
       });
     }
@@ -780,10 +972,8 @@ angular.module('starter.services', []).factory('Buildings', function() {
       }
     },
     isActive: function(q_name) {
-      if (angular.equals(name, q_name) || name === void 0) {
+      if (actives[q_name] === 'active') {
         return true;
-      } else {
-        return false;
       }
     },
     cancelAll: function() {
@@ -829,6 +1019,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
         results.push(actives[k] = void 0);
       }
       return results;
+    },
+    setAll: function() {
+      actives['200 Massachusetts'] = 'active';
+      actives['250 Massachusetts'] = 'active';
+      actives['600 Second Street'] = 'active';
+      actives['201 F Street'] = 'active';
+      return actives['200 F Street'] = 'active';
     }
   };
 }).factory('Presentations', function() {
@@ -1260,6 +1457,81 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     name: function() {
       return "Video";
+    },
+    sorted: function() {
+      var hash, i, k, result, v;
+      hash = {};
+      result = [];
+      i = 0;
+      while (i < models.length) {
+        if (hash[models[i].building_name] === void 0) {
+          hash[models[i].building_name] = [models[i]];
+        } else {
+          hash[models[i].building_name].push(models[i]);
+        }
+        i++;
+      }
+      for (k in hash) {
+        v = hash[k];
+        result.push(v);
+      }
+      return result;
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Timelapses', function() {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Timelapse 1",
+      image: 'img/assets/views/1.jpg',
+      building_name: '200 Massachusetts',
+      recording: 'img/assets/videos/1.mp4'
+    }, {
+      id: 2,
+      name: "Timelapse 2",
+      image: 'img/assets/views/2.jpg',
+      building_name: '200 Massachusetts',
+      recording: 'img/assets/videos/2.mp4'
+    }, {
+      id: 3,
+      name: "Timelapse 3",
+      image: 'img/assets/views/3.jpg',
+      building_name: '250 Massachusetts',
+      recording: 'img/assets/videos/3.mp4'
+    }
+  ];
+  return {
+    getRecording: function(videoId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(videoId)) {
+          return models[i].recording;
+        }
+        i++;
+      }
+      return null;
+    },
+    name: function() {
+      return "Timelapse";
     },
     sorted: function() {
       var hash, i, k, result, v;

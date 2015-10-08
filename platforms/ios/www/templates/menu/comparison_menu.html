@@ -1,25 +1,32 @@
 <!-- <div id="comparison_wrap" > -->
 <!-- style="{{bld_style}}" -->
-
-<svg version="1.0" id="comp_left" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-   width="118.5px" height="37.1px" viewBox="0 0 118.5 37.1" enable-background="new 0 0 118.5 37.1" xml:space="preserve">
-<path fill="none" stroke="#808080" stroke-width="0.5" d="M0.3,0.2h118v36.6H0.3V0.2z M60,0.3L0.6,36.9 M0.1,0.3l59.4,36.6
+<div id="comp_left" ng-click="setActiveComparison('left')">
+<svg version="1.0"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+   width="118px" height="37px" viewBox="0 0 118 37" enable-background="new 0 0 118 37" xml:space="preserve">
+<path fill="none" stroke="{{getComparisonStroke('left')}}" stroke-width="2.0" d="M0.3,0.2h118v36.6H0.3V0.2z M60,0.3L0.6,36.9 M0.1,0.3l59.4,36.6
    M59.7,36.9v-36"/>
 </svg>
+<span> LEFT SCREEN</span>
+</div>
 
+<div id="comp_mid" ng-click="setActiveComparison('center')">
 
-<svg version="1.0" id="comp_mid" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-   width="119px" height="37.6px" viewBox="0 0 119 37.6" enable-background="new 0 0 119 37.6" xml:space="preserve">
-<path fill="none" stroke="#808080" d="M0.5,0.5h118v36.6H0.5V0.5z M118.4,1.1L0.8,36.5 M0.2,0.5l118.2,36"/>
+<svg version="1.0"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+   width="119px" height="37px" viewBox="0 0 119 37" enable-background="new 0 0 119 37" xml:space="preserve">
+<path fill="none" stroke="{{getComparisonStroke('center')}}" d="M0.5,0.5h118v36.6H0.5V0.5z M118.4,1.1L0.8,36.5 M0.2,0.5l118.2,36" stroke-width="2.0"/>
 </svg>
+<span> FULL SCREEN</span>
+</div>
 
+<div id="comp_right" ng-click="setActiveComparison('right')">
 
-<svg version="1.0" id="comp_right" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-   width="118.6px" height="37.1px" viewBox="0 0 118.6 37.1" enable-background="new 0 0 118.6 37.1" xml:space="preserve">
-<path fill="none" stroke="#808080" stroke-width="0.5" d="M118.2,36.8H59.2V0.2h59.1V36.8z M118.2,0.2H0.2v36.6h118V0.2z M118,36.8
+<svg version="1.0"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+   width="118px" height="37px" viewBox="0 0 118 37" enable-background="new 0 0 118 37" xml:space="preserve" >
+<path fill="none" stroke="{{getComparisonStroke('right')}}" stroke-width="2.0" d="M118.2,36.8H59.2V0.2h59.1V36.8z M118.2,0.2H0.2v36.6h118V0.2z M118,36.8
   L58.6,0.2 M59.1,36.8l59.4-36.6"/>
 </svg>
-
+<span> RIGHT SCREEN</span>
+</div>
 
 
 <!-- </div> -->

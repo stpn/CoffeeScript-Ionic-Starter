@@ -39,7 +39,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     url: '/timelapses/:id',
     views: {
       'webcams': {
-        templateUrl: 'templates/videos/timelapsePlayer.html',
+        templateUrl: 'templates/Videos/timelapsePlayer.html',
         controller: 'TimelapsesCtrl'
       }
     }
@@ -407,13 +407,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.buildingCode(name);
   };
   $scope.setActiveBuilding = function(name) {
-    if (name === void 0) {
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
-    } else if (name === "all") {
-      $scope.activeBuilding.cancelAll();
+    if (name === "all") {
+      if ($scope.activeBuilding.isActive("all")) {
+        $scope.activeBuilding.cancelAll();
+        $scope.activeBuilding.setName("all");
+      } else {
+        $scope.activeBuilding.setAll();
+      }
     } else {
       if ($scope.activeBuilding.isActive("all")) {
-        console.log("ALL");
         $scope.activeBuilding.setName("all");
       }
     }
@@ -486,6 +488,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
+  $scope.videoState = true;
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -495,10 +498,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     $scope.videoDiv.pause();
     return $location.path('#/dash/');
   };
+  $scope.update = function() {
+    return $scope.videoDiv.pause();
+  };
   $scope.seekRelease = function() {
     var currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
-    return $scope.videoDiv.currentTime = currentTime;
+    $scope.videoDiv.currentTime = currentTime;
+    if ($scope.videoState) {
+      return $scope.videoDiv.play();
+    }
   };
   $scope.volumeUp = function() {
     if ($scope.volume.value < 100) {
@@ -525,9 +534,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.videoPlay = function() {
     if ($scope.videoDiv.paused) {
-      return $scope.videoDiv.play();
+      $scope.videoDiv.play();
+      return $scope.videoState = true;
     } else {
-      return $scope.videoDiv.pause();
+      $scope.videoDiv.pause();
+      return $scope.videoState = false;
     }
   };
   $scope.isMute = function() {
@@ -561,14 +572,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.max = 80;
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
   $scope.building_name = $scope.video.building_name;
+  $scope.videoState = true;
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
-  $scope.postVideoId = function(videoId) {
-    return $log.debug("....  " + videoId);
-  };
-  $scope.alertMe = function() {
-    return $log.debug("...");
+  $scope.update = function() {
+    $scope.videoDiv.pause();
+    return $scope.videoState = true;
   };
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
@@ -582,7 +592,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.seekRelease = function() {
     var currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
-    return $scope.videoDiv.currentTime = currentTime;
+    $scope.videoDiv.currentTime = currentTime;
+    if ($scope.videoState) {
+      return $scope.videoDiv.play();
+    }
   };
   $scope.volumeUp = function() {
     if ($scope.volume.value < 100) {
@@ -609,9 +622,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.videoPlay = function() {
     if ($scope.videoDiv.paused) {
-      return $scope.videoDiv.play();
+      $scope.videoDiv.play();
+      return $scope.videoState = true;
     } else {
-      return $scope.videoDiv.pause();
+      $scope.videoDiv.pause();
+      return $scope.videoState = false;
     }
   };
   $scope.isMute = function() {
@@ -1004,6 +1019,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
         results.push(actives[k] = void 0);
       }
       return results;
+    },
+    setAll: function() {
+      actives['200 Massachusetts'] = 'active';
+      actives['250 Massachusetts'] = 'active';
+      actives['600 Second Street'] = 'active';
+      actives['201 F Street'] = 'active';
+      return actives['200 F Street'] = 'active';
     }
   };
 }).factory('Presentations', function() {

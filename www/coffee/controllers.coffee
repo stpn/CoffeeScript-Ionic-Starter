@@ -342,7 +342,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.transformStyle = "scale(1.19)"
   $scope.activeBuilding = ActiveCrestron
 
-
   $scope.getTemplate = (name) ->
     Buildings.getTemplate(name)
 
@@ -356,13 +355,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.setActiveBuilding = (name)->
-    if name == undefined
-      $scope.activeBuilding.tabName = "SELECT BUILDING"
-    else if name == "all"
-      $scope.activeBuilding.cancelAll()
+    if name == "all"
+      if $scope.activeBuilding.isActive("all")
+        $scope.activeBuilding.cancelAll()
+        $scope.activeBuilding.setName("all")
+      else
+        $scope.activeBuilding.setAll()        
     else 
       if $scope.activeBuilding.isActive("all")
-        console.log "ALL"
         $scope.activeBuilding.setName("all")
 
     $scope.activeBuilding.setName(name)
@@ -452,6 +452,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.skipValue = 0
   $scope.mute = false
   $scope.max = 80
+  $scope.videoState = true
 
   $scope.videoDiv.addEventListener 'timeupdate', ->
     # console.log 'test'
@@ -464,9 +465,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.videoDiv.pause()
     $location.path('#/dash/')
 
+  $scope.update = ->
+    $scope.videoDiv.pause()
+
   $scope.seekRelease = ->
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
     $scope.videoDiv.currentTime = currentTime;
+    if $scope.videoState
+      $scope.videoDiv.play()
 
   $scope.volumeUp = ->
     #console.log 'UP'
@@ -495,8 +501,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.videoPlay =  ->
     if $scope.videoDiv.paused
       $scope.videoDiv.play()
+      $scope.videoState = true
     else
       $scope.videoDiv.pause()
+      $scope.videoState = false
 
   $scope.isMute = ->
     $scope.mute
@@ -530,16 +538,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.max = 80
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
   $scope.building_name = $scope.video.building_name 
-  
+  $scope.videoState = true
+
   $scope.trustSrc = (src) ->
     $scope.videos = $sce.getTrustedResourceUrl(src);
 
-  $scope.postVideoId = (videoId) ->
-    $log.debug("....  "+ videoId)
-  
-  $scope.alertMe = ()->
-    $log.debug("...")    
-  
+
+  $scope.update = ->
+    $scope.videoDiv.pause()
+    $scope.videoState = true
+
 
   $scope.videoDiv.addEventListener 'timeupdate', ->
     # console.log 'test'
@@ -548,6 +556,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     #console.log value
     $scope.seekBar.value = value
     return
+
   $scope.closeBtn =() ->
     $scope.videoDiv.pause()
     $location.path('#/dash/')
@@ -555,6 +564,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.seekRelease = ->
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
     $scope.videoDiv.currentTime = currentTime;
+    if $scope.videoState
+      $scope.videoDiv.play()
+      
+
 
   $scope.volumeUp = ->
     #console.log 'UP'
@@ -583,8 +596,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.videoPlay =  ->
     if $scope.videoDiv.paused
       $scope.videoDiv.play()
+      $scope.videoState = true
     else
       $scope.videoDiv.pause()
+      $scope.videoState = false
 
   $scope.isMute = ->
     $scope.mute

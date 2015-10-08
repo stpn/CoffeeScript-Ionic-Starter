@@ -111,6 +111,15 @@ angular.module('starter.services', []).factory('Buildings', ->
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
+    
+    setAll: ->
+      actives['200 Massachusetts'] = 'active'
+      actives['250 Massachusetts'] = 'active'
+      actives['600 Second Street'] = 'active'
+      actives['201 F Street'] = 'active'
+      actives['200 F Street'] = 'active'
+      
+
   }
 
 ).factory('Presentations', ->

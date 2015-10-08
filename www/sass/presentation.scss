@@ -3,11 +3,14 @@
     margin-left: 36px;
     color: #DAD9D9;
     font-family: "Gotham Light";
-    .presentation_title {
+    #presentation_title {
         font-size: 22px;
+
     }
-    .presentation_subtitle {
+    #presentation_subtitle {
         font-size: 20px;
+        margin-top: 5px;
+
     }
 }
 
@@ -44,6 +47,17 @@
             color: white;
         }
     }
+
+    .close_button {
+    position: absolute;
+    right: 6px;
+    top: 0px;
+    font-size: 25px;
+    
+    .ion-close::before {
+        color: #808080;
+    }
+}
 }
 
 #presentation_controls {
@@ -83,11 +97,4 @@
     }
 }
 
-.close_button {
-    float: right;
-    font-size: 25px;
-    margin-right: 33px;
-    .ion-close::before {
-        color: #808080;
-    }
-}
+

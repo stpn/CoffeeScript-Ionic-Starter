@@ -35,7 +35,7 @@ angular.module('starter', [
     
     url: '/timelapses/:id'
     views: 'webcams':
-      templateUrl: 'templates/videos/timelapsePlayer.html'
+      templateUrl: 'templates/Videos/timelapsePlayer.html'
       controller: 'TimelapsesCtrl').state('tab.views',
     
     url: '/views/:id'

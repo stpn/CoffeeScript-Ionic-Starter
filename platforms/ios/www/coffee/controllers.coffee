@@ -4,10 +4,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   # [["Presentation"], [models]] 
   $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()],  ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()],  ["Webcams", Webcams.sorted()]]
   $scope.activeBuilding = ActiveBuilding
+  $scope.activeBuildingName = undefined
   $scope.lastActiveName = undefined
 
   $scope.buldingTabName = "Select Buildings"
   
+  $scope.activeComparison = undefined
+
   $scope.comparisonState = false
   # $scope.topMenu = TopmenuState.states
 
@@ -25,18 +28,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
   $scope.showOverlay = false
 
-  # $scope.isBuildings = () ->
-  #   TopmenuState.getBuildings()
-
-  # $scope.isComparison = () ->    
-  #   TopmenuState.getComparison()
 
   $scope.isComparison = () ->    
     $scope.comparisonState
 
-
-  $scope.isActive =(name) ->
-    $scope.activeBuilding.isActive(name)
+  $scope.isActiveBuilding =(name) ->
+    if $scope.activeBuildingName == undefined
+      return true
+    $scope.activeBuildingName == name
 
   $scope.toggleGroup = (group) ->
     menu = document.getElementById('ionTopMenu')
@@ -89,14 +88,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       $scope.setActiveBuilding(undefined)
       $scope.activeBuilding.cancelAll()
 
-    # $scope.activeBuilding.name = undefined
-    # $log.debug($scope.activeBuilding)
-  
-  # $scope.activeBuildingTabName = ->
-  #   if $scope.activeBuilding.name == undefined 
-  #     "SELECT BUILDING"
-  #   else 
-  #     $scope.activeBuilding.name
 
   $scope.building_is = (code, name) ->
     if code == name
@@ -107,14 +98,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     Buildings.getTemplate(name)
 
   $scope.setActiveBuilding = (name)->
-    $scope.activeBuilding.cancelAll()
-    if name == undefined
-      $scope.activeBuilding.tabName = "SELECT BUILDING"
-    $scope.activeBuilding.setName(name)
-    $scope.activeBuilding.tabName = name
-    $scope.lastActiveName = name
+    # if name == undefined
+    #   $scope.activeBuilding.tabName = "SELECT BUILDING"
+    # else 
+    if $scope.activeBuildingName == name
+      name = undefined
+    $scope.activeBuildingName = name
+    $scope.buldingTabName = name
 
-
+  
   $scope.buildingCode = (name)->    
     Buildings.buildingCode(name)
 
@@ -124,8 +116,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     if $scope.comparisonState == true
       was_comparison = true
     $scope.comparisonState = false
-    if $scope.lastActiveName == undefined
-      $scope.activeBuilding.tabName = "SELECT BUILDING"
+    $scope.buldingTabName = $scope.activeBuildingName
     $scope.activeBuilding.tabName = $scope.lastActiveName
     bld = document.getElementById('building_wrap')
     menu = document.getElementById('ionTopMenu')
@@ -151,7 +142,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.showCompareMenu = () ->    
     if $scope.comparisonState == false
       $scope.comparisonState = true
-      $scope.activeBuilding.tabName = "COMPARISON MODE"
+      $scope.buldingTabName = "COMPARISON MODE"
     # else 
     #   $scope.activeBuilding.tabName = $scope.activeBuilding.name
       bld = document.getElementById('building_wrap')
@@ -159,7 +150,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       pane = document.getElementsByTagName('ion-content')[0]
     else
       $scope.comparisonState = false
-      $scope.activeBuilding.tabName = "SELECT BUILDING"
+      $scope.buldingTabName = $scope.activeBuildingName
 
     if menu.offsetHeight == 24 
       menu.style.height = '250px' 
@@ -176,9 +167,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
   $scope.getFillColorFor = (bld_name) ->
     #console.log name, $scope.activeBuilding.getName() + " YESS"
-    if $scope.activeBuilding == undefined
+    if $scope.activeBuildingName == undefined
       return "none"
-    else if $scope.activeBuilding.getName(bld_name)
+    else if $scope.activeBuildingName == bld_name || $scope.activeBuildingName == "all"
       #console.log 'yess'
       return "#6D6F72"
     else 
@@ -197,9 +188,18 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       return "F200"
 
 
-).controller('VideoDetailCtrl', ($scope, $stateParams, Videos) ->
-  $scope.video = Videos.get($stateParams.id)
-  return
+  $scope.setActiveComparison = (comparison) ->
+    if comparison == $scope.activeComparison
+      comparison = undefined
+    $scope.activeComparison = comparison
+
+  $scope.getComparisonStroke = (comparison) ->
+    if comparison == $scope.activeComparison
+      return "#FFF"
+    else
+      return "#808080"      
+
+
 
 ).controller('titleCtrl', ($scope, $stateParams) ->
   $scope.titleTemplate = "templates/menu/title.html"
@@ -304,11 +304,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.currentSlide = 1
 
   $scope.postSlide = (slideIdx) ->
-    if slideIdx == $scope.slides.length 
+    if slideIdx >= $scope.slides.length 
       $scope.currentSlide = $scope.slides.length  
-    if slideIdx == 1
+    else if slideIdx <= 1
       $scope.currentSlide = 1
     else
+
       $scope.currentSlide = slideIdx
       
   $scope.alertMe = ()->
@@ -319,7 +320,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 ).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
   $scope.video = Videos.get($stateParams.id)
   #$log.debug($scope.video.recording);
+
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+
   $scope.building_name = $scope.video.building_name 
   
   $scope.trustSrc = (src) ->
@@ -339,7 +342,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.transformStyle = "scale(1.19)"
   $scope.activeBuilding = ActiveCrestron
 
-
   $scope.getTemplate = (name) ->
     Buildings.getTemplate(name)
 
@@ -353,13 +355,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   $scope.setActiveBuilding = (name)->
-    if name == undefined
-      $scope.activeBuilding.tabName = "SELECT BUILDING"
-    else if name == "all"
-      $scope.activeBuilding.cancelAll()
+    if name == "all"
+      if $scope.activeBuilding.isActive("all")
+        $scope.activeBuilding.cancelAll()
+        $scope.activeBuilding.setName("all")
+      else
+        $scope.activeBuilding.setAll()        
     else 
       if $scope.activeBuilding.isActive("all")
-        console.log "ALL"
         $scope.activeBuilding.setName("all")
 
     $scope.activeBuilding.setName(name)
@@ -375,6 +378,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       return "#6D6F72"
     else 
       return "none"
+
+
 
   # $scope.getFillColorFor = (bld) ->
   #   if bld == "all" == $scope.activeBuilding.getName()
@@ -447,6 +452,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.skipValue = 0
   $scope.mute = false
   $scope.max = 80
+  $scope.videoState = true
 
   $scope.videoDiv.addEventListener 'timeupdate', ->
     # console.log 'test'
@@ -459,9 +465,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.videoDiv.pause()
     $location.path('#/dash/')
 
+  $scope.update = ->
+    $scope.videoDiv.pause()
+
   $scope.seekRelease = ->
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
     $scope.videoDiv.currentTime = currentTime;
+    if $scope.videoState
+      $scope.videoDiv.play()
 
   $scope.volumeUp = ->
     #console.log 'UP'
@@ -490,8 +501,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.videoPlay =  ->
     if $scope.videoDiv.paused
       $scope.videoDiv.play()
+      $scope.videoState = true
     else
       $scope.videoDiv.pause()
+      $scope.videoState = false
 
   $scope.isMute = ->
     $scope.mute
@@ -514,6 +527,102 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
 
   return
+
+).controller('TimelapsesCtrl', ($scope, $sce, $log, $stateParams,  Timelapses, $location) ->
+  $scope.video = Timelapses.get($stateParams.id)
+  $scope.videoDiv = document.getElementById('video')
+  $scope.seekBar = document.getElementById('seekbar')
+  $scope.volume = document.getElementById('volume')
+  $scope.skipValue = 0
+  $scope.mute = false
+  $scope.max = 80
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+  $scope.building_name = $scope.video.building_name 
+  $scope.videoState = true
+
+  $scope.trustSrc = (src) ->
+    $scope.videos = $sce.getTrustedResourceUrl(src);
+
+
+  $scope.update = ->
+    $scope.videoDiv.pause()
+    $scope.videoState = true
+
+
+  $scope.videoDiv.addEventListener 'timeupdate', ->
+    # console.log 'test'
+    # never calls
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    #console.log value
+    $scope.seekBar.value = value
+    return
+
+  $scope.closeBtn =() ->
+    $scope.videoDiv.pause()
+    $location.path('#/dash/')
+
+  $scope.seekRelease = ->
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    $scope.videoDiv.currentTime = currentTime;
+    if $scope.videoState
+      $scope.videoDiv.play()
+      
+
+
+  $scope.volumeUp = ->
+    #console.log 'UP'
+    if $scope.volume.value < 100
+      $scope.volume.value = $scope.volume.value + 5
+    else
+      $scope.volume.value = 100
+
+  $scope.volumeDown = ->
+    #console.log 'DOWN'
+    if $scope.volume.value > 0 
+      $scope.volume.value = $scope.volume.value - 5
+    else
+      $scope.volume.value = 0    
+
+
+  $scope.videoBack =  ->
+    $scope.videoDiv.currentTime = 0
+
+  $scope.videoBw =  ->
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5
+
+  $scope.videoFw =  ->
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5
+
+  $scope.videoPlay =  ->
+    if $scope.videoDiv.paused
+      $scope.videoDiv.play()
+      $scope.videoState = true
+    else
+      $scope.videoDiv.pause()
+      $scope.videoState = false
+
+  $scope.isMute = ->
+    $scope.mute
+
+  $scope.setMute = ->
+    $scope.mute = !$scope.mute
+
+  $scope.progressRelease = ($event) ->
+    if $event.gesture.deltaX > 0          
+      if $scope.volume.value >= 100
+        $scope.volume.value = 100
+      else
+        $scope.volume.value = $scope.volume.value + 5/$scope.volume.getBoundingClientRect().width * $scope.max
+      #$scope.volumeUp()
+    else
+      if $scope.volume.value <= 0
+        $scope.volume.value = 0
+      else
+        $scope.volume.value = $scope.volume.value - 5/$scope.volume.getBoundingClientRect().width * $scope.max
+
+
+  return
+
 
 ).controller('HomeCtrl', ($scope) ->
   $scope.home = "HOME"
