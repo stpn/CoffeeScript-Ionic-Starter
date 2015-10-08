@@ -294,10 +294,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
 
   $scope.postSlide = (slideIdx) ->
     if slideIdx >= $scope.slides.length 
+      console.log "HERE"
       $scope.currentSlide = $scope.slides.length  
-    if slideIdx == 1
+    else if slideIdx <= 1
+      console.log "HERE2"
       $scope.currentSlide = 1
     else
+      console.log "HERE3"
       $scope.currentSlide = slideIdx
       
   $scope.alertMe = ()->

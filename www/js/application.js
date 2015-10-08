@@ -346,12 +346,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.project_name = $scope.presentation.project_name;
   $scope.currentSlide = 1;
   $scope.postSlide = function(slideIdx) {
-    if (slideIdx === $scope.slides.length) {
-      $scope.currentSlide = $scope.slides.length;
-    }
-    if (slideIdx === 1) {
+    if (slideIdx >= $scope.slides.length) {
+      console.log("HERE");
+      return $scope.currentSlide = $scope.slides.length;
+    } else if (slideIdx <= 1) {
+      console.log("HERE2");
       return $scope.currentSlide = 1;
     } else {
+      console.log("HERE3");
       return $scope.currentSlide = slideIdx;
     }
   };
