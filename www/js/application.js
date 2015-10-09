@@ -796,43 +796,59 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         deltaWidth = 0;
         scaleChange = false;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var transform;
+          var LastMinX, match, scalRgxp, transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
+          scalRgxp = /scale\((\d{1,}\.\d{1,})\)/;
+          match = e.target.style.transform.match(scalRgxp);
+          if (!match) {
+            match = [""];
+          } else {
+            if (oldScale !== match[1]) {
+              LastMinX = void 0;
+              oldScale = match[1];
+            }
+          }
           switch (e.type) {
             case 'touch':
               lastScale = scale;
-              break;
+              return console.log("TOUCH");
             case 'drag':
+              console.log("DRAG");
               posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
               posY = e.gesture.deltaY / square.getBoundingClientRect().height * max + lastPosY;
-              square.style.left = String(posX + "px");
-              square.style.top = String(posY + "px");
               deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
               deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+              transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
+              e.target.style.transform = transform;
+              e.target.style.webkitTransform = e.target.style.transform;
               if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
-                posX = pan.offsetLeft - deltaWidth / 2;
+                posX = -deltaWidth / 2;
                 changeX = true;
               }
               if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
-                posY = pan.offsetTop - deltaHeight / 2;
+                posY = -deltaHeight / 2;
                 changeY = true;
               }
               if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
-                posX = (pan.offsetLeft + pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth / 2;
+                posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
                 changeX = true;
               }
               if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
-                posY = (pan.offsetTop + pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight / 2;
+                posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
                 changeY = true;
               }
               if (changeX === true) {
-                square.style.left = String(posX + "px");
+                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
+                e.target.style.transform = transform;
+                e.target.style.webkitTransform = e.target.style.transform;
                 changeX = false;
               }
               if (changeY === true) {
-                square.style.top = String(posY + "px");
-                changeY = false;
+                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
+                e.target.style.transform = transform;
+                e.target.style.webkitTransform = e.target.style.transform;
+                return changeY = false;
               }
               break;
             case 'transform':
@@ -845,41 +861,42 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               }
               deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
               deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+              transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
+              e.target.style.transform = transform;
+              e.target.style.webkitTransform = e.target.style.transform;
               if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
-                posX = pan.offsetLeft - deltaWidth / 2;
+                posX = -deltaWidth / 2;
                 changeX = true;
               }
               if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
-                posY = pan.offsetTop - deltaHeight / 2;
+                posY = -deltaHeight / 2;
                 changeY = true;
               }
               if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
-                posX = (pan.offsetLeft + pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth / 2;
+                posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
                 changeX = true;
               }
               if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
-                posY = (pan.offsetTop + pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight / 2;
+                posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
                 changeY = true;
               }
               if (changeX === true) {
-                square.style.left = String(posX + "px");
+                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
+                e.target.style.transform = transform;
+                e.target.style.webkitTransform = e.target.style.transform;
                 changeX = false;
               }
               if (changeY === true) {
-                square.style.top = String(posY + "px");
-                changeY = false;
+                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
+                e.target.style.transform = transform;
+                e.target.style.webkitTransform = e.target.style.transform;
+                return changeY = false;
               }
               break;
             case 'dragend':
               lastPosX = posX;
               lastPosY = posY;
-              lastScale = scale;
-          }
-          if (scaleChange) {
-            transform = 'scale(' + scale + ')';
-            e.target.style.transform = transform;
-            e.target.style.webkitTransform = e.target.style.transform;
-            return scaleChange = false;
+              return lastScale = scale;
           }
         }), $element[0]);
       });
