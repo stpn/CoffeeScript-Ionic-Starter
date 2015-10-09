@@ -419,6 +419,27 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.currentZoom = 1.0
 
 
+  # $scope.zoomIn = (name) ->
+  #   console.log $scope.currentZoom
+  #   if $scope.currentZoom <= 0.4 
+  #     return             
+  #   toZoom = document.getElementById(name)
+  #   $scope.currentZoom = $scope.currentZoom - 0.2
+  #   toZoom.style.width = toZoom.style.width
+  #   # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
+  #   # toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
+
+  # $scope.zoomOut = (name) ->
+  #   console.log $scope.currentZoom 
+  #   if $scope.currentZoom >= 1.0 
+  #     return
+  #   toZoom = document.getElementById(name)
+  #   $scope.currentZoom = $scope.currentZoom + 0.2
+  #   # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
+  #   # toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
+
+
+
   $scope.zoomIn = (name) ->
     console.log $scope.currentZoom
     if $scope.currentZoom <= 0.4 

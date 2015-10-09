@@ -729,8 +729,12 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         return;
       }
       return $timeout(function() {
-        var bottomYLimit, bufferX, bufferY, dragReady, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, posX, posY, rightXLimit, rotation, scale, square, topYLimit;
+        var bottomYLimit, bufferX, bufferY, changeX, changeY, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, pan, pass, posX, posY, rightXLimit, rotation, scale, sq, square, topYLimit;
+        pan = document.getElementById("panorama_image");
+        sq = document.getElementById("square");
         square = $element[0];
+        firstWidth = square.getBoundingClientRect().width;
+        firstHeight = square.getBoundingClientRect().height;
         posX = 0;
         posY = 0;
         lastPosX = 0;
@@ -744,14 +748,20 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         dragReady = 0;
         leftXLimit = 44;
         rightXLimit = 720;
-        topYLimit = 197;
-        bottomYLimit = 385;
+        topYLimit = 204;
+        bottomYLimit = 390;
         lastMaxX = 0;
-        lastMinX = void 0;
+        lastMinX = 0;
         lastMaxY = 0;
         lastMinY = 0;
         max = 200;
         oldScale = 0;
+        oldWidth = 0;
+        pass = false;
+        changeX = false;
+        changeY = false;
+        deltaHeight = 0;
+        deltaWidth = 0;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
           var transform;
           e.gesture.srcEvent.preventDefault();
@@ -761,122 +771,77 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               lastScale = scale;
               break;
             case 'drag':
-              if (square.getBoundingClientRect().left > leftXLimit && square.getBoundingClientRect().top > topYLimit && square.getBoundingClientRect().bottom < bottomYLimit && square.getBoundingClientRect().right < rightXLimit) {
-                posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
-                posY = e.gesture.deltaY / square.getBoundingClientRect().height * max + lastPosY;
-                if (lastMinX !== void 0) {
-                  if (posX < lastMinX) {
-                    posX = lastMinX;
-                  }
-                }
-                if (posX > lastMaxX && lastMaxX > 0) {
-                  posX = lastMaxX;
-                }
-                if (posY < lastMinY) {
-                  posY = lastMinY;
-                }
-                if (posY > lastMaxY && lastMaxY > 0) {
-                  posY = lastMaxY;
-                }
-                console.log(square.getBoundingClientRect().top, " < TOP", square.getBoundingClientRect().left, " <LEFT", posX, " < posX", lastMinX, " <LastMinX");
-              } else {
-                if (square.getBoundingClientRect().left <= leftXLimit) {
-                  lastPosX = lastPosX + 1;
-                  lastMinX = lastPosX;
-                  posX = lastMinX;
-                  console.log("AFTER ", lastMinX);
-                }
-                if (square.getBoundingClientRect().right > rightXLimit) {
-                  lastPosX = posX - 1;
-                  lastMaxX = lastPosX;
-                  posX = lastMaxX;
-                }
-                if (square.getBoundingClientRect().top < topYLimit) {
-                  lastMinY = lastPosY + 1;
-                  lastMinY = lastPosY;
-                }
-                if (square.getBoundingClientRect().bottom > bottomYLimit) {
-                  lastPosY = posY - 1;
-                  lastMaxY = lastPosY;
-                  posY = lastMaxY;
-                }
+              posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
+              posY = e.gesture.deltaY / square.getBoundingClientRect().height * max + lastPosY;
+              square.style.left = String(posX + "px");
+              square.style.top = String(posY + "px");
+              deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+              deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+              if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+                posX = pan.offsetLeft - deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+                posY = pan.offsetTop - deltaHeight / 2;
+                changeY = true;
+              }
+              if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+                posX = (pan.offsetLeft + pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+                posY = (pan.offsetTop + pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight / 2;
+                changeY = true;
+              }
+              if (changeX === true) {
+                square.style.left = String(posX + "px");
+                changeX = false;
+              }
+              if (changeY === true) {
+                square.style.top = String(posY + "px");
+                changeY = false;
               }
               break;
             case 'transform':
               scale = e.gesture.scale * lastScale;
-              lastMaxX = 0;
-              lastMinX = void 0;
-              lastMaxY = 0;
+              if (scale > 1) {
+                scale = 1;
+              }
+              deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+              deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+              if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+                posX = pan.offsetLeft - deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+                posY = pan.offsetTop - deltaHeight / 2;
+                changeY = true;
+              }
+              if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+                posX = (pan.offsetLeft + pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+                posY = (pan.offsetTop + pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight / 2;
+                changeY = true;
+              }
+              if (changeX === true) {
+                square.style.left = String(posX + "px");
+                changeX = false;
+              }
+              if (changeY === true) {
+                square.style.top = String(posY + "px");
+                changeY = false;
+              }
               break;
             case 'dragend':
               lastPosX = posX;
               lastPosY = posY;
               lastScale = scale;
           }
-          transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ';
-          e.target.style.transform = transform + " " + match[0];
-          return e.target.style.webkitTransform = e.target.style.transform + " " + match[0];
-        }), $element[0]);
-      });
-    }
-  };
-});
-
-angular.module('starter.directives', []).directive('ionPpinchh', function($timeout) {
-  return {
-    restrict: 'E',
-    link: function($scope, $element, attrs) {
-      if ($element[0].classList[0] !== "square") {
-        return;
-      }
-      return $timeout(function() {
-        var bottomYLimit, bufferX, bufferY, dragReady, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, posX, posY, rightXLimit, rotation, scale, square, topYLimit;
-        square = $element[0];
-        posX = 0;
-        posY = 0;
-        lastPosX = 0;
-        lastPosY = 0;
-        bufferX = 0;
-        bufferY = 0;
-        scale = 1;
-        lastScale = void 0;
-        rotation = 0;
-        last_rotation = void 0;
-        dragReady = 0;
-        leftXLimit = 0;
-        rightXLimit = 720;
-        topYLimit = 197;
-        bottomYLimit = 385;
-        lastMaxX = 0;
-        lastMinX = void 0;
-        lastMaxY = 0;
-        lastMinY = 0;
-        max = 200;
-        oldScale = 0;
-        return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var curTransform, realLeft;
-          e.gesture.srcEvent.preventDefault();
-          e.gesture.preventDefault();
-          switch (e.type) {
-            case 'touch':
-              lastScale = scale;
-              break;
-            case 'drag':
-              posX = e.gesture.deltaX + lastPosX;
-              break;
-            case 'transform':
-              scale = e.gesture.scale * lastScale;
-              break;
-            case 'dragend':
-              lastScale = scale;
-              lastPosX = posX;
-          }
-          square.style.left = String(posX) + "px";
-          curTransform = new WebKitCSSMatrix(window.getComputedStyle(e.target).webkitTransform);
-          realLeft = e.target.offsetLeft + curTransform.m41;
-          if (realLeft <= document.getElementById("panorama_image").getBoundingClientRect().left) {
-            return e.target.style.left = String(document.getElementById("panorama_image").getBoundingClientRect().left) + "px";
-          }
+          transform = 'scale(' + scale + ')';
+          e.target.style.transform = transform;
+          return e.target.style.webkitTransform = e.target.style.transform;
         }), $element[0]);
       });
     }
