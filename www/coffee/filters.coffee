@@ -197,7 +197,7 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
         return      
       $timeout ->        
         pan = document.getElementById("panorama_image")
-        sq = document.getElementById("square")
+        
         square = $element[0]
         firstWidth = square.getBoundingClientRect().width
         firstHeight = square.getBoundingClientRect().height
@@ -229,6 +229,7 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
         changeY = false
         deltaHeight = 0
         deltaWidth = 0
+        scaleChange = false
         ionic.onGesture 'touch drag dragend transform', ((e) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
@@ -266,6 +267,8 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
             when 'transform'
 
               scale = e.gesture.scale * lastScale
+              if scale  != lastScale
+                scaleChange = true
               if scale > 1 
                 scale = 1
               deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth)
@@ -297,11 +300,12 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
           #   lastMaxX = 0
           #   lastMinX = 0
           #   lastMaxY = 0
-          #   lastMinY = 0     
-          transform = 'scale(' + scale + ')'  #+ 'rotate(' + rotation + 'deg) '
-          e.target.style.transform = transform# +  " " + match[0]
-          e.target.style.webkitTransform = e.target.style.transform #+ " " + match[0]
-
+          #   lastMinY = 0    
+          if scaleChange  
+            transform = 'scale(' + scale + ')'  #+ 'rotate(' + rotation + 'deg) '
+            e.target.style.transform = transform# +  " " + match[0]
+            e.target.style.webkitTransform = e.target.style.transform #+ " " + match[0]
+            scaleChange = false
           # e.target.style.height = String(e.target.offsetHeight * scale)+"px"
           # e.target.style.width = String(e.target.offsetWidth * scale)+"px"
           # newVal = posX

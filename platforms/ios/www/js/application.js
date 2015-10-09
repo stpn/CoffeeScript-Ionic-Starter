@@ -449,9 +449,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
+  var firstHeight, firstWidth, pan, posX, posY, square;
   $scope.panorama = Panoramas.get($stateParams.id);
   $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
   $scope.currentZoom = 1.0;
+  square = document.getElementById("square");
+  posX = 0;
+  posY = 0;
+  pan = document.getElementById("panorama_image");
+  firstWidth = square.getBoundingClientRect().width;
+  firstHeight = square.getBoundingClientRect().height;
   $scope.zoomIn = function(name) {
     var toZoom;
     console.log($scope.currentZoom);
@@ -464,7 +471,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
   };
   $scope.zoomOut = function(name) {
-    var toZoom;
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
@@ -472,7 +479,33 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     toZoom = document.getElementById(name);
     $scope.currentZoom = $scope.currentZoom + 0.2;
     toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
-    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+    toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+    if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+      posX = pan.offsetLeft - deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+      posY = pan.offsetTop - deltaHeight / 2;
+      changeY = true;
+    }
+    if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+      posX = (pan.offsetLeft + pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+      posY = (pan.offsetTop + pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight / 2;
+      changeY = true;
+    }
+    if (changeX === true) {
+      square.style.left = String(posX + "px");
+      changeX = false;
+    }
+    if (changeY === true) {
+      square.style.top = String(posY + "px");
+      return changeY = false;
+    }
   };
   $scope.getPanorama = function() {
     return $scope.panorama.image;
@@ -729,9 +762,8 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         return;
       }
       return $timeout(function() {
-        var bottomYLimit, bufferX, bufferY, changeX, changeY, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, pan, pass, posX, posY, rightXLimit, rotation, scale, sq, square, topYLimit;
+        var bottomYLimit, bufferX, bufferY, changeX, changeY, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, pan, pass, posX, posY, rightXLimit, rotation, scale, scaleChange, square, topYLimit;
         pan = document.getElementById("panorama_image");
-        sq = document.getElementById("square");
         square = $element[0];
         firstWidth = square.getBoundingClientRect().width;
         firstHeight = square.getBoundingClientRect().height;
@@ -762,6 +794,7 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         changeY = false;
         deltaHeight = 0;
         deltaWidth = 0;
+        scaleChange = false;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
           var transform;
           e.gesture.srcEvent.preventDefault();
@@ -804,6 +837,9 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               break;
             case 'transform':
               scale = e.gesture.scale * lastScale;
+              if (scale !== lastScale) {
+                scaleChange = true;
+              }
               if (scale > 1) {
                 scale = 1;
               }
@@ -839,9 +875,12 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               lastPosY = posY;
               lastScale = scale;
           }
-          transform = 'scale(' + scale + ')';
-          e.target.style.transform = transform;
-          return e.target.style.webkitTransform = e.target.style.transform;
+          if (scaleChange) {
+            transform = 'scale(' + scale + ')';
+            e.target.style.transform = transform;
+            e.target.style.webkitTransform = e.target.style.transform;
+            return scaleChange = false;
+          }
         }), $element[0]);
       });
     }

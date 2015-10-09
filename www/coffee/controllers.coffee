@@ -417,7 +417,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
   $scope.webcam_name = Panoramas.getWebcamName($stateParams.id)
   #console.log $scope.panorama.image
   $scope.currentZoom = 1.0
-
+  square = document.getElementById("square")
+  posX = 0
+  posY = 0
+  pan =  document.getElementById("panorama_image")
+  firstWidth = square.getBoundingClientRect().width
+  firstHeight = square.getBoundingClientRect().height
 
   # $scope.zoomIn = (name) ->
   #   console.log $scope.currentZoom
@@ -457,6 +462,27 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
     $scope.currentZoom = $scope.currentZoom + 0.2
     toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
     toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth)
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight)
+
+    if square.getBoundingClientRect().left <= pan.getBoundingClientRect().left
+      posX = pan.offsetLeft - deltaWidth  / 2
+      changeX = true
+    if square.getBoundingClientRect().top <= pan.getBoundingClientRect().top
+      posY = pan.offsetTop - deltaHeight  / 2
+      changeY = true
+    if square.getBoundingClientRect().right >= pan.getBoundingClientRect().right
+      posX = (pan.offsetLeft+pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth  / 2
+      changeX = true
+    if square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom
+      posY = (pan.offsetTop+pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight  / 2
+      changeY = true                
+    if changeX ==true
+      square.style.left = String(posX + "px")
+      changeX = false
+    if changeY  == true
+      square.style.top = String(posY + "px")
+      changeY = false    
 
 
   $scope.getPanorama =  ->
