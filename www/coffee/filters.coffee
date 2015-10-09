@@ -90,14 +90,14 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
 
-          scalRgxp = /scale\((\d{1,}\.\d{1,})\)/
-          match = e.target.style.transform.match(scalRgxp)
-          if !match
-            match = [""]
-          else
-            if oldScale != match[1]
-              LastMinX = undefined
-              oldScale = match[1]
+          # scalRgxp = /scale\((\d{1,}\.\d{1,})\)/
+          # match = e.target.style.transform.match(scalRgxp)
+          # if !match
+          #   match = [""]
+          # else
+          #   if oldScale != match[1]
+          #     LastMinX = undefined
+          #     oldScale = match[1]
 
           switch e.type
             when 'touch'
@@ -243,7 +243,7 @@ angular.module('starter.directives',[]).directive 'ionPpinchh', ($timeout) ->
               lastScale = scale
               lastPosX = posX
           square.style.left = String(posX)+"px"
-          curTransform = new   WebKitCSSMatrix(window.getComputedStyle(e.target).webkitTransform)
+          curTransform = new  WebKitCSSMatrix(window.getComputedStyle(e.target).webkitTransform)
           realLeft = e.target.offsetLeft + curTransform.m41
           #http://stackoverflow.com/questions/13882070/jquery-draggable-and-webkit-transform-scale
           #http://cerdiogenes.blogspot.com.br/2015/01/jquery-ui-draggable-reseizable-with.html

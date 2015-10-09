@@ -18714,7 +18714,7 @@ ion-item {
   height: 10px; }
 
 #header a.title_tab {
-  height: 86px;
+  height: 80px;
   padding-left: 20px;
   padding-right: 20px;
   border-left: 1px solid #48484A; }
@@ -18932,7 +18932,8 @@ ion-top-menu .item {
     #video_container .close_button .ion-close::before {
       color: #808080; }
   #video_container .presentation_titles {
-    margin-left: 11px !important; }
+    margin-left: 11px !important;
+    margin-bottom: 10px; }
   #video_container ion-content {
     position: relative; }
   #video_container .video_controls {

@@ -753,19 +753,9 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         max = 200;
         oldScale = 0;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var LastMinX, match, scalRgxp, transform;
+          var transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
-          scalRgxp = /scale\((\d{1,}\.\d{1,})\)/;
-          match = e.target.style.transform.match(scalRgxp);
-          if (!match) {
-            match = [""];
-          } else {
-            if (oldScale !== match[1]) {
-              LastMinX = void 0;
-              oldScale = match[1];
-            }
-          }
           switch (e.type) {
             case 'touch':
               lastScale = scale;
