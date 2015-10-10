@@ -270,17 +270,17 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
               if square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom
                 posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight  / 2
                 changeY = true  
-              if changeX ==true
+              if changeX ==true || changeY  == true
                 transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) '+  " " + match[0]
                 e.target.style.transform = transform  
                 e.target.style.webkitTransform = e.target.style.transform              
                 # square.style.left = String(posX + "px")
                 changeX = false
-              if changeY  == true
-                #square.style.top = String(posY + "px")
-                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + match[0]
-                e.target.style.transform = transform
-                e.target.style.webkitTransform = e.target.style.transform                
+              # if changeY  == true
+              #   #square.style.top = String(posY + "px")
+              #   transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + match[0]
+              #   e.target.style.transform = transform
+              #   e.target.style.webkitTransform = e.target.style.transform                
                 changeY = false                              
 
             when 'transform'
@@ -307,17 +307,17 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
               if square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom
                 posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight  / 2
                 changeY = true  
-              if changeX ==true
+              if changeX ==true || changeY  == true
                 transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) '+  " " + 'scale(' + scale + ')'
                 e.target.style.transform = transform  
                 e.target.style.webkitTransform = e.target.style.transform              
                 # square.style.left = String(posX + "px")
                 changeX = false
-              if changeY  == true
-                #square.style.top = String(posY + "px")
-                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + 'scale(' + scale + ')'
-                e.target.style.transform = transform
-                e.target.style.webkitTransform = e.target.style.transform                
+              # if changeY  == true
+              #   #square.style.top = String(posY + "px")
+              #   transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + 'scale(' + scale + ')'
+              #   e.target.style.transform = transform
+              #   e.target.style.webkitTransform = e.target.style.transform                
                 changeY = false     
 
             when 'dragend'

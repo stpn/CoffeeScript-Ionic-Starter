@@ -471,39 +471,39 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
   };
   $scope.zoomOut = function(name) {
-    var changeX, changeY, deltaHeight, deltaWidth, toZoom;
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
     }
     toZoom = document.getElementById(name);
     $scope.currentZoom = $scope.currentZoom + 0.2;
-    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
-    toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
     deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
     deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+    transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+    toZoom.style.transform = transform;
+    toZoom.style.webkitTransform = toZoom.style.transform;
     if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
-      posX = pan.offsetLeft - deltaWidth / 2;
+      posX = -deltaWidth / 2;
       changeX = true;
     }
     if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
-      posY = pan.offsetTop - deltaHeight / 2;
+      posY = -deltaHeight / 2;
       changeY = true;
     }
     if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
-      posX = (pan.offsetLeft + pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth / 2;
+      posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
       changeX = true;
     }
     if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
-      posY = (pan.offsetTop + pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight / 2;
+      posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
       changeY = true;
     }
-    if (changeX === true) {
-      square.style.left = String(posX + "px");
+    if (changeX === true || changeY === true) {
+      transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+      toZoom.style.transform = transform;
+      toZoom.style.webkitTransform = toZoom.style.transform;
       changeX = false;
-    }
-    if (changeY === true) {
-      square.style.top = String(posY + "px");
       return changeY = false;
     }
   };
@@ -838,16 +838,11 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
                 posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
                 changeY = true;
               }
-              if (changeX === true) {
+              if (changeX === true || changeY === true) {
                 transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
                 e.target.style.transform = transform;
                 e.target.style.webkitTransform = e.target.style.transform;
                 changeX = false;
-              }
-              if (changeY === true) {
-                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
-                e.target.style.transform = transform;
-                e.target.style.webkitTransform = e.target.style.transform;
                 return changeY = false;
               }
               break;
@@ -880,16 +875,11 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
                 posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
                 changeY = true;
               }
-              if (changeX === true) {
+              if (changeX === true || changeY === true) {
                 transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
                 e.target.style.transform = transform;
                 e.target.style.webkitTransform = e.target.style.transform;
                 changeX = false;
-              }
-              if (changeY === true) {
-                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
-                e.target.style.transform = transform;
-                e.target.style.webkitTransform = e.target.style.transform;
                 return changeY = false;
               }
               break;

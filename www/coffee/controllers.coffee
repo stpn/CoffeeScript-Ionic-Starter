@@ -460,29 +460,41 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $rootS
       return
     toZoom = document.getElementById(name)
     $scope.currentZoom = $scope.currentZoom + 0.2
-    toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
-    toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
-    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth)
-    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight)
+    # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
+    # toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
 
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth)
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight)                          
+    transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + "scale("+$scope.currentZoom+")"
+    toZoom.style.transform = transform 
+    toZoom.style.webkitTransform = toZoom.style.transform
     if square.getBoundingClientRect().left <= pan.getBoundingClientRect().left
-      posX = pan.offsetLeft - deltaWidth  / 2
+      posX =  -deltaWidth  / 2
       changeX = true
     if square.getBoundingClientRect().top <= pan.getBoundingClientRect().top
-      posY = pan.offsetTop - deltaHeight  / 2
+      posY = -deltaHeight  / 2
       changeY = true
     if square.getBoundingClientRect().right >= pan.getBoundingClientRect().right
-      posX = (pan.offsetLeft+pan.offsetWidth) - square.getBoundingClientRect().width - deltaWidth  / 2
+      posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth  / 2
       changeX = true
     if square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom
-      posY = (pan.offsetTop+pan.offsetHeight) - square.getBoundingClientRect().height - deltaHeight  / 2
-      changeY = true                
-    if changeX ==true
-      square.style.left = String(posX + "px")
+      posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight  / 2
+      changeY = true  
+    if changeX ==true || changeY  == true
+      transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) '+  " " + "scale("+$scope.currentZoom+")"
+      toZoom.style.transform = transform  
+      toZoom.style.webkitTransform = toZoom.style.transform              
+      # square.style.left = String(posX + "px")
       changeX = false
-    if changeY  == true
-      square.style.top = String(posY + "px")
-      changeY = false    
+      changeY = false  
+    # if changeY  == true
+    #   #square.style.top = String(posY + "px")
+    #   transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + "scale("+$scope.currentZoom+")"
+    #   toZoom.style.transform = transform
+    #   toZoom.style.webkitTransform = toZoom.style.transform                
+    #   changeY = false  
+
+
 
 
   $scope.getPanorama =  ->
