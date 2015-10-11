@@ -1,13 +1,26 @@
+// .close_button{
+//   margin-right: 3px !important;
+//   margin-top:  0px !important;
+//   padding: 30px;
+// }
+
 #video_container {
+      .close_button {
+    position: absolute;
+    right: 36px;
+    top: 30px;
+    font-size: 25px;
+        .ion-close::before {
+            color: #808080;
+        }
+    }
 
   .presentation_titles {
 margin-left: 11px !important;
+margin-bottom: 10px;
 }
-.close_button{
-  margin-right: 3px !important;
-  margin-top:  0px !important;
-}
-    margin-top: 55px;
+
+    margin-top: 85px;
     width: 696px;
     margin-left: auto;
     margin-right: auto;
@@ -22,19 +35,22 @@ margin-left: 11px !important;
             margin-top: 34px;
         }
         .pres_button {
+          color: #D9D9D9;
             width: 172px;
             height: 75px;
             border: solid 1px;
-            margin-right: 2 px;
+            margin-left: 2px;
             i.ion-rewind-back {
                 font-size: 80px;
                 line-height: 120px;
             }
             i {
                 font-size: 60px;
-                margin-left: 54px;
-                margin-right: auto;
+//                margin-left: 54px;
+//                margin-right: auto;
+                padding: 20px;
                 line-height: 90px;
+
             }
         }
         li {
@@ -42,19 +58,22 @@ margin-left: 11px !important;
             cursor: pointer;
             float: left;
         }
-        .volume_controls{
+
+    }
+}
+
+    .volume_controls{
           position: absolute;
           left: 0px;
               bottom: 70px;
             i {
                 font-size: 30px;
-                margin-left: 40px !important;                
+                margin-left: 30px !important;                
                 margin-right: 30px;
                 line-height: 90px;
             }
-            i.ion-minus{
-              margin-left: 20px;
-
+            li{
+              margin-left: 10px;
             }
 
         // progress.volume {
@@ -64,8 +83,48 @@ margin-left: 11px !important;
         // }
 
         }
-    }
+
+#volume_btn{
+width: 82.5px;
+    // height: 64px;
+    // margin-left: 0px;
+    // text-align: center;
+
 }
+
+input[type=range]{
+
+    -webkit-appearance: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 14px;
+    background: #807F80;
+    border: none;
+    border-radius: 0px;
+}
+
+input[type=range]::-webkit-slider-thumb {
+      transition: all .5s !important;
+
+    -webkit-appearance: none;
+    border: none;
+    height: 43px;
+    width: 43px;
+    border-radius: 50%;
+    background: #D9D9D9;
+    margin-top: -15px;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: #ccc;
+}
+
+
 progress {
   width: 450px;
   height: 24px;
@@ -78,14 +137,14 @@ progress {
 
 /* All good till now. Now we'll style the background */
 progress::-webkit-progress-bar {
-  background: #808080;
+  background: #333333;
 box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
-  padding: 5px;
+  padding: 0px;
 }
 
 /* Now the value part */
 progress::-webkit-progress-value {
-  background: #666667;
+  background: #666666;
   //background-size: 25px 14px, 100% 100%, 100% 100%;
   -webkit-animation: move 5s linear 0 infinite;
 }

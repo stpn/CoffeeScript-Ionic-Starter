@@ -3,11 +3,12 @@
     margin-left: 36px;
     color: #DAD9D9;
     font-family: "Gotham Light";
-    .presentation_title {
+    #presentation_title {
         font-size: 22px;
     }
-    .presentation_subtitle {
+    #presentation_subtitle {
         font-size: 20px;
+        margin-top: 5px;
     }
 }
 
@@ -17,6 +18,9 @@
         background-color: black !important;
         margin-left: 0px;
         min-height: 743px;
+        .item {
+            background-color: black !important;
+        }
         .col_slide {
             -webkit-box-flex: 0;
             -webkit-flex: 0 0 132px;
@@ -32,6 +36,21 @@
             img {
                 max-height: 74px;
             }
+        }
+        .col_slide.active {
+            border-color: white;
+            border-width: 3px;
+            border: solid;
+            color: white;
+        }
+    }
+    .close_button {
+        position: absolute;
+    right: 40px;
+    top: 30px;
+        font-size: 25px;
+        .ion-close::before {
+            color: #808080;
         }
     }
 }
@@ -55,8 +74,8 @@
         height: 75px;
         border: solid 1px;
         margin-left: 5px;
-        .skipbackward_button{
-            i{
+        .skipbackward_button {
+            i {
                 font-size: 80px;
             }
         }
@@ -70,14 +89,5 @@
     li {
         cursor: pointer;
         float: left;
-    }
-}
-
-.close_button {
-    float: right;
-    font-size: 25px;
-    margin-right: 33px;
-    .ion-close::before {
-        color: #808080;
     }
 }

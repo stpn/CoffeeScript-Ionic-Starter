@@ -1,4 +1,3 @@
-current_server  ="http://localhost:3000"
 angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
@@ -49,189 +48,50 @@ angular.module('starter.services', []).factory('Buildings', ->
       else
         return name      
   }
-).service('ActiveBuilding', ->
-  name = undefined
-  tabName = "SELECT BUILDING"
-  actives = {}
 
-  {
-    setName: (new_name) ->
-      if actives[new_name] == "active"
-        actives[new_name] = undefined
+).service('HelperService', (Buildings) ->
+
+  @sort_models = (models) ->
+    hash = {}
+    result = []
+    i = 0  
+    while i < models.length
+      # bld_name = 'all'      
+      # if  models[i].building_id
+      #   bld_name =  Buildings.get(models[i].building_id).name
+      if models[i].building_name == undefined
+        models[i].building_name = 'all'
+      # if models[i].image
+      #   models[i].image.url = "http://localhost:3000/"+models[i].image.url
+      if hash[models[i].building_name] == undefined
+        hash[models[i].building_name] = [models[i]]
       else
-        actives[new_name] = "active"
+        hash[models[i].building_name].push models[i]
+      # if hash[models[i].building_name] == undefined
+      #   hash[models[i].building_name] = [models[i]]
+      # else
+      #   hash[models[i].building_name].push(models[i])
+      i++
+    for k,v of hash
+      result.push(v)    
+    result
 
+  return
 
-    getName: (new_name) ->
-      if actives[new_name] == "active"
-        return true
-      else
-        return false
+).factory('Presentations',($http, HelperService)  ->
+  models = []
 
-    isActive: (q_name) ->
-      if angular.equals(name,q_name) || name == undefined
-        return true
-      else 
-        return false
-    cancelAll: ->
-      for k,v of actives
-        actives[k] = undefined
-  }
-
-).factory('Presentations', ->
-  models = [
-    {
-      id: 1
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 2
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 3
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 4
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 5
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 6
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 7
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 8
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 9
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 10
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 11
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 12
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 13
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 14
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 15
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 16
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 17
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 18
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },    
-    {
-      id: 19
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '600 Second Street'
-      project_name: "600 Second Street"      
-    }
-  ]
   {
     name: ->
      "Presentation"
 
     sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      console.log result, "PRES"        
-      result
+      $http.get('http://localhost:3000/presentations.json').then ((response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+      ), (data) ->
+        console.log "ERROR PRES"
+        return
 
     all: ->
       models
@@ -239,12 +99,14 @@ angular.module('starter.services', []).factory('Buildings', ->
       models.splice models.indexOf(chat), 1
       return
     get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
+      $http.get('http://localhost:3000/presentations/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log "ERROR PRES"
+        return
+
     getSlides: (presentationId) ->
       slides = [
         {
@@ -290,56 +152,17 @@ angular.module('starter.services', []).factory('Buildings', ->
       ]
 
   }
-).factory('Renderings', ($http, Buildings) ->
+).factory('Renderings', ($http, Buildings, HelperService) ->
   models = []
-    # {
-    #   id: 1
-    #   name: "Rend1"
-    #   image: 'img/assets/renderings/1.jpg'
-    #   building_name: '200 Massachusetts'
-    # },
-    # {
-    #   id: 2
-    #   name: "Rend2"
-    #   image: 'img/assets/renderings/2.jpg'
-    #   building_name: '200 Massachusetts'
-    # },
-    # {
-    #   id: 3
-    #   name: "Rendering 3"
-    #   image: 'img/assets/renderings/3.jpg'
-    #   building_name: '250 Massachusetts'
-    # }    
-#  ]
+
   {
     name: ->
      "Rendering"
 
     sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      $http.get('http://localhost:3000/renderings.json').then (response) ->
-        
-        models = response.data
-        while i < models.length
-          bld_name =  Buildings.get(models[i].building_id).name
-          models[i].building_name = bld_name
-          models[i].image.url = "http://localhost:3000/"+models[i].image.url
-          if hash[bld_name] == undefined
-            hash[bld_name] = [models[i]]
-          else
-            hash[bld_name].push models[i]
-          # if hash[models[i].building_name] == undefined
-          #   hash[models[i].building_name] = [models[i]]
-          # else
-          #   hash[models[i].building_name].push(models[i])
-          i++
-        for k,v of hash
-          result.push(v)    
-        console.log result, "RENDER"
+      $http.get('http://localhost:3000/renderings.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
         result
-
 
     all: ->
       $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
@@ -359,48 +182,16 @@ angular.module('starter.services', []).factory('Buildings', ->
       null
 
   }
-).factory('Views', ->
-  models = [
-    {
-      id: 1
-      name: "View1"
-      image: 'img/assets/views/1.jpg'
-      building_name: '200 Massachusetts'
-      camera_name: '1'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'img/assets/views/2.jpg'
-      building_name: '200 Massachusetts'
-      camera_name: '2'
-    },   
-   {
-      id: 3
-      name: "View3"
-      image: 'img/assets/views/3.jpg'
-      building_name: '250 Massachusetts'
-      camera_name: '3'
-    }                               
-  ]
+).factory('Views', ($http, HelperService) ->
+  models = []
   {
     name: ->
      "View"  
 
     sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
+      $http.get('http://localhost:3000/views.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
+        result
 
     all: ->
       newMod = []
@@ -423,45 +214,16 @@ angular.module('starter.services', []).factory('Buildings', ->
 
 
   }
-).factory('Floorplans', ->
-  models = [
-    {
-      id: 1
-      name: "Floorplan1"
-      image: 'img/assets/floorplans/1.svg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 2
-      name: "Floorplan2"
-      image: 'img/assets/floorplans/1.svg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 3
-      name: "Floorplan3"
-      image: 'img/assets/floorplans/3.svg'
-      building_name: '250 Massachusetts'
-    }        
-  ]
+).factory('Floorplans', ($http, HelperService)->
+  models = []
   {
     name: ->
      "Floorplan"  
 
     sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
+      $http.get('http://localhost:3000/floorplans.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
+        result
 
     all: ->
       models
@@ -477,30 +239,8 @@ angular.module('starter.services', []).factory('Buildings', ->
       null
 
   }
-).factory('Videos', ->
-  models = [
-    {
-      id: 1
-      name: "Video1"
-      image: 'img/assets/views/1.jpg'
-      building_name: '200 Massachusetts'
-      recording: 'img/assets/videos/1.mp4'
-    },
-    {
-      id: 2
-      name: "Video2"
-      image: 'img/assets/views/2.jpg'
-      building_name: '200 Massachusetts'
-      recording: 'img/assets/videos/2.mp4'
-    },
-    {
-      id: 3
-      name: "Video3"
-      image: 'img/assets/views/3.jpg'
-      building_name: '250 Massachusetts'
-      recording: 'img/assets/videos/3.mp4'
-    }    
-  ]
+).factory('Videos', ($http, HelperService) ->
+  models = []
   {
     getRecording: (videoId) ->
       i = 0
@@ -513,19 +253,12 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Video"
 
     sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
+      $http.get('http://localhost:3000/videos.json').then ((response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+      ), (data) ->
+        console.log "ERROR PRES"
+        return        
 
     all: ->
       models
@@ -542,56 +275,16 @@ angular.module('starter.services', []).factory('Buildings', ->
 
   }
 
-).service('ActiveCamera', ->
-  name = undefined
-
-  {
-    setName: (new_name) ->
-      name = new_name
-
-    getName: (new_name) ->
-      name
-  }
-
-).factory('Webcams', ->
-  models = [
-    {
-      id: 1
-      name: "Webcam1"
-      image: 'img/assets/webcams/1.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 2
-      name: "Webcam2"
-      image: 'img/assets/webcams/2.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 3
-      name: "Webcam3"
-      image: 'img/assets/webcams/3.jpg'
-      building_name: '250 Massachusetts'
-    }   
-  ]
+).factory('Webcams', ($http, HelperService) ->
+  models = []
   {
     name: ->
      "Webcam"        
 
     sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
+      $http.get('http://localhost:3000/cameras.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
+        result
 
     all: ->
       models
@@ -633,6 +326,46 @@ angular.module('starter.services', []).factory('Buildings', ->
         }    
       ] 
   }
+).factory('Timelapses', ->
+  models = []
+  {
+    getRecording: (videoId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(videoId)
+          return models[i].recording
+        i++
+      null
+
+    name: ->
+     "Timelapse"
+
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+    get: (chatId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(chatId)
+          return models[i]
+        i++
+      null
+
+  }
+
+).service('ActiveCamera', ->
+  name = undefined
+
+  {
+    setName: (new_name) ->
+      name = new_name
+
+    getName: (new_name) ->
+      name
+  }
+
 ).factory('Panoramas', ->
   models = [
     {
@@ -662,6 +395,79 @@ angular.module('starter.services', []).factory('Buildings', ->
       models[0].camera_name
 
   }
+).service('ActiveBuilding', ->
+  name = undefined
+  tabName = "SELECT BUILDING"
+  actives = {}
+
+  {
+    setName: (new_name) ->
+      if actives[new_name] == "active"
+        actives[new_name] = undefined
+      else
+        actives[new_name] = "active"
+
+
+    getName: (new_name) ->
+      if actives[new_name] == "active"
+        return true
+      else
+        return false
+
+    isActive: (q_name) ->
+      if actives[q_name] == 'active'
+        return true
+    # getActive: ->
+    #   if actives.size > 0
+    #     for k,v of actives
+    #       if actives[k] != undefined
+    #         actives[k]
+    cancelAll: ->
+      for k,v of actives
+        actives[k] = undefined
+  }
+
+).service('ActiveCrestron', ->
+  name = undefined
+  tabName = "SELECT BUILDING"
+  actives = {}
+
+  {
+    setName: (new_name) ->
+      if actives[new_name] == "active"
+        actives[new_name] = undefined
+      else
+        actives[new_name] = "active"
+
+
+    getName: (new_name) ->
+      if actives[new_name] == "active"
+        return true
+      else
+        return false
+
+    isActive: (q_name) ->
+      if actives[q_name] == 'active'
+        return true
+    # getActive: ->
+    #   if actives.size > 0
+    #     for k,v of actives
+    #       if actives[k] != undefined
+    #         actives[k]
+    cancelAll: ->
+      for k,v of actives
+        actives[k] = undefined
+    
+    setAll: ->
+      actives['200 Massachusetts'] = 'active'
+      actives['250 Massachusetts'] = 'active'
+      actives['600 Second Street'] = 'active'
+      actives['201 F Street'] = 'active'
+      actives['200 F Street'] = 'active'
+      
+
+  }
+
 ).factory('TopmenuState', ->
   
   states =

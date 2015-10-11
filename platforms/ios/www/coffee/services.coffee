@@ -1,3 +1,4 @@
+current_server  ="http://localhost:3000"
 angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
@@ -68,13 +69,57 @@ angular.module('starter.services', []).factory('Buildings', ->
         return false
 
     isActive: (q_name) ->
-      if angular.equals(name,q_name) || name == undefined
+      if actives[q_name] == 'active'
         return true
-      else 
-        return false
+    # getActive: ->
+    #   if actives.size > 0
+    #     for k,v of actives
+    #       if actives[k] != undefined
+    #         actives[k]
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
+  }
+
+).service('ActiveCrestron', ->
+  name = undefined
+  tabName = "SELECT BUILDING"
+  actives = {}
+
+  {
+    setName: (new_name) ->
+      if actives[new_name] == "active"
+        actives[new_name] = undefined
+      else
+        actives[new_name] = "active"
+
+
+    getName: (new_name) ->
+      if actives[new_name] == "active"
+        return true
+      else
+        return false
+
+    isActive: (q_name) ->
+      if actives[q_name] == 'active'
+        return true
+    # getActive: ->
+    #   if actives.size > 0
+    #     for k,v of actives
+    #       if actives[k] != undefined
+    #         actives[k]
+    cancelAll: ->
+      for k,v of actives
+        actives[k] = undefined
+    
+    setAll: ->
+      actives['200 Massachusetts'] = 'active'
+      actives['250 Massachusetts'] = 'active'
+      actives['600 Second Street'] = 'active'
+      actives['201 F Street'] = 'active'
+      actives['200 F Street'] = 'active'
+      
+
   }
 
 ).factory('Presentations', ->
@@ -288,7 +333,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       ]
 
   }
-).factory('Renderings', ->
+).factory('Renderings', ($http, Buildings) ->
   models = [
     {
       id: 1
@@ -308,7 +353,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       image: 'img/assets/renderings/3.jpg'
       building_name: '250 Massachusetts'
     }    
-  ]
+ ]
   {
     name: ->
      "Rendering"
@@ -317,8 +362,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       hash = {}
       result = []
       i = 0
-      while i < models.length
-        
+      while i < models.length        
         if hash[models[i].building_name] == undefined
           hash[models[i].building_name] = [models[i]]
         else
@@ -329,8 +373,37 @@ angular.module('starter.services', []).factory('Buildings', ->
       result
 
 
+    # sorted: ->
+    #   hash = {}
+    #   result = []
+    #   i = 0
+    #   $http.get('http://localhost:3000/renderings.json').then (response) ->
+        
+    #     models = response.data
+    #     console.log models
+    #     while i < models.length
+    #       bld_name =  Buildings.get(models[i].building_id).name
+    #       if hash[bld_name] == undefined
+    #         hash[bld_name] = [models[i]]
+    #       else
+    #         hash[bld_name].push models[i]
+    #       # if hash[models[i].building_name] == undefined
+    #       #   hash[models[i].building_name] = [models[i]]
+    #       # else
+    #       #   hash[models[i].building_name].push(models[i])
+    #       i++
+    #     for k,v of hash
+    #       result.push(v)    
+
+    #     result
+
+
     all: ->
+      # $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
+      #   console.log response
+      #   models = response
       models
+
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
@@ -495,6 +568,71 @@ angular.module('starter.services', []).factory('Buildings', ->
       null
     name: ->
      "Video"
+
+    sorted: ->
+      hash = {}
+      result = []
+      i = 0
+      while i < models.length
+        
+        if hash[models[i].building_name] == undefined
+          hash[models[i].building_name] = [models[i]]
+        else
+          hash[models[i].building_name].push(models[i])
+        i++
+      for k,v of hash
+        result.push(v)
+      result
+
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+    get: (chatId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(chatId)
+          return models[i]
+        i++
+      null
+
+  }
+
+).factory('Timelapses', ->
+  models = [
+    {
+      id: 1
+      name: "Timelapse 1"
+      image: 'img/assets/views/1.jpg'
+      building_name: '200 Massachusetts'
+      recording: 'img/assets/videos/1.mp4'
+    },
+    {
+      id: 2
+      name: "Timelapse 2"
+      image: 'img/assets/views/2.jpg'
+      building_name: '200 Massachusetts'
+      recording: 'img/assets/videos/2.mp4'
+    },
+    {
+      id: 3
+      name: "Timelapse 3"
+      image: 'img/assets/views/3.jpg'
+      building_name: '250 Massachusetts'
+      recording: 'img/assets/videos/3.mp4'
+    }    
+  ]
+  {
+    getRecording: (videoId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(videoId)
+          return models[i].recording
+        i++
+      null
+    name: ->
+     "Timelapse"
 
     sorted: ->
       hash = {}

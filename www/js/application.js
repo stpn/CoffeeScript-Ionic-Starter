@@ -35,6 +35,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'VideoPlayerCtrl'
       }
     }
+  }).state('tab.timelapses', {
+    url: '/timelapses/:id',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/Videos/timelapsePlayer.html',
+        controller: 'TimelapsesCtrl'
+      }
+    }
   }).state('tab.views', {
     url: '/views/:id',
     views: {
@@ -87,11 +95,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/home');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $q, $http, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
   $scope.presentations = {};
-  $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()], ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()], ["Webcams", Webcams.sorted()]];
+  $scope.factories = [["Presentations"], ["Videos"], ["Floor Plans"], ["Renderings"], ["Views"], ["Webcams"]];
+  Renderings.sorted().then(function(reports) {
+    $scope.factories[3].push(reports);
+  });
+  angular.forEach([Presentations, Videos, Floorplans, Renderings, Views, Webcams], function(factory, index) {
+    console.log(factory, index);
+    return factory.sorted().then(function(reports) {
+      return $scope.factories[index].push(reports);
+    });
+  });
   $scope.activeBuilding = ActiveBuilding;
+  $scope.activeBuildingName = void 0;
+  $scope.lastActiveName = void 0;
   $scope.buldingTabName = "Select Buildings";
+  $scope.activeComparison = void 0;
   $scope.comparisonState = false;
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
@@ -107,8 +127,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isComparison = function() {
     return $scope.comparisonState;
   };
-  $scope.isActive = function(name) {
-    return $scope.activeBuilding.isActive(name);
+  $scope.isActiveBuilding = function(name) {
+    if ($scope.activeBuildingName === void 0) {
+      return true;
+    }
+    return $scope.activeBuildingName === name;
   };
   $scope.toggleGroup = function(group) {
     var menu;
@@ -158,13 +181,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.activeBuilding.cancelAll();
     }
   };
-  $scope.activeBuildingTabName = function() {
-    if ($scope.activeBuilding.name === void 0) {
-      return "SELECT BUILDING";
-    } else {
-      return $scope.activeBuilding.name;
-    }
-  };
   $scope.building_is = function(code, name) {
     if (code === name) {
       return true;
@@ -174,11 +190,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.getTemplate(name);
   };
   $scope.setActiveBuilding = function(name) {
-    if (name === void 0) {
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    if ($scope.activeBuildingName === name) {
+      name = void 0;
     }
-    $scope.activeBuilding.setName(name);
-    return $scope.activeBuilding.tabName = name;
+    $scope.activeBuildingName = name;
+    return $scope.buldingTabName = name;
   };
   $scope.buildingCode = function(name) {
     return Buildings.buildingCode(name);
@@ -190,7 +206,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       was_comparison = true;
     }
     $scope.comparisonState = false;
-    $scope.activeBuilding.tabName = "SELECT BUILDING";
+    $scope.buldingTabName = $scope.activeBuildingName;
+    $scope.activeBuilding.tabName = $scope.lastActiveName;
     bld = document.getElementById('building_wrap');
     menu = document.getElementById('ionTopMenu');
     pane = document.getElementsByTagName('ion-content')[0];
@@ -216,13 +233,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     var bld, menu, pane;
     if ($scope.comparisonState === false) {
       $scope.comparisonState = true;
-      $scope.activeBuilding.tabName = "COMPARISON MODE";
+      $scope.buldingTabName = "COMPARISON MODE";
       bld = document.getElementById('building_wrap');
       menu = document.getElementById('ionTopMenu');
       pane = document.getElementsByTagName('ion-content')[0];
     } else {
       $scope.comparisonState = false;
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
+      $scope.buldingTabName = $scope.activeBuildingName;
     }
     if (menu.offsetHeight === 24) {
       menu.style.height = '250px';
@@ -236,15 +253,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.getFillColorFor = function(bld_name) {
-    if ($scope.activeBuilding === void 0) {
+    if ($scope.activeBuildingName === void 0) {
       return "none";
-    } else if ($scope.activeBuilding.getName(bld_name)) {
+    } else if ($scope.activeBuildingName === bld_name || $scope.activeBuildingName === "all") {
       return "#6D6F72";
     } else {
       return "none";
     }
   };
-  return $scope.convertCode = function(name) {
+  $scope.convertCode = function(name) {
     if (name === "200M") {
       return "M200";
     }
@@ -261,8 +278,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return "F200";
     }
   };
-}).controller('VideoDetailCtrl', function($scope, $stateParams, Videos) {
-  $scope.video = Videos.get($stateParams.id);
+  $scope.setActiveComparison = function(comparison) {
+    if (comparison === $scope.activeComparison) {
+      comparison = void 0;
+    }
+    return $scope.activeComparison = comparison;
+  };
+  return $scope.getComparisonStroke = function(comparison) {
+    if (comparison === $scope.activeComparison) {
+      return "#FFF";
+    } else {
+      return "#808080";
+    }
+  };
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
   $scope.home = '#/tab/home';
@@ -341,23 +369,21 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.shownGroup === group;
   };
 }).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
-  $scope.presentation = Presentations.get($stateParams.id);
-  $scope.slides = Presentations.getSlides($stateParams.id);
-  $scope.presentation_name = $scope.presentation.name;
-  $scope.project_name = $scope.presentation.project_name;
   $scope.currentSlide = 1;
-  $scope.postSlide = function(slideIdx) {
-    if (slideIdx === $scope.slides.length) {
-      $scope.currentSlide = $scope.slides.length;
-    }
-    if (slideIdx === 1) {
+  Presentations.get($stateParams.id).then(function(result) {
+    $scope.presentation = result;
+    $scope.slides = $scope.presentation.slides;
+    $scope.presentation_name = $scope.presentation.name;
+    return $scope.project_name = $scope.presentation.building_name;
+  });
+  return $scope.postSlide = function(slideIdx) {
+    if (slideIdx >= $scope.slides.length) {
+      return $scope.currentSlide = $scope.slides.length;
+    } else if (slideIdx <= 1) {
       return $scope.currentSlide = 1;
     } else {
       return $scope.currentSlide = slideIdx;
     }
-  };
-  $scope.alertMe = function() {
-    return $log.debug("...");
   };
 }).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.id);
@@ -372,11 +398,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.alertMe = function() {
     return $log.debug("...");
   };
-}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveBuilding) {
+}).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveCrestron) {
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
   $scope.transformStyle = "scale(1.19)";
-  $scope.activeBuilding = ActiveBuilding;
+  $scope.activeBuilding = ActiveCrestron;
   $scope.getTemplate = function(name) {
     return Buildings.getTemplate(name);
   };
@@ -389,10 +415,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return Buildings.buildingCode(name);
   };
   $scope.setActiveBuilding = function(name) {
-    if (name === void 0) {
-      $scope.activeBuilding.tabName = "SELECT BUILDING";
+    if (name === "all") {
+      if ($scope.activeBuilding.isActive("all")) {
+        $scope.activeBuilding.cancelAll();
+        $scope.activeBuilding.setName("all");
+      } else {
+        $scope.activeBuilding.setAll();
+      }
+    } else {
+      if ($scope.activeBuilding.isActive("all")) {
+        $scope.activeBuilding.setName("all");
+      }
     }
-    ActiveBuilding.setName(name);
+    $scope.activeBuilding.setName(name);
     return $scope.activeBuilding.tabName = name;
   };
   $scope.getFillColorFor = function(bld_name) {
@@ -422,25 +457,63 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
+  var firstHeight, firstWidth, pan, posX, posY, square;
   $scope.panorama = Panoramas.get($stateParams.id);
   $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
-  $scope.currentZoom = 1.2;
+  $scope.currentZoom = 1.0;
+  square = document.getElementById("square");
+  posX = 0;
+  posY = 0;
+  pan = document.getElementById("panorama_image");
+  firstWidth = square.getBoundingClientRect().width;
+  firstHeight = square.getBoundingClientRect().height;
   $scope.zoomIn = function(name) {
     var toZoom;
-    toZoom = document.getElementById(name);
-    $scope.currentZoom = $scope.currentZoom + 0.2;
-    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
-    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
-  };
-  $scope.zoomOut = function() {
-    var toZoom;
-    if ($scope.currentZoom === 1.0) {
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom <= 0.4) {
       return;
     }
     toZoom = document.getElementById(name);
     $scope.currentZoom = $scope.currentZoom - 0.2;
     toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
     return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+  };
+  $scope.zoomOut = function(name) {
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom >= 1.0) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom + 0.2;
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+    transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+    toZoom.style.transform = transform;
+    toZoom.style.webkitTransform = toZoom.style.transform;
+    if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+      posX = -deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+      posY = -deltaHeight / 2;
+      changeY = true;
+    }
+    if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+      posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+      posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
+      changeY = true;
+    }
+    if (changeX === true || changeY === true) {
+      transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+      toZoom.style.transform = transform;
+      toZoom.style.webkitTransform = toZoom.style.transform;
+      changeX = false;
+      return changeY = false;
+    }
   };
   $scope.getPanorama = function() {
     return $scope.panorama.image;
@@ -454,6 +527,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
   $scope.skipValue = 0;
+  $scope.mute = false;
+  $scope.max = 80;
+  $scope.videoState = true;
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -463,10 +539,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     $scope.videoDiv.pause();
     return $location.path('#/dash/');
   };
+  $scope.update = function() {
+    return $scope.videoDiv.pause();
+  };
   $scope.seekRelease = function() {
     var currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
-    return $scope.videoDiv.currentTime = currentTime;
+    $scope.videoDiv.currentTime = currentTime;
+    if ($scope.videoState) {
+      return $scope.videoDiv.play();
+    }
   };
   $scope.volumeUp = function() {
     if ($scope.volume.value < 100) {
@@ -493,9 +575,120 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.videoPlay = function() {
     if ($scope.videoDiv.paused) {
-      return $scope.videoDiv.play();
+      $scope.videoDiv.play();
+      return $scope.videoState = true;
     } else {
-      return $scope.videoDiv.pause();
+      $scope.videoDiv.pause();
+      return $scope.videoState = false;
+    }
+  };
+  $scope.isMute = function() {
+    return $scope.mute;
+  };
+  $scope.setMute = function() {
+    return $scope.mute = !$scope.mute;
+  };
+  $scope.progressRelease = function($event) {
+    if ($event.gesture.deltaX > 0) {
+      if ($scope.volume.value >= 100) {
+        return $scope.volume.value = 100;
+      } else {
+        return $scope.volume.value = $scope.volume.value + 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    } else {
+      if ($scope.volume.value <= 0) {
+        return $scope.volume.value = 0;
+      } else {
+        return $scope.volume.value = $scope.volume.value - 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    }
+  };
+}).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location) {
+  $scope.video = Timelapses.get($stateParams.id);
+  $scope.videoDiv = document.getElementById('video');
+  $scope.seekBar = document.getElementById('seekbar');
+  $scope.volume = document.getElementById('volume');
+  $scope.skipValue = 0;
+  $scope.mute = false;
+  $scope.max = 80;
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.building_name = $scope.video.building_name;
+  $scope.videoState = true;
+  $scope.trustSrc = function(src) {
+    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  };
+  $scope.update = function() {
+    $scope.videoDiv.pause();
+    return $scope.videoState = true;
+  };
+  $scope.videoDiv.addEventListener('timeupdate', function() {
+    var value;
+    value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    $scope.seekBar.value = value;
+  });
+  $scope.closeBtn = function() {
+    $scope.videoDiv.pause();
+    return $location.path('#/dash/');
+  };
+  $scope.seekRelease = function() {
+    var currentTime;
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
+    $scope.videoDiv.currentTime = currentTime;
+    if ($scope.videoState) {
+      return $scope.videoDiv.play();
+    }
+  };
+  $scope.volumeUp = function() {
+    if ($scope.volume.value < 100) {
+      return $scope.volume.value = $scope.volume.value + 5;
+    } else {
+      return $scope.volume.value = 100;
+    }
+  };
+  $scope.volumeDown = function() {
+    if ($scope.volume.value > 0) {
+      return $scope.volume.value = $scope.volume.value - 5;
+    } else {
+      return $scope.volume.value = 0;
+    }
+  };
+  $scope.videoBack = function() {
+    return $scope.videoDiv.currentTime = 0;
+  };
+  $scope.videoBw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+  };
+  $scope.videoFw = function() {
+    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+  };
+  $scope.videoPlay = function() {
+    if ($scope.videoDiv.paused) {
+      $scope.videoDiv.play();
+      return $scope.videoState = true;
+    } else {
+      $scope.videoDiv.pause();
+      return $scope.videoState = false;
+    }
+  };
+  $scope.isMute = function() {
+    return $scope.mute;
+  };
+  $scope.setMute = function() {
+    return $scope.mute = !$scope.mute;
+  };
+  $scope.progressRelease = function($event) {
+    if ($event.gesture.deltaX > 0) {
+      if ($scope.volume.value >= 100) {
+        return $scope.volume.value = 100;
+      } else {
+        return $scope.volume.value = $scope.volume.value + 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
+    } else {
+      if ($scope.volume.value <= 0) {
+        return $scope.volume.value = 0;
+      } else {
+        return $scope.volume.value = $scope.volume.value - 5 / $scope.volume.getBoundingClientRect().width * $scope.max;
+      }
     }
   };
 }).controller('HomeCtrl', function($scope) {
@@ -577,8 +770,11 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         return;
       }
       return $timeout(function() {
-        var bufferX, bufferY, dragReady, fixPosXmax, fixPosXmin, halt, lastMaxX, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, posX, posY, rightXLimit, rotation, scale, square;
+        var bottomYLimit, bufferX, bufferY, changeX, changeY, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, pan, pass, posX, posY, rightXLimit, rotation, scale, scaleChange, square, topYLimit;
+        pan = document.getElementById("panorama_image");
         square = $element[0];
+        firstWidth = square.getBoundingClientRect().width;
+        firstHeight = square.getBoundingClientRect().height;
         posX = 0;
         posY = 0;
         lastPosX = 0;
@@ -590,51 +786,121 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         rotation = 0;
         last_rotation = void 0;
         dragReady = 0;
-        leftXLimit = 340;
-        rightXLimit = 1080;
-        fixPosXmin = 0;
-        fixPosXmax = 250;
+        leftXLimit = 44;
+        rightXLimit = 720;
+        topYLimit = 204;
+        bottomYLimit = 390;
         lastMaxX = 0;
-        halt = false;
+        lastMinX = 0;
+        lastMaxY = 0;
+        lastMinY = 0;
         max = 200;
+        oldScale = 0;
+        oldWidth = 0;
+        pass = false;
+        changeX = false;
+        changeY = false;
+        deltaHeight = 0;
+        deltaWidth = 0;
+        scaleChange = false;
         return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var transform;
+          var LastMinX, match, scalRgxp, transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
+          scalRgxp = /scale\((\d{1,}\.\d{1,})\)/;
+          match = e.target.style.transform.match(scalRgxp);
+          if (!match) {
+            match = [""];
+          } else {
+            if (oldScale !== match[1]) {
+              LastMinX = void 0;
+              oldScale = match[1];
+            }
+          }
           switch (e.type) {
             case 'touch':
               lastScale = scale;
-              break;
+              return console.log("TOUCH");
             case 'drag':
+              console.log("DRAG");
               posX = e.gesture.deltaX / square.getBoundingClientRect().width * max + lastPosX;
-              lastMaxX = posX;
-              halt = false;
-              if (posX > 249) {
-                posX = 249;
+              posY = e.gesture.deltaY / square.getBoundingClientRect().height * max + lastPosY;
+              deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+              deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+              transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
+              e.target.style.transform = transform;
+              e.target.style.webkitTransform = e.target.style.transform;
+              if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+                posX = -deltaWidth / 2;
+                changeX = true;
               }
-              if (posX <= 1) {
-                posX = 2;
+              if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+                posY = -deltaHeight / 2;
+                changeY = true;
+              }
+              if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+                posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+                posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
+                changeY = true;
+              }
+              if (changeX === true || changeY === true) {
+                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + match[0];
+                e.target.style.transform = transform;
+                e.target.style.webkitTransform = e.target.style.transform;
+                changeX = false;
+                return changeY = false;
               }
               break;
             case 'transform':
               scale = e.gesture.scale * lastScale;
+              if (scale !== lastScale) {
+                scaleChange = true;
+              }
+              if (scale > 1) {
+                scale = 1;
+              }
+              deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+              deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+              transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
+              e.target.style.transform = transform;
+              e.target.style.webkitTransform = e.target.style.transform;
+              if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+                posX = -deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+                posY = -deltaHeight / 2;
+                changeY = true;
+              }
+              if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+                posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
+                changeX = true;
+              }
+              if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+                posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
+                changeY = true;
+              }
+              if (changeX === true || changeY === true) {
+                transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + 'scale(' + scale + ')';
+                e.target.style.transform = transform;
+                e.target.style.webkitTransform = e.target.style.transform;
+                changeX = false;
+                return changeY = false;
+              }
               break;
             case 'dragend':
               lastPosX = posX;
-              lastScale = scale;
+              lastPosY = posY;
+              return lastScale = scale;
           }
-          transform = 'translate3d(' + posX + 'px, 0px, 0) ' + 'scale(' + scale + ')';
-          e.target.style.transform = transform;
-          return e.target.style.webkitTransform = transform;
         }), $element[0]);
       });
     }
   };
 });
-
-var current_server;
-
-current_server = "http://localhost:3000";
 
 angular.module('starter.services', []).factory('Buildings', function() {
   var models;
@@ -690,185 +956,44 @@ angular.module('starter.services', []).factory('Buildings', function() {
       }
     }
   };
-}).service('ActiveBuilding', function() {
-  var actives, name, tabName;
-  name = void 0;
-  tabName = "SELECT BUILDING";
-  actives = {};
-  return {
-    setName: function(new_name) {
-      if (actives[new_name] === "active") {
-        return actives[new_name] = void 0;
+}).service('HelperService', function(Buildings) {
+  this.sort_models = function(models) {
+    var hash, i, k, result, v;
+    hash = {};
+    result = [];
+    i = 0;
+    while (i < models.length) {
+      if (models[i].building_name === void 0) {
+        models[i].building_name = 'all';
+      }
+      if (hash[models[i].building_name] === void 0) {
+        hash[models[i].building_name] = [models[i]];
       } else {
-        return actives[new_name] = "active";
+        hash[models[i].building_name].push(models[i]);
       }
-    },
-    getName: function(new_name) {
-      if (actives[new_name] === "active") {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    isActive: function(q_name) {
-      if (angular.equals(name, q_name) || name === void 0) {
-        return true;
-      } else {
-        return false;
-      }
-    },
-    cancelAll: function() {
-      var k, results, v;
-      results = [];
-      for (k in actives) {
-        v = actives[k];
-        results.push(actives[k] = void 0);
-      }
-      return results;
+      i++;
     }
+    for (k in hash) {
+      v = hash[k];
+      result.push(v);
+    }
+    return result;
   };
-}).factory('Presentations', function() {
+}).factory('Presentations', function($http, HelperService) {
   var models;
-  models = [
-    {
-      id: 1,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 2,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 3,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 4,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 5,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 6,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 7,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 8,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 9,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 10,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 11,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 12,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 13,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 14,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 15,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 16,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 17,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 18,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 19,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '600 Second Street',
-      project_name: "600 Second Street"
-    }
-  ];
+  models = [];
   return {
     name: function() {
       return "Presentation";
     },
     sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      console.log(result, "PRES");
-      return result;
+      return $http.get('http://localhost:3000/presentations.json').then((function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      }), function(data) {
+        console.log("ERROR PRES");
+      });
     },
     all: function() {
       return models;
@@ -877,15 +1002,14 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
+      return $http.get('http://localhost:3000/presentations/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log("ERROR PRES");
+      });
     },
     getSlides: function(presentationId) {
       var slides;
@@ -924,7 +1048,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       ];
     }
   };
-}).factory('Renderings', function($http, Buildings) {
+}).factory('Renderings', function($http, Buildings, HelperService) {
   var models;
   models = [];
   return {
@@ -932,29 +1056,9 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Rendering";
     },
     sorted: function() {
-      var hash, i, result;
-      hash = {};
-      result = [];
-      i = 0;
       return $http.get('http://localhost:3000/renderings.json').then(function(response) {
-        var bld_name, k, v;
-        models = response.data;
-        while (i < models.length) {
-          bld_name = Buildings.get(models[i].building_id).name;
-          models[i].building_name = bld_name;
-          models[i].image.url = "http://localhost:3000/" + models[i].image.url;
-          if (hash[bld_name] === void 0) {
-            hash[bld_name] = [models[i]];
-          } else {
-            hash[bld_name].push(models[i]);
-          }
-          i++;
-        }
-        for (k in hash) {
-          v = hash[k];
-          result.push(v);
-        }
-        console.log(result, "RENDER");
+        var result;
+        result = HelperService.sort_models(response.data);
         return result;
       });
     },
@@ -980,51 +1084,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return null;
     }
   };
-}).factory('Views', function() {
+}).factory('Views', function($http, HelperService) {
   var models;
-  models = [
-    {
-      id: 1,
-      name: "View1",
-      image: 'img/assets/views/1.jpg',
-      building_name: '200 Massachusetts',
-      camera_name: '1'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'img/assets/views/2.jpg',
-      building_name: '200 Massachusetts',
-      camera_name: '2'
-    }, {
-      id: 3,
-      name: "View3",
-      image: 'img/assets/views/3.jpg',
-      building_name: '250 Massachusetts',
-      camera_name: '3'
-    }
-  ];
+  models = [];
   return {
     name: function() {
       return "View";
     },
     sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
+      return $http.get('http://localhost:3000/views.json').then(function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      });
     },
     all: function() {
       var j, len, model, newMod;
@@ -1054,48 +1126,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return models[0].camera_name;
     }
   };
-}).factory('Floorplans', function() {
+}).factory('Floorplans', function($http, HelperService) {
   var models;
-  models = [
-    {
-      id: 1,
-      name: "Floorplan1",
-      image: 'img/assets/floorplans/1.svg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 2,
-      name: "Floorplan2",
-      image: 'img/assets/floorplans/1.svg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 3,
-      name: "Floorplan3",
-      image: 'img/assets/floorplans/3.svg',
-      building_name: '250 Massachusetts'
-    }
-  ];
+  models = [];
   return {
     name: function() {
       return "Floorplan";
     },
     sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
+      return $http.get('http://localhost:3000/floorplans.json').then(function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      });
     },
     all: function() {
       return models;
@@ -1115,29 +1158,9 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return null;
     }
   };
-}).factory('Videos', function() {
+}).factory('Videos', function($http, HelperService) {
   var models;
-  models = [
-    {
-      id: 1,
-      name: "Video1",
-      image: 'img/assets/views/1.jpg',
-      building_name: '200 Massachusetts',
-      recording: 'img/assets/videos/1.mp4'
-    }, {
-      id: 2,
-      name: "Video2",
-      image: 'img/assets/views/2.jpg',
-      building_name: '200 Massachusetts',
-      recording: 'img/assets/videos/2.mp4'
-    }, {
-      id: 3,
-      name: "Video3",
-      image: 'img/assets/views/3.jpg',
-      building_name: '250 Massachusetts',
-      recording: 'img/assets/videos/3.mp4'
-    }
-  ];
+  models = [];
   return {
     getRecording: function(videoId) {
       var i;
@@ -1154,23 +1177,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Video";
     },
     sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
+      return $http.get('http://localhost:3000/videos.json').then((function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      }), function(data) {
+        console.log("ERROR PRES");
+      });
     },
     all: function() {
       return models;
@@ -1190,59 +1203,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return null;
     }
   };
-}).service('ActiveCamera', function() {
-  var name;
-  name = void 0;
-  return {
-    setName: function(new_name) {
-      return name = new_name;
-    },
-    getName: function(new_name) {
-      return name;
-    }
-  };
-}).factory('Webcams', function() {
+}).factory('Webcams', function($http, HelperService) {
   var models;
-  models = [
-    {
-      id: 1,
-      name: "Webcam1",
-      image: 'img/assets/webcams/1.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 2,
-      name: "Webcam2",
-      image: 'img/assets/webcams/2.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 3,
-      name: "Webcam3",
-      image: 'img/assets/webcams/3.jpg',
-      building_name: '250 Massachusetts'
-    }
-  ];
+  models = [];
   return {
     name: function() {
       return "Webcam";
     },
     sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
+      return $http.get('http://localhost:3000/cameras.json').then(function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      });
     },
     all: function() {
       return models;
@@ -1288,6 +1261,53 @@ angular.module('starter.services', []).factory('Buildings', function() {
       ];
     }
   };
+}).factory('Timelapses', function() {
+  var models;
+  models = [];
+  return {
+    getRecording: function(videoId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(videoId)) {
+          return models[i].recording;
+        }
+        i++;
+      }
+      return null;
+    },
+    name: function() {
+      return "Timelapse";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(chatId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).service('ActiveCamera', function() {
+  var name;
+  name = void 0;
+  return {
+    setName: function(new_name) {
+      return name = new_name;
+    },
+    getName: function(new_name) {
+      return name;
+    }
+  };
 }).factory('Panoramas', function() {
   var models;
   models = [
@@ -1322,6 +1342,83 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     getWebcamName: function(panId) {
       return models[0].camera_name;
+    }
+  };
+}).service('ActiveBuilding', function() {
+  var actives, name, tabName;
+  name = void 0;
+  tabName = "SELECT BUILDING";
+  actives = {};
+  return {
+    setName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return actives[new_name] = void 0;
+      } else {
+        return actives[new_name] = "active";
+      }
+    },
+    getName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isActive: function(q_name) {
+      if (actives[q_name] === 'active') {
+        return true;
+      }
+    },
+    cancelAll: function() {
+      var k, results, v;
+      results = [];
+      for (k in actives) {
+        v = actives[k];
+        results.push(actives[k] = void 0);
+      }
+      return results;
+    }
+  };
+}).service('ActiveCrestron', function() {
+  var actives, name, tabName;
+  name = void 0;
+  tabName = "SELECT BUILDING";
+  actives = {};
+  return {
+    setName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return actives[new_name] = void 0;
+      } else {
+        return actives[new_name] = "active";
+      }
+    },
+    getName: function(new_name) {
+      if (actives[new_name] === "active") {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    isActive: function(q_name) {
+      if (actives[q_name] === 'active') {
+        return true;
+      }
+    },
+    cancelAll: function() {
+      var k, results, v;
+      results = [];
+      for (k in actives) {
+        v = actives[k];
+        results.push(actives[k] = void 0);
+      }
+      return results;
+    },
+    setAll: function() {
+      actives['200 Massachusetts'] = 'active';
+      actives['250 Massachusetts'] = 'active';
+      actives['600 Second Street'] = 'active';
+      actives['201 F Street'] = 'active';
+      return actives['200 F Street'] = 'active';
     }
   };
 }).factory('TopmenuState', function() {
