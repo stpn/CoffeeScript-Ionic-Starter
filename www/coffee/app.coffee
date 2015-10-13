@@ -31,7 +31,7 @@ angular.module('starter', [
     url: '/videos/:id'
     views: 'tab-dash':
       templateUrl: 'templates/Videos/videoPlayer.html'
-      controller: 'VideoPlayerCtrl').state('tab.timelapses',
+      controller: 'VideoCtrl').state('tab.timelapses',
     
     url: '/timelapses/:id'
     views: 'webcams':
@@ -48,7 +48,7 @@ angular.module('starter', [
       templateUrl: 'templates/home.html'
       controller: 'HomeCtrl').state('tab.panoramas',
     
-    url: '/panoramas/:id'
+    url: '/panoramas/:cameraId'
     views: 'webcams':
       templateUrl: 'templates/panoramas/panorama.html'
       controller: 'PanoramasCtrl').state('tab.webcams',

@@ -76,6 +76,21 @@ angular.module('starter.services', []).factory('Buildings', ->
       result.push(v)    
     result
 
+
+  @sort_snapshots = (models) ->
+    hash = {}
+    result = []
+    i = 0  
+    while i < models.length
+      if hash[models[i].camera_name] == undefined
+        hash[models[i].camera_name] = [models[i]]
+      else
+        hash[models[i].camera_name].push models[i]
+      i++
+    for k,v of hash
+      result.push(v)    
+    result    
+
   return
 
 ).factory('Presentations',($http, HelperService)  ->
@@ -203,12 +218,13 @@ angular.module('starter.services', []).factory('Buildings', ->
       models.splice models.indexOf(chat), 1
       return
     get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
+      $http.get('http://localhost:3000/views/'+String(chatId)+'.json').then ((response) ->        
+        # console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log "ERROR View"
+        return
     getWebcamName: (panId) ->
       models[0].camera_name
 
@@ -242,13 +258,7 @@ angular.module('starter.services', []).factory('Buildings', ->
 ).factory('Videos', ($http, HelperService) ->
   models = []
   {
-    getRecording: (videoId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(videoId)
-          return models[i].recording
-        i++
-      null
+
     name: ->
      "Video"
 
@@ -266,12 +276,13 @@ angular.module('starter.services', []).factory('Buildings', ->
       models.splice models.indexOf(chat), 1
       return
     get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
+      $http.get('http://localhost:3000/videos/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log "ERROR Video"
+        return
 
   }
 
@@ -281,23 +292,32 @@ angular.module('starter.services', []).factory('Buildings', ->
     name: ->
      "Webcam"        
 
-    sorted: ->
-      $http.get('http://localhost:3000/cameras.json').then (response) ->        
-        result = HelperService.sort_models(response.data)
-        result
+    # sorted: ->
+    #   $http.get('http://localhost:3000/cameras.json').then (response) ->        
+    #     result = HelperService.sort_models(response.data)
+    #     result
 
     all: ->
-      models
+      $http.get('http://localhost:3000/cameras.json').then ((response) ->        
+        console.log response
+        models = response.data
+        models
+      ), (data) ->
+        console.log "ERROR Cameras"
+        return
+
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
-    get: (chatId) ->
+
+    getLocal: (camId) ->
       i = 0
       while i < models.length
-        if models[i].id == parseInt(chatId)
+        if models[i].id == parseInt(camId)
           return models[i]
         i++
       null
+
     getPanoramas: (chatId) ->
       [
         {
@@ -355,18 +375,30 @@ angular.module('starter.services', []).factory('Buildings', ->
 
   }
 
-).service('ActiveCamera', ->
-  name = undefined
+).service('Snapshots', (HelperService, $http) ->
 
-  {
-    setName: (new_name) ->
-      name = new_name
+    name: ->
+     "Screenshot" 
 
-    getName: (new_name) ->
-      name
-  }
+    sorted: ->
+      $http.get('http://localhost:3000/snapshots.json').then ((response) ->        
+        result = HelperService.sort_snapshots(response.data)
+        result
+      ), (data) ->
+        console.log "ERROR Snapshot"
+        return        
 
-).factory('Panoramas', ->
+    get: (chatId) ->
+      $http.get('http://localhost:3000/snapshots/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log "ERROR Snapshot"
+        return
+
+
+).factory('Panoramas', ($http) ->
   models = [
     {
       id: 1
@@ -384,17 +416,33 @@ angular.module('starter.services', []).factory('Buildings', ->
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
+
+    get_by_camera: (camera_id) ->
+      $http.get('http://localhost:3000/panorama_by_camera/'+String(camera_id)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log "ERROR Panorama"
+        return
+
     getWebcamName: (panId) ->
       models[0].camera_name
 
   }
+
+
+).service('ActiveCamera', ->
+  name = undefined
+
+  {
+    setName: (new_name) ->
+      name = new_name
+
+    getName: (new_name) ->
+      name
+  }
+
 ).service('ActiveBuilding', ->
   name = undefined
   tabName = "SELECT BUILDING"

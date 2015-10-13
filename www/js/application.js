@@ -32,7 +32,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     views: {
       'tab-dash': {
         templateUrl: 'templates/Videos/videoPlayer.html',
-        controller: 'VideoPlayerCtrl'
+        controller: 'VideoCtrl'
       }
     }
   }).state('tab.timelapses', {
@@ -60,7 +60,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   }).state('tab.panoramas', {
-    url: '/panoramas/:id',
+    url: '/panoramas/:cameraId',
     views: {
       'webcams': {
         templateUrl: 'templates/panoramas/panorama.html',
@@ -95,17 +95,18 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/home');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $q, $http, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $q, $http, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) {
   $scope.presentations = {};
-  $scope.factories = [["Presentations"], ["Videos"], ["Floor Plans"], ["Renderings"], ["Views"], ["Webcams"]];
-  Renderings.sorted().then(function(reports) {
-    $scope.factories[3].push(reports);
-  });
-  angular.forEach([Presentations, Videos, Floorplans, Renderings, Views, Webcams], function(factory, index) {
+  $scope.factories = [["Presentations"], ["Videos"], ["Floor Plans"], ["Renderings"], ["Views"]];
+  $scope.snapshots = [["Webcams"]];
+  angular.forEach([Presentations, Videos, Floorplans, Renderings, Views], function(factory, index) {
     console.log(factory, index);
     return factory.sorted().then(function(reports) {
       return $scope.factories[index].push(reports);
     });
+  });
+  Snapshots.sorted().then(function(reports) {
+    $scope.snapshots[0].push(reports);
   });
   $scope.activeBuilding = ActiveBuilding;
   $scope.activeBuildingName = void 0;
@@ -298,15 +299,30 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.buildings = "#/tab/buildings";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.id);
-}).controller('WebcamsCtrl', function($scope, $log, Webcams) {
-  $scope.webcams = Webcams.all();
+}).controller('WebcamsCtrl', function($scope, $log, Webcams, $state) {
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
   $scope.nowLive4 = false;
+  $scope.activeWebcamId = void 0;
+  Webcams.all().then(function(reports) {
+    $scope.webcams = reports;
+  });
+  $scope.viewPano = function() {
+    if ($scope.activeWebcam) {
+      if ($scope.activeWebcam.panoramas_count === 0) {
+        return 1;
+      } else {
+        return $state.go('tab.panoramas', {
+          cameraId: $scope.activeWebcamId
+        });
+      }
+    }
+  };
   $scope.isActive = function(item) {
+    console.log(item);
     if ($scope.activeWebcam === void 0) {
       return false;
-    } else if ($scope.activeWebcam.id === item) {
+    } else if ($scope.activeWebcam.id === item.id) {
       return true;
     } else {
       return false;
@@ -318,11 +334,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setZoom = function(val) {
     return $scope.currentZoom = val;
   };
-  $scope.setActiveWebcam = function(activeWebcamId) {
-    $scope.selected = activeWebcamId;
-    $scope.activeWebcam = Webcams.get(activeWebcamId);
-    $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
-    $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
+  $scope.setActiveWebcam = function(activeWebcam) {
+    $scope.activeWebcamId = activeWebcam.id;
+    $scope.activeWebcam = Webcams.getLocal($scope.activeWebcamId);
+    console.log($scope.activeWebcam, "ACTIVE");
     $scope.nowLive = false;
     $scope.nowLive4 = false;
     $scope.nowPano = false;
@@ -387,7 +402,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 }).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.id);
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
   $scope.building_name = $scope.video.building_name;
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
@@ -458,8 +473,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
   var firstHeight, firstWidth, pan, posX, posY, square;
-  $scope.panorama = Panoramas.get($stateParams.id);
-  $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
   $scope.currentZoom = 1.0;
   square = document.getElementById("square");
   posX = 0;
@@ -467,6 +480,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   pan = document.getElementById("panorama_image");
   firstWidth = square.getBoundingClientRect().width;
   firstHeight = square.getBoundingClientRect().height;
+  Panoramas.get_by_camera($stateParams.cameraId).then(function(result) {
+    $scope.panorama = result;
+    $scope.webcam_name = $scope.panorama.webcam_name;
+    return $scope.image_url = $scope.panorama.image.url;
+  });
   $scope.zoomIn = function(name) {
     var toZoom;
     console.log($scope.currentZoom);
@@ -521,8 +539,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   return $scope.getCamera = function() {
     return 1;
   };
-}).controller('VideoCtrl', function($scope, $stateParams, Videos, $location) {
-  $scope.video = Videos.get($stateParams.id);
+}).controller('VideoCtrl', function($scope, $sce, $log, $stateParams, Videos, $location) {
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
@@ -530,6 +547,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.mute = false;
   $scope.max = 80;
   $scope.videoState = true;
+  Videos.get($stateParams.id).then(function(result) {
+    $scope.video = result;
+    console.log($scope.video.recording.url, "URL");
+    $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
+    return $scope.building_name = $scope.video.building_name;
+  });
+  $scope.trustSrc = function(src) {
+    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  };
+  $scope.postVideoId = function(videoId) {};
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -701,8 +728,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $location.path(path);
   };
 }).controller('ViewsCtrl', function($scope, $stateParams, Views, ActiveCamera, $ionicHistory) {
-  $scope.view = Views.get($stateParams.id);
-  $scope.webcam_name = Views.getWebcamName($stateParams.id);
+  Views.get($stateParams.id).then(function(result) {
+    $scope.view = result;
+    $scope.building_name = $scope.view.building_name;
+    $scope.imageUrl = $scope.view.image.url;
+    return console.log($scope.view, "VIEW");
+  });
   $scope.getView = function() {
     return $scope.view.image;
   };
@@ -979,6 +1010,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
     }
     return result;
   };
+  this.sort_snapshots = function(models) {
+    var hash, i, k, result, v;
+    hash = {};
+    result = [];
+    i = 0;
+    while (i < models.length) {
+      if (hash[models[i].camera_name] === void 0) {
+        hash[models[i].camera_name] = [models[i]];
+      } else {
+        hash[models[i].camera_name].push(models[i]);
+      }
+      i++;
+    }
+    for (k in hash) {
+      v = hash[k];
+      result.push(v);
+    }
+    return result;
+  };
 }).factory('Presentations', function($http, HelperService) {
   var models;
   models = [];
@@ -1112,15 +1162,13 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
+      return $http.get('http://localhost:3000/views/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log("ERROR View");
+      });
     },
     getWebcamName: function(panId) {
       return models[0].camera_name;
@@ -1162,17 +1210,6 @@ angular.module('starter.services', []).factory('Buildings', function() {
   var models;
   models = [];
   return {
-    getRecording: function(videoId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(videoId)) {
-          return models[i].recording;
-        }
-        i++;
-      }
-      return null;
-    },
     name: function() {
       return "Video";
     },
@@ -1192,15 +1229,14 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
+      return $http.get('http://localhost:3000/videos/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log("ERROR Video");
+      });
     }
   };
 }).factory('Webcams', function($http, HelperService) {
@@ -1210,24 +1246,23 @@ angular.module('starter.services', []).factory('Buildings', function() {
     name: function() {
       return "Webcam";
     },
-    sorted: function() {
-      return $http.get('http://localhost:3000/cameras.json').then(function(response) {
-        var result;
-        result = HelperService.sort_models(response.data);
-        return result;
-      });
-    },
     all: function() {
-      return models;
+      return $http.get('http://localhost:3000/cameras.json').then((function(response) {
+        console.log(response);
+        models = response.data;
+        return models;
+      }), function(data) {
+        console.log("ERROR Cameras");
+      });
     },
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);
     },
-    get: function(chatId) {
+    getLocal: function(camId) {
       var i;
       i = 0;
       while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
+        if (models[i].id === parseInt(camId)) {
           return models[i];
         }
         i++;
@@ -1297,18 +1332,32 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return null;
     }
   };
-}).service('ActiveCamera', function() {
-  var name;
-  name = void 0;
+}).service('Snapshots', function(HelperService, $http) {
   return {
-    setName: function(new_name) {
-      return name = new_name;
+    name: function() {
+      return "Screenshot";
     },
-    getName: function(new_name) {
-      return name;
+    sorted: function() {
+      return $http.get('http://localhost:3000/snapshots.json').then((function(response) {
+        var result;
+        result = HelperService.sort_snapshots(response.data);
+        return result;
+      }), function(data) {
+        console.log("ERROR Snapshot");
+      });
+    },
+    get: function(chatId) {
+      return $http.get('http://localhost:3000/snapshots/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log("ERROR Snapshot");
+      });
     }
   };
-}).factory('Panoramas', function() {
+}).factory('Panoramas', function($http) {
   var models;
   models = [
     {
@@ -1329,19 +1378,29 @@ angular.module('starter.services', []).factory('Buildings', function() {
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);
     },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
+    get_by_camera: function(camera_id) {
+      return $http.get('http://localhost:3000/panorama_by_camera/' + String(camera_id) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log("ERROR Panorama");
+      });
     },
     getWebcamName: function(panId) {
       return models[0].camera_name;
+    }
+  };
+}).service('ActiveCamera', function() {
+  var name;
+  name = void 0;
+  return {
+    setName: function(new_name) {
+      return name = new_name;
+    },
+    getName: function(new_name) {
+      return name;
     }
   };
 }).service('ActiveBuilding', function() {

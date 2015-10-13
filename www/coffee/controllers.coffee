@@ -1,16 +1,20 @@
-angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $http, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) -> 
+angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $http, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) -> 
   $scope.presentations = {}  
-  $scope.factories = [["Presentations"], ["Videos"],  ["Floor Plans"], ["Renderings"], ["Views"],  ["Webcams"]]
+  $scope.factories = [["Presentations"], ["Videos"],  ["Floor Plans"], ["Renderings"], ["Views"]]
+  $scope.snapshots = [["Webcams"]]
 
-  Renderings.sorted().then (reports) ->
-    $scope.factories[3].push(reports)
-    return
+  # Renderings.sorted().then (reports) ->
+  #   $scope.factories[3].push(reports)
+  #   return
 
-  angular.forEach [Presentations, Videos, Floorplans, Renderings, Views, Webcams], (factory, index) ->
+  angular.forEach [Presentations, Videos, Floorplans, Renderings, Views], (factory, index) ->
     console.log factory, index
     factory.sorted().then (reports) ->
       $scope.factories[index].push(reports)
 
+  Snapshots.sorted().then (reports) ->
+    $scope.snapshots[0].push(reports)
+    return
 
 
   $scope.activeBuilding = ActiveBuilding
@@ -227,21 +231,33 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   return
 
 
-).controller('WebcamsCtrl', ($scope, $log, Webcams) ->
-  $scope.webcams = Webcams.all()
+).controller('WebcamsCtrl', ($scope, $log, Webcams, $state) ->
   $scope.activeWebcam = undefined
   $scope.nowLive = false
   $scope.nowLive4 = false
+  $scope.activeWebcamId = undefined
 
-  
+
+
+  Webcams.all().then (reports) ->
+    $scope.webcams = reports
+    return  
+
+
+  $scope.viewPano = ->
+    if $scope.activeWebcam
+      if $scope.activeWebcam.panoramas_count == 0
+        return 1
+      else
+        $state.go('tab.panoramas', ({cameraId : $scope.activeWebcamId}) );
+
   # $scope.panoramas = undefined
   # $scope.timelapses = undefined
 
   $scope.isActive = (item) ->
-    #console.log $scope.activeWebcam
     if $scope.activeWebcam == undefined
       false
-    else if $scope.activeWebcam.id == item
+    else if $scope.activeWebcam.id == item.id
       true
     else
       false
@@ -253,11 +269,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.currentZoom = val
 
 
-  $scope.setActiveWebcam = (activeWebcamId) ->   
-    $scope.selected = activeWebcamId
-    $scope.activeWebcam = Webcams.get(activeWebcamId)
-    $scope.panoramas = Webcams.getPanoramas(activeWebcamId)
-    $scope.timelapses = Webcams.getTimelapses(activeWebcamId)
+  $scope.setActiveWebcam = (activeWebcam) ->   
+    $scope.activeWebcamId = activeWebcam.id
+    $scope.activeWebcam = Webcams.getLocal($scope.activeWebcamId)
+    #$scope.timelapses = Webcams.getTimelapses(activeWebcamId)
     $scope.nowLive = false
     $scope.nowLive4 = false
     $scope.nowPano = false
@@ -336,7 +351,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   $scope.video = Videos.get($stateParams.id)
   #$log.debug($scope.video.recording);
 
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
 
   $scope.building_name = $scope.video.building_name 
   
@@ -428,8 +443,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
 
 ).controller('PanoramasCtrl', ($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) ->
-  $scope.panorama = Panoramas.get($stateParams.id)
-  $scope.webcam_name = Panoramas.getWebcamName($stateParams.id)
+  
+  #$scope.webcam_name = Panoramas.getWebcamName($stateParams.id)
   #console.log $scope.panorama.image
   $scope.currentZoom = 1.0
   square = document.getElementById("square")
@@ -439,25 +454,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   firstWidth = square.getBoundingClientRect().width
   firstHeight = square.getBoundingClientRect().height
 
-  # $scope.zoomIn = (name) ->
-  #   console.log $scope.currentZoom
-  #   if $scope.currentZoom <= 0.4 
-  #     return             
-  #   toZoom = document.getElementById(name)
-  #   $scope.currentZoom = $scope.currentZoom - 0.2
-  #   toZoom.style.width = toZoom.style.width
-  #   # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
-  #   # toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
-
-  # $scope.zoomOut = (name) ->
-  #   console.log $scope.currentZoom 
-  #   if $scope.currentZoom >= 1.0 
-  #     return
-  #   toZoom = document.getElementById(name)
-  #   $scope.currentZoom = $scope.currentZoom + 0.2
-  #   # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
-  #   # toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
-
+  Panoramas.get_by_camera($stateParams.cameraId).then (result) ->
+    $scope.panorama = result
+    $scope.webcam_name = $scope.panorama.webcam_name
+    $scope.image_url = $scope.panorama.image.url
 
 
   $scope.zoomIn = (name) ->
@@ -518,8 +518,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   $scope.getCamera =  ->
     1
 
-).controller('VideoCtrl', ($scope, $stateParams, Videos, $location) ->
-  $scope.video = Videos.get($stateParams.id)
+).controller('VideoCtrl', ($scope, $sce, $log,  $stateParams, Videos, $location) ->
   $scope.videoDiv = document.getElementById('video')
   $scope.seekBar = document.getElementById('seekbar')
   $scope.volume = document.getElementById('volume')
@@ -527,6 +526,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   $scope.mute = false
   $scope.max = 80
   $scope.videoState = true
+
+  Videos.get($stateParams.id).then (result) ->
+    $scope.video = result
+    console.log $scope.video.recording.url, "URL"
+    $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
+    $scope.building_name = $scope.video.building_name 
+
+
+  
+  $scope.trustSrc = (src) ->
+    $scope.videos = $sce.getTrustedResourceUrl(src);
+
+  $scope.postVideoId = (videoId) ->  
 
   $scope.videoDiv.addEventListener 'timeupdate', ->
     # console.log 'test'
@@ -715,8 +727,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
 
 ).controller 'ViewsCtrl', ($scope, $stateParams, Views, ActiveCamera, $ionicHistory) ->
-  $scope.view = Views.get($stateParams.id)
-  $scope.webcam_name = Views.getWebcamName($stateParams.id)
+
+  Views.get($stateParams.id).then (result) ->
+    $scope.view = result
+    $scope.building_name = $scope.view.building_name 
+    $scope.imageUrl = $scope.view.image.url
+    console.log $scope.view, "VIEW"
+
+
 
   $scope.getView =  ->
     $scope.view.image

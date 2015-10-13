@@ -21,13 +21,13 @@
 
     <div class="camera_buttons">
     <div class ="button_columns">
-        <ion-item class="camera1 short_btn" ng-click="setActiveWebcam(1)" ng-class="{active: isActive(1)}">CAMERA 1</ion-item>
-        <ion-item class="camera2 short_btn" ng-click="setActiveWebcam(2)" ng-class="{active: isActive(2)}">CAMERA 2</ion-item>
-        <ion-item class="camera3 short_btn" ng-click="setActiveWebcam(3)" ng-class="{active: isActive(3)}" >CAMERA 3</ion-item>
+        <ion-item class="camera1 short_btn" ng-click="setActiveWebcam(webcams[0])" ng-class="{active: isActive(webcams[0])}">CAMERA 1</ion-item>
+        <ion-item class="camera2 short_btn" ng-click="setActiveWebcam(webcams[1])" ng-class="{active: isActive(webcams[1])}">CAMERA 2</ion-item>
+        <ion-item class="camera3 short_btn" ng-click="setActiveWebcam(webcams[2])" ng-class="{active: isActive(webcams[2])}" >CAMERA 3</ion-item>
 
         <ion-item class="live short_btn" ng-click="setLive()" ng-class="{active: isLive()}">LIVE FEED</ion-item>
         </div>
-        <ion-item class="panorama" ui-sref="tab.panoramas({id : 1})"  ng-class="{active: isPano()}">PANORAMA</ion-item>
+        <ion-item class="panorama" ng-click="viewPano()"  ng-class="{active: isPano(), disabled: noPano()}">PANORAMA</ion-item>
     </div>
     <div id="webcam_assets" has-bouncing="false">
         <ion-list >
