@@ -332,21 +332,10 @@ angular.module('starter.services', []).factory('Buildings', ->
         }    
       ]      
 
-    getTimelapses: (chatId) ->
-      [
-        {
-          id: 1
-          name: "Video1"
-          image: 'img/assets/webcams/1.jpg'
-        },
-        {
-          id: 2
-          name: "Video2"
-          image: 'img/assets/webcams/2.jpg'
-        }    
-      ] 
+   
+
   }
-).factory('Timelapses', ->
+).factory('Timelapses',($http) ->
   models = []
   {
     getRecording: (videoId) ->
@@ -359,6 +348,22 @@ angular.module('starter.services', []).factory('Buildings', ->
 
     name: ->
      "Timelapse"
+
+    getForCamera: (cameraId) ->
+      $http.get('http://localhost:3000/timelapses_by_camera/'+cameraId+'.json').then ((response) ->        
+        models = response.data
+        models
+      ), (data) ->
+        console.log "ERROR Timelapses"
+        return   
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
 
     all: ->
       models

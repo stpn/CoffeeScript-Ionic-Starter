@@ -231,7 +231,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   return
 
 
-).controller('WebcamsCtrl', ($scope, $log, Webcams, $state) ->
+).controller('WebcamsCtrl', ($scope, $log, Webcams, Timelapses, $state) ->
   $scope.activeWebcam = undefined
   $scope.nowLive = false
   $scope.nowLive4 = false
@@ -243,6 +243,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.webcams = reports
     return  
 
+  $scope.noPano = ->
+    if $scope.activeWebcam
+      if $scope.activeWebcam.panoramas_count == 0
+        return true
+    else
+      return true
 
   $scope.viewPano = ->
     if $scope.activeWebcam
@@ -271,11 +277,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
   $scope.setActiveWebcam = (activeWebcam) ->   
     $scope.activeWebcamId = activeWebcam.id
-    $scope.activeWebcam = Webcams.getLocal($scope.activeWebcamId)
-    #$scope.timelapses = Webcams.getTimelapses(activeWebcamId)
+    $scope.activeWebcam = Webcams.getLocal($scope.activeWebcamId)    
     $scope.nowLive = false
     $scope.nowLive4 = false
     $scope.nowPano = false
+    Timelapses.getForCamera($scope.activeWebcamId).then (timelapses) ->
+      $scope.timelapses = timelapses
 
     $log.debug($scope.panoramas)
 
@@ -290,15 +297,21 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
   $scope.setLive = ->
     $scope.nowLive = !$scope.nowLive
-    $scope.activeWebcam = undefined
+    $scope.resetEverything()
     $scope.nowLive4 = false
 
   $scope.setLive4 = ->
     $scope.nowLive4 = !$scope.nowLive4
-    $scope.activeWebcam = undefined
+    $scope.resetEverything()
     $scope.nowLive = false
 
   
+  $scope.resetEverything = ->
+    $scope.activeWebcam = undefined
+    $scope.activeWebcamId = undefined
+    $scope.timelapses = undefined
+    $scope.shownGroup = null    
+
   $scope.isLive4 = ->
     $scope.nowLive4
 
@@ -614,26 +627,33 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
   return
 
-).controller('TimelapsesCtrl', ($scope, $sce, $log, $stateParams,  Timelapses, $location) ->
-  $scope.video = Timelapses.get($stateParams.id)
+).controller('TimelapsesCtrl', ($scope, $sce, $log,  $stateParams, Timelapses, $location) ->
   $scope.videoDiv = document.getElementById('video')
   $scope.seekBar = document.getElementById('seekbar')
   $scope.volume = document.getElementById('volume')
   $scope.skipValue = 0
   $scope.mute = false
   $scope.max = 80
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording)
-  $scope.building_name = $scope.video.building_name 
   $scope.videoState = true
 
+  # Timelapses.get($stateParams.id).then (result) ->
+  #   $scope.video = result
+  #   console.log $scope.video.recording.url, "URL"
+  #   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
+  #   $scope.building_name = $scope.video.building_name 
+
+
+#  Timelapses.get($stateParams.id).then (result) ->
+  $scope.video = Timelapses.getLocal($stateParams.id)
+  console.log $scope.video.recording.url, "URL"
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
+  $scope.building_name = $scope.video.building_name 
+
+  
   $scope.trustSrc = (src) ->
     $scope.videos = $sce.getTrustedResourceUrl(src);
 
-
-  $scope.update = ->
-    $scope.videoDiv.pause()
-    $scope.videoState = true
-
+  $scope.postVideoId = (videoId) ->  
 
   $scope.videoDiv.addEventListener 'timeupdate', ->
     # console.log 'test'
@@ -642,18 +662,18 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     #console.log value
     $scope.seekBar.value = value
     return
-
   $scope.closeBtn =() ->
     $scope.videoDiv.pause()
     $location.path('#/dash/')
+
+  $scope.update = ->
+    $scope.videoDiv.pause()
 
   $scope.seekRelease = ->
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
     $scope.videoDiv.currentTime = currentTime;
     if $scope.videoState
       $scope.videoDiv.play()
-      
-
 
   $scope.volumeUp = ->
     #console.log 'UP'
@@ -706,8 +726,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       else
         $scope.volume.value = $scope.volume.value - 5/$scope.volume.getBoundingClientRect().width * $scope.max
 
-
-  return
 
 
 ).controller('HomeCtrl', ($scope) ->

@@ -19092,6 +19092,8 @@ progress::-webkit-progress-value {
     max-width: 500px; }
   .camera_buttons .panorama.active {
     background: #999 !important; }
+  .camera_buttons ion-item.disabled {
+    color: gray !important; }
 
 #webcam_content {
   width: 696px;

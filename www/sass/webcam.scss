@@ -71,6 +71,16 @@
     .panorama.active {
         background: #999 !important;
     }
+
+    ion-item.disabled{
+        
+        color: gray !important;
+        // a{
+        //   color: red !important;
+        // }
+    }
+
+    
 }
 
 #webcam_content {

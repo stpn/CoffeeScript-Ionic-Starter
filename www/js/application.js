@@ -299,7 +299,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.buildings = "#/tab/buildings";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.id);
-}).controller('WebcamsCtrl', function($scope, $log, Webcams, $state) {
+}).controller('WebcamsCtrl', function($scope, $log, Webcams, Timelapses, $state) {
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
   $scope.nowLive4 = false;
@@ -307,6 +307,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   Webcams.all().then(function(reports) {
     $scope.webcams = reports;
   });
+  $scope.noPano = function() {
+    if ($scope.activeWebcam) {
+      if ($scope.activeWebcam.panoramas_count === 0) {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  };
   $scope.viewPano = function() {
     if ($scope.activeWebcam) {
       if ($scope.activeWebcam.panoramas_count === 0) {
@@ -319,7 +328,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.isActive = function(item) {
-    console.log(item);
     if ($scope.activeWebcam === void 0) {
       return false;
     } else if ($scope.activeWebcam.id === item.id) {
@@ -337,10 +345,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setActiveWebcam = function(activeWebcam) {
     $scope.activeWebcamId = activeWebcam.id;
     $scope.activeWebcam = Webcams.getLocal($scope.activeWebcamId);
-    console.log($scope.activeWebcam, "ACTIVE");
     $scope.nowLive = false;
     $scope.nowLive4 = false;
     $scope.nowPano = false;
+    Timelapses.getForCamera($scope.activeWebcamId).then(function(timelapses) {
+      return $scope.timelapses = timelapses;
+    });
     return $log.debug($scope.panoramas);
   };
   $scope.isEnabled = function(model) {
@@ -354,13 +364,19 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.setLive = function() {
     $scope.nowLive = !$scope.nowLive;
-    $scope.activeWebcam = void 0;
+    $scope.resetEverything();
     return $scope.nowLive4 = false;
   };
   $scope.setLive4 = function() {
     $scope.nowLive4 = !$scope.nowLive4;
-    $scope.activeWebcam = void 0;
+    $scope.resetEverything();
     return $scope.nowLive = false;
+  };
+  $scope.resetEverything = function() {
+    $scope.activeWebcam = void 0;
+    $scope.activeWebcamId = void 0;
+    $scope.timelapses = void 0;
+    return $scope.shownGroup = null;
   };
   $scope.isLive4 = function() {
     return $scope.nowLive4;
@@ -631,23 +647,21 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location) {
-  $scope.video = Timelapses.get($stateParams.id);
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
-  $scope.building_name = $scope.video.building_name;
   $scope.videoState = true;
+  $scope.video = Timelapses.getLocal($stateParams.id);
+  console.log($scope.video.recording.url, "URL");
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
+  $scope.building_name = $scope.video.building_name;
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
-  $scope.update = function() {
-    $scope.videoDiv.pause();
-    return $scope.videoState = true;
-  };
+  $scope.postVideoId = function(videoId) {};
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -656,6 +670,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.closeBtn = function() {
     $scope.videoDiv.pause();
     return $location.path('#/dash/');
+  };
+  $scope.update = function() {
+    return $scope.videoDiv.pause();
   };
   $scope.seekRelease = function() {
     var currentTime;
@@ -703,7 +720,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setMute = function() {
     return $scope.mute = !$scope.mute;
   };
-  $scope.progressRelease = function($event) {
+  return $scope.progressRelease = function($event) {
     if ($event.gesture.deltaX > 0) {
       if ($scope.volume.value >= 100) {
         return $scope.volume.value = 100;
@@ -1281,22 +1298,9 @@ angular.module('starter.services', []).factory('Buildings', function() {
           image: 'img/assets/panoramas/2.jpg'
         }
       ];
-    },
-    getTimelapses: function(chatId) {
-      return [
-        {
-          id: 1,
-          name: "Video1",
-          image: 'img/assets/webcams/1.jpg'
-        }, {
-          id: 2,
-          name: "Video2",
-          image: 'img/assets/webcams/2.jpg'
-        }
-      ];
     }
   };
-}).factory('Timelapses', function() {
+}).factory('Timelapses', function($http) {
   var models;
   models = [];
   return {
@@ -1313,6 +1317,25 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     name: function() {
       return "Timelapse";
+    },
+    getForCamera: function(cameraId) {
+      return $http.get('http://localhost:3000/timelapses_by_camera/' + cameraId + '.json').then((function(response) {
+        models = response.data;
+        return models;
+      }), function(data) {
+        console.log("ERROR Timelapses");
+      });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
     },
     all: function() {
       return models;
