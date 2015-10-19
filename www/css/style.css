@@ -19181,3 +19181,63 @@ progress::-webkit-progress-value {
     font-size: 60px;
     text-align: center;
     line-height: 60px; }
+
+.center {
+  min-width: 102px;
+  min-height: 102px;
+  float: left; }
+
+.cross {
+  width: 500px;
+  height: 491px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 200px; }
+  .cross .container_h,
+  .cross .container_v {
+    margin-left: auto;
+    margin-right: auto; }
+  .cross .container_h {
+    height: 200px; }
+  .cross .container_v {
+    height: 102px;
+    width: 500px; }
+  .cross .arrow {
+    width: 102px;
+    margin-left: auto;
+    margin-right: auto;
+    border: 1px solid #333333; }
+  .cross .top,
+  .cross .down {
+    min-height: 200px;
+    min-width: 88px; }
+    .cross .top svg,
+    .cross .down svg {
+      margin-left: 19px;
+      margin-top: 51px; }
+  .cross .left,
+  .cross .right {
+    float: left;
+    min-width: 199px;
+    min-height: 88px; }
+    .cross .left svg,
+    .cross .right svg {
+      margin-left: 68px; }
+  .cross .right svg {
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg); }
+  .cross .down svg {
+    -webkit-transform: rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    transform: rotate(180deg); }
+  .cross .left svg {
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    -o-transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    transform: rotate(-90deg); }

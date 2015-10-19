@@ -1,23 +1,23 @@
-<ion-view view-title="Panorama" has-bouncing="false">
+<ion-view view-title="View" has-bouncing="false">
     <ion-content padding="true" id="webcam_content" style="margin-top: 50px" has-bouncing="false">
-        <a class="close_button" ui-sref="tab.dash">
+        <a class="close_button" ui-sref="tab.dash" ng-click="closeBtn()">
             <i class="ion-close"></i>
         </a>
         <div class="presentation_titles panorama_titles" style = "margin-left:1px;">
-            <div id="presentation_title">VIEW</div>
+            <div id="presentation_title">{{view.name}}</div>
             <div id="presentation_subtitle">{{building_name | uppercase}}</div>
         </div>
         <!-- <div back-img="getPanorama" id= "panorama_view"></img> -->
         <div id="panorama_view">
-            <ion-Ppinch class="square"  xpos=""></ion-Ppinch>
+            <ion-Ppinch class="square"  xpos="" id="square"></ion-Ppinch>
             <img ng-src={{imageUrl}} id="panorama_image" width="676" height="186"/>
         </div>
         <div class="zoom_buttons">
 
-            <div class ="zoom_in" ng-click="zoomIn('panorama_image')" >
+            <div class ="zoom_in" ng-click="zoomIn('square')" >
                 +
             </div>
-            <div class ="zoom_out" ng-click="zoomOut('panorama_image')" >
+            <div class ="zoom_out" ng-click="zoomOut('square')" >
                 -
             </div>
         </div>

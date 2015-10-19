@@ -71,17 +71,23 @@
     .panorama.active {
         background: #999 !important;
     }
+    ion-item.disabled {
+        color: gray !important;
+        // a{
+        //   color: red !important;
+        // }
+    }
 }
 
 #webcam_content {
     width: 696px;
     margin-left: auto;
     margin-right: auto;
-          .close_button {
-    position: absolute;
-    right: 12px;
-    top: 10px;
-    font-size: 25px;
+    .close_button {
+        position: absolute;
+        right: 12px;
+        top: 10px;
+        font-size: 25px;
         .ion-close::before {
             color: #808080;
         }
@@ -175,5 +181,91 @@
         font-size: 60px;
         text-align: center;
         line-height: 60px;
+    }
+}
+
+//live
+.center {
+    min-width: 102px;
+    min-height: 102px;
+    float: left;
+}
+
+.cross {
+    width: 500px;
+    height: 491px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 200px;
+    .container_h,
+    .container_v {
+        //height: 200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .container_h {
+        height: 200px;
+         
+    }
+    .container_v {
+        height: 102px;
+        width: 500px;
+    }
+    .arrow {
+        // -webkit-transform-origin: 30% 55%;
+        // -moz-transform-origin: 30% 55%;
+        // -o-transform-origin: 30% 55%;
+        //transform-origin: 30% 55%;
+        width: 102px;
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid #333333;
+    }
+
+    .top,
+    .down {
+        min-height: 200px;
+        min-width: 88px;
+        svg {
+            margin-left: 19px;
+            margin-top: 51px;
+        }
+    }
+    .left,
+    .right {
+        float: left;
+        min-width: 199px;
+        min-height: 88px;
+        svg {
+            margin-left: 68px;
+        }
+    }
+    .top {}
+    .right {
+        svg {
+            -webkit-transform: rotate(90deg);
+            -moz-transform: rotate(90deg);
+            -o-transform: rotate(90deg);
+            -ms-transform: rotate(90deg);
+            transform: rotate(90deg);
+        }
+    }
+    .down {
+        svg {
+            -webkit-transform: rotate(180deg);
+            -moz-transform: rotate(180deg);
+            -o-transform: rotate(180deg);
+            -ms-transform: rotate(180deg);
+            transform: rotate(180deg);
+        }
+    }
+    .left {
+        svg {
+            -webkit-transform: rotate(-90deg);
+            -moz-transform: rotate(-90deg);
+            -o-transform: rotate(-90deg);
+            -ms-transform: rotate(-90deg);
+            transform: rotate(-90deg);
+        }
     }
 }

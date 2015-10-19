@@ -1,4 +1,3 @@
-current_server  ="http://localhost:3000"
 angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
@@ -49,6 +48,445 @@ angular.module('starter.services', []).factory('Buildings', ->
       else
         return name      
   }
+
+).service('HelperService', (Buildings) ->
+
+  @sort_models = (models) ->
+    hash = {}
+    result = []
+    i = 0  
+    while i < models.length
+      # bld_name = 'all'      
+      # if  models[i].building_id
+      #   bld_name =  Buildings.get(models[i].building_id).name
+      if models[i].building_name == undefined
+        models[i].building_name = 'all'
+      # if models[i].image
+      #   models[i].image.url = "http://localhost:3000/"+models[i].image.url
+      if hash[models[i].building_name] == undefined
+        hash[models[i].building_name] = [models[i]]
+      else
+        hash[models[i].building_name].push models[i]
+      # if hash[models[i].building_name] == undefined
+      #   hash[models[i].building_name] = [models[i]]
+      # else
+      #   hash[models[i].building_name].push(models[i])
+      i++
+    for k,v of hash
+      result.push(v)    
+    result
+
+
+  @sort_snapshots = (models) ->
+    hash = {}
+    result = []
+    i = 0  
+    while i < models.length
+      if hash[models[i].camera_name] == undefined
+        hash[models[i].camera_name] = [models[i]]
+      else
+        hash[models[i].camera_name].push models[i]
+      i++
+    for k,v of hash
+      result.push(v)    
+    result    
+
+  return
+
+
+
+).service('APIService', ($http) ->
+
+  server = "http://localhost:3000"
+
+
+  # {:asset => {:type => "Rendering", :id => "23"},
+  #  :command =>
+  #  {:channel => "twelve",
+  #   :screens => "12",
+  #   :metadata1 => "Meta1", :metadata2 => "Meta2", :metadata3 => "Meta3", :metadata4 => "Meta4",
+  #   :loction => 'left',
+  #   :x => "1", :y => '2', :z => '3'
+  #   }
+  #  }
+
+  @play = (asset, name, command) ->
+    json =
+      asset:
+        type: name
+        id: asset.id
+      command: 
+        command: "play"
+
+    angular.extend(json.command, command)
+
+    $http.post(server+"/pgs_command", json).then ((response) ->
+      console.log response
+      ), (data) ->
+      console.log data
+      return
+
+  return
+
+
+
+).factory('Presentations',($http, HelperService)  ->
+  models = []
+
+  {
+    name: ->
+     "Presentation"
+
+    sorted: ->
+      $http.get('http://localhost:3000/presentations.json').then ((response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+      ), (data) ->
+        console.log data, "ERROR PRES"
+        return
+
+    all: ->
+      models
+
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+
+    get: (chatId) ->
+      $http.get('http://localhost:3000/presentations/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log data, "ERROR PRES"
+        return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+  }
+
+).factory('Renderings', ($http, Buildings, HelperService) ->
+  models = []
+
+  {
+    name: ->
+     "Rendering"
+
+    sorted: ->
+      $http.get('http://localhost:3000/renderings.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+
+    all: ->
+      $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
+        console.log response
+        models = response
+        models
+
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+  }
+).factory('Views', ($http, HelperService) ->
+  models = []
+  {
+    name: ->
+     "View"  
+
+    sorted: ->
+      $http.get('http://localhost:3000/views.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+
+    all: ->
+      newMod = []
+      for model in models
+        model.id = Math.floor((Math.random()*10)+1);
+        newMod.push(model)      
+      newMod
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+    get: (chatId) ->
+      $http.get('http://localhost:3000/views/'+String(chatId)+'.json').then ((response) ->        
+        # console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log data, "ERROR View"
+        return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+
+    getWebcamName: (panId) ->
+      models[0].camera_name
+
+
+  }
+).factory('Floorplans', ($http, HelperService)->
+  models = []
+  {
+    name: ->
+     "Floorplan"  
+
+    sorted: ->
+      $http.get('http://localhost:3000/floorplans.json').then (response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+
+  }
+).factory('Videos', ($http, HelperService) ->
+  models = []
+  {
+
+    name: ->
+     "Video"
+
+    sorted: ->
+      $http.get('http://localhost:3000/videos.json').then ((response) ->        
+        result = HelperService.sort_models(response.data)
+        result
+      ), (data) ->
+        console.log data, "ERROR PRES"
+        return        
+
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+    get: (chatId) ->
+      $http.get('http://localhost:3000/videos/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log data, "ERROR Video"
+        return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+
+  }
+
+).factory('Webcams', ($http, HelperService) ->
+  models = []
+  {
+    name: ->
+     "Webcam"        
+
+    # sorted: ->
+    #   $http.get('http://localhost:3000/cameras.json').then (response) ->        
+    #     result = HelperService.sort_models(response.data)
+    #     result
+
+    all: ->
+      $http.get('http://localhost:3000/cameras.json').then ((response) ->        
+        console.log response
+        models = response.data
+        models
+      ), (data) ->
+        console.log data, "ERROR Cameras"
+        return
+
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+    getPanoramas: (chatId) ->
+      [
+        {
+          id: 1
+          name: "Panorama1"
+          image: 'img/assets/panoramas/1.jpg'
+        },
+        {
+          id: 2
+          name: "Panorama2"
+          image: 'img/assets/panoramas/2.jpg'
+        }    
+      ]      
+
+   
+
+  }
+).factory('Timelapses',($http) ->
+  models = []
+  {
+    getRecording: (videoId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(videoId)
+          return models[i].recording
+        i++
+      null
+
+    name: ->
+     "Timelapse"
+
+    getForCamera: (cameraId) ->
+      $http.get('http://localhost:3000/timelapses_by_camera/'+cameraId+'.json').then ((response) ->        
+        models = response.data
+        models
+      ), (data) ->
+        console.log data, "ERROR Timelapses"
+        return   
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+    all: ->
+      models
+
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+
+
+  }
+
+).service('Snapshots', (HelperService, $http) ->
+
+    name: ->
+     "Screenshot" 
+
+    sorted: ->
+      $http.get('http://localhost:3000/snapshots.json').then ((response) ->        
+        result = HelperService.sort_snapshots(response.data)
+        result
+      ), (data) ->
+        console.log data, "ERROR Snapshot"
+        return        
+
+    get: (chatId) ->
+      $http.get('http://localhost:3000/snapshots/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log data, "ERROR Snapshot"
+        return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+
+
+).factory('Panoramas', ($http) ->
+  models = [
+    {
+      id: 1
+      name: "Pan1"
+      image: 'img/assets/panoramas/1.jpg'
+      building_name: '200 Massachusetts'
+      camera_name: 'Camera 1'
+    }    
+  ]
+  {
+    name: ->
+     "Panorama"
+    all: ->
+      models
+    remove: (chat) ->
+      models.splice models.indexOf(chat), 1
+      return
+
+    get_by_camera: (camera_id) ->
+      $http.get('http://localhost:3000/panorama_by_camera/'+String(camera_id)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log data, "ERROR Panorama"
+        return
+
+    getWebcamName: (panId) ->
+      models[0].camera_name
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+
+  }
+
+
+).service('ActiveCamera', ->
+  name = undefined
+
+  {
+    setName: (new_name) ->
+      name = new_name
+
+    getName: (new_name) ->
+      name
+  }
+
 ).service('ActiveBuilding', ->
   name = undefined
   tabName = "SELECT BUILDING"
@@ -79,6 +517,8 @@ angular.module('starter.services', []).factory('Buildings', ->
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
+
+
   }
 
 ).service('ActiveCrestron', ->
@@ -103,11 +543,7 @@ angular.module('starter.services', []).factory('Buildings', ->
     isActive: (q_name) ->
       if actives[q_name] == 'active'
         return true
-    # getActive: ->
-    #   if actives.size > 0
-    #     for k,v of actives
-    #       if actives[k] != undefined
-    #         actives[k]
+
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
@@ -122,668 +558,6 @@ angular.module('starter.services', []).factory('Buildings', ->
 
   }
 
-).factory('Presentations', ->
-  models = [
-    {
-      id: 1
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 2
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 3
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 4
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 5
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 6
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 7
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 8
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 9
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 10
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 11
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 12
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 13
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 14
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 15
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },
-    {
-      id: 16
-      name: "Overview Presentation"
-      image: 'img/assets/presentations/1.png'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"
-    },
-    {
-      id: 17
-      name: "Sustainability Presentation"
-      image: 'img/assets/presentations/2.jpg'
-      building_name: '200 Massachusetts'
-      project_name: "200 Massachusetts"      
-    },
-    {
-      id: 18
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '250 Massachusetts'
-      project_name: "250 Massachusetts"      
-    },    
-    {
-      id: 19
-      name: "Building Presentation"
-      image: 'img/assets/presentations/3.jpg'
-      building_name: '600 Second Street'
-      project_name: "600 Second Street"      
-    }
-  ]
-  {
-    name: ->
-     "Presentation"
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-    all: ->
-      models
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-    getSlides: (presentationId) ->
-      slides = [
-        {
-          id: 1
-          image: 'img/assets/slides/1.jpg'
-        },
-        {
-          id: 2
-          image: 'img/assets/slides/2.jpg'
-        },
-        {
-          id: 3
-          image: 'img/assets/slides/3.jpg'
-        },
-        {
-          id: 4
-          image: 'img/assets/slides/4.jpg'
-        },
-        {
-          id: 5
-          image: 'img/assets/slides/5.jpg'
-        },
-        {
-          id: 6
-          image: 'img/assets/slides/6.jpg'
-        },
-        {
-          id: 7
-          image: 'img/assets/slides/7.jpg'
-        },
-        {
-          id: 8
-          image: 'img/assets/slides/8.jpg'
-        },
-        {
-          id: 9
-          image: 'img/assets/slides/9.jpg'
-        },
-        {
-          id: 10
-          image: 'img/assets/slides/10.jpg'
-        }  
-      ]
-
-  }
-).factory('Renderings', ($http, Buildings) ->
-  models = [
-    {
-      id: 1
-      name: "Rend1"
-      image: 'img/assets/renderings/1.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 2
-      name: "Rend2"
-      image: 'img/assets/renderings/2.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 3
-      name: "Rendering 3"
-      image: 'img/assets/renderings/3.jpg'
-      building_name: '250 Massachusetts'
-    }    
- ]
-  {
-    name: ->
-     "Rendering"
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-
-    # sorted: ->
-    #   hash = {}
-    #   result = []
-    #   i = 0
-    #   $http.get('http://localhost:3000/renderings.json').then (response) ->
-        
-    #     models = response.data
-    #     console.log models
-    #     while i < models.length
-    #       bld_name =  Buildings.get(models[i].building_id).name
-    #       if hash[bld_name] == undefined
-    #         hash[bld_name] = [models[i]]
-    #       else
-    #         hash[bld_name].push models[i]
-    #       # if hash[models[i].building_name] == undefined
-    #       #   hash[models[i].building_name] = [models[i]]
-    #       # else
-    #       #   hash[models[i].building_name].push(models[i])
-    #       i++
-    #     for k,v of hash
-    #       result.push(v)    
-
-    #     result
-
-
-    all: ->
-      # $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
-      #   console.log response
-      #   models = response
-      models
-
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-
-  }
-).factory('Views', ->
-  models = [
-    {
-      id: 1
-      name: "View1"
-      image: 'img/assets/views/1.jpg'
-      building_name: '200 Massachusetts'
-      camera_name: '1'
-    },
-    {
-      id: 2
-      name: "View2"
-      image: 'img/assets/views/2.jpg'
-      building_name: '200 Massachusetts'
-      camera_name: '2'
-    },   
-   {
-      id: 3
-      name: "View3"
-      image: 'img/assets/views/3.jpg'
-      building_name: '250 Massachusetts'
-      camera_name: '3'
-    }                               
-  ]
-  {
-    name: ->
-     "View"  
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-    all: ->
-      newMod = []
-      for model in models
-        model.id = Math.floor((Math.random()*10)+1);
-        newMod.push(model)      
-      newMod
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-    getWebcamName: (panId) ->
-      models[0].camera_name
-
-
-  }
-).factory('Floorplans', ->
-  models = [
-    {
-      id: 1
-      name: "Floorplan1"
-      image: 'img/assets/floorplans/1.svg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 2
-      name: "Floorplan2"
-      image: 'img/assets/floorplans/1.svg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 3
-      name: "Floorplan3"
-      image: 'img/assets/floorplans/3.svg'
-      building_name: '250 Massachusetts'
-    }        
-  ]
-  {
-    name: ->
-     "Floorplan"  
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-    all: ->
-      models
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-
-  }
-).factory('Videos', ->
-  models = [
-    {
-      id: 1
-      name: "Video1"
-      image: 'img/assets/views/1.jpg'
-      building_name: '200 Massachusetts'
-      recording: 'img/assets/videos/1.mp4'
-    },
-    {
-      id: 2
-      name: "Video2"
-      image: 'img/assets/views/2.jpg'
-      building_name: '200 Massachusetts'
-      recording: 'img/assets/videos/2.mp4'
-    },
-    {
-      id: 3
-      name: "Video3"
-      image: 'img/assets/views/3.jpg'
-      building_name: '250 Massachusetts'
-      recording: 'img/assets/videos/3.mp4'
-    }    
-  ]
-  {
-    getRecording: (videoId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(videoId)
-          return models[i].recording
-        i++
-      null
-    name: ->
-     "Video"
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-    all: ->
-      models
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-
-  }
-
-).factory('Timelapses', ->
-  models = [
-    {
-      id: 1
-      name: "Timelapse 1"
-      image: 'img/assets/views/1.jpg'
-      building_name: '200 Massachusetts'
-      recording: 'img/assets/videos/1.mp4'
-    },
-    {
-      id: 2
-      name: "Timelapse 2"
-      image: 'img/assets/views/2.jpg'
-      building_name: '200 Massachusetts'
-      recording: 'img/assets/videos/2.mp4'
-    },
-    {
-      id: 3
-      name: "Timelapse 3"
-      image: 'img/assets/views/3.jpg'
-      building_name: '250 Massachusetts'
-      recording: 'img/assets/videos/3.mp4'
-    }    
-  ]
-  {
-    getRecording: (videoId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(videoId)
-          return models[i].recording
-        i++
-      null
-    name: ->
-     "Timelapse"
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-    all: ->
-      models
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-
-  }
-
-).service('ActiveCamera', ->
-  name = undefined
-
-  {
-    setName: (new_name) ->
-      name = new_name
-
-    getName: (new_name) ->
-      name
-  }
-
-).factory('Webcams', ->
-  models = [
-    {
-      id: 1
-      name: "Webcam1"
-      image: 'img/assets/webcams/1.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 2
-      name: "Webcam2"
-      image: 'img/assets/webcams/2.jpg'
-      building_name: '200 Massachusetts'
-    },
-    {
-      id: 3
-      name: "Webcam3"
-      image: 'img/assets/webcams/3.jpg'
-      building_name: '250 Massachusetts'
-    }   
-  ]
-  {
-    name: ->
-     "Webcam"        
-
-    sorted: ->
-      hash = {}
-      result = []
-      i = 0
-      while i < models.length
-        
-        if hash[models[i].building_name] == undefined
-          hash[models[i].building_name] = [models[i]]
-        else
-          hash[models[i].building_name].push(models[i])
-        i++
-      for k,v of hash
-        result.push(v)
-      result
-
-    all: ->
-      models
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-    getPanoramas: (chatId) ->
-      [
-        {
-          id: 1
-          name: "Panorama1"
-          image: 'img/assets/panoramas/1.jpg'
-        },
-        {
-          id: 2
-          name: "Panorama2"
-          image: 'img/assets/panoramas/2.jpg'
-        }    
-      ]      
-
-    getTimelapses: (chatId) ->
-      [
-        {
-          id: 1
-          name: "Video1"
-          image: 'img/assets/webcams/1.jpg'
-        },
-        {
-          id: 2
-          name: "Video2"
-          image: 'img/assets/webcams/2.jpg'
-        }    
-      ] 
-  }
-).factory('Panoramas', ->
-  models = [
-    {
-      id: 1
-      name: "Pan1"
-      image: 'img/assets/panoramas/1.jpg'
-      building_name: '200 Massachusetts'
-      camera_name: 'Camera 1'
-    }    
-  ]
-  {
-    name: ->
-     "Panorama"
-    all: ->
-      models
-    remove: (chat) ->
-      models.splice models.indexOf(chat), 1
-      return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
-    getWebcamName: (panId) ->
-      models[0].camera_name
-
-  }
 ).factory('TopmenuState', ->
   
   states =

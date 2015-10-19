@@ -1,8 +1,8 @@
 <ion-view view-title="Dash">
     <div id="overlay" ng-show="comparisonState" class="cssFade"></div>
     <ion-top-menu id="ionTopMenu">
-        <ion-scroll style="width:100%;height:100%"  has-bouncing="false">
-            <div class="list" id="building_menu_wrap" ng-show="isComparison() == false" >
+        <ion-scroll style="width:100%;height:100%" has-bouncing="false">
+            <div class="list" id="building_menu_wrap" ng-show="isComparison() == false">
                 <ng-include src="templatePath"></ng-include>
             </div>
             <div id="comparison_wrap" ng-show="isComparison() == true">
@@ -25,75 +25,74 @@
                 </ion-item>
                 <!-- ng-if="$index % 4 === 0 && isGroupShown(factory) -->
                 <ion-scroll ng-style="{'height': isGroupClicked(factory)}">
-                        <div  ng-repeat="models in factory[1] " ng-if=" isGroupShown(factory)">
-
-
-                               <div class="row responsive-md item-accordion gallery" ng-repeat="model in models | buildingFilter: activeBuildingName" ng-if="$index % 4 === 0 && isGroupShown(factory)" ng-class="{'first_row_row' : models.indexOf(model) == 0}">
-     
-                            <div class="list_title" ng-show="isGroupShown(factory) && models.indexOf(model) == 0">{{model.building_name.toUpperCase()}}</div> 
-
-                            <ion-item class="col cust_col" ng-if="$index < models.length && isActiveBuilding( models[$index].building_name)" ui-sref="tab.{{factory[0].toLowerCase()}}({id:{{models[$index].id}}})" on-hold="showCompareMenu()"
-                            ng-class="{'first_row' : $index == 0}"
-                            >
-                                <img ng-src="{{models[$index].image}}" width="100%" height="100%" />
+                    <div ng-repeat="models in factory[1] " ng-if=" isGroupShown(factory)">
+                        <div class="row responsive-md item-accordion gallery" ng-repeat="model in models | buildingFilter: activeBuildingName" ng-if="$index % 4 === 0 && isGroupShown(factory)" ng-class="{'first_row_row' : models.indexOf(model) == 0}">
+                            <div class="list_title" ng-show="isGroupShown(factory) && models.indexOf(model) == 0">{{model.building_name.toUpperCase()}}</div>
+                            <ion-item class="col cust_col" ng-if="$index < models.length && isActiveBuilding( models[$index].building_name)" ng-click="playAsset(factory[0], models[$index])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index == 0}">
+                                <img ng-src="{{models[$index].image.thumb_url}}" width="100%" height="100%" />
                                 <div class="image_name" ng-if="models[$index].name !== undefined">
                                     {{models[$index].name}}
                                 </div>
                             </ion-item>
-                            <ion-item class="col cust_col" ng-if="$index + 1 < models.length && isActiveBuilding( models[$index + 1].building_name)" ui-sref="tab.{{factory[0].toLowerCase()}}({id:{{models[$index + 1].id}}})" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 1 == 1}">
-                                <img ng-src="{{models[$index + 1].image}}" width="100%" />
+                            <ion-item class="col cust_col" ng-if="$index + 1 < models.length && isActiveBuilding( models[$index + 1].building_name)" ng-click="playAsset(factory[0], models[$index+1])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 1 == 1}">
+                                <img ng-src="{{models[$index + 1].image.thumb_url}}" width="100%" />
                                 <div class="image_name" ng-if="models[$index + 1].name !== undefined">
                                     {{models[$index + 1].name}}
                                 </div>
                             </ion-item>
-                            <ion-item class="col cust_col" ng-if="$index + 2 < models.length && isActiveBuilding( models[$index + 2].building_name)" ui-sref="tab.{{factory[0].toLowerCase()}}({id:{{models[$index + 2].id}}})" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 2 == 2}">
-                                <img ng-src="{{models[$index + 2].image}}" width="100%" />
+                            <ion-item class="col cust_col" ng-if="$index + 2 < models.length && isActiveBuilding( models[$index + 2].building_name)" ng-click="playAsset(factory[0], models[$index+2])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 2 == 2}">
+                                <img ng-src="{{models[$index + 2].image.thumb_url}}" width="100%" />
                                 <div class="image_name" ng-if="models[$index + 2].name !== undefined">
                                     {{models[$index + 2].name}}
                                 </div>
                             </ion-item>
-                            <ion-item class="col cust_col" ng-if="$index + 3 < models.length && isActiveBuilding( models[$index + 3].building_name)" ui-sref="tab.{{factory[0].toLowerCase()}}({id:{{models[$index + 3].id}}})" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 3 == 3}">
-                                <img ng-src="{{models[$index + 3].image}}" width="100%" />
+                            <ion-item class="col cust_col" ng-if="$index + 3 < models.length && isActiveBuilding( models[$index + 3].building_name)" ng-click="playAsset(factory[0], models[$index+3])"  on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 3 == 3}">
+                                <img ng-src="{{models[$index + 3].image.thumb_url}}" width="100%" />
                                 <div class="image_name" ng-if="models[$index + 3].name !== undefined">
                                     {{models[$index + 3].name}}
                                 </div>
                             </ion-item>
-                            </div>
                         </div>
+                    </div>
                 </ion-scroll>
             </div>
-            <!-- <div ng-repeat='(nam, factory) in factories' class="accordion_container">
-    <ion-item class="item-stable" ng-click="toggleGroup(factory)" ng-class="{active: isGroupShown(factory)}">
-        <i class="icon" ng-class="isGroupShown(factory) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; {{nam}}
-    </ion-item>
-    <div class="row responsive-md item-accordion gallery" ng-show="isGroupShown(factory)" ng-repeat="model in factory | buildingFilter: activeBuildingName" ng-if="$index % 4 === 0">
-        <ion-item class="col cust_col" ng-if="$index < factory.length && isActiveBuilding( factory[$index].building_name)" href="#/tab/{{nam.toLowerCase()}}/{{model.id}}" on-hold="showCompareMenu()">
-            <img ng-src="{{factory[$index].image}}" width="100%" height="100%" />
-            <div class="image_name" ng-if="factory[$index].name !== undefined">
-                {{factory[$index].name}}
+            <div ng-repeat='factory in snapshots' class="accordion_container">
+                <ion-item class="item-stable clicker" ng-click="toggleGroup(factory)" ng-class="{active: isGroupShown(factory)}" ng-style="{'padding-top': clicker_padding, 'padding-bottom':clicker_padding}">
+                    <i class="icon" ng-class="isGroupShown(factory) ? 'ion-minus' : 'ion-plus'"></i> &nbsp; {{factory[0] | uppercase }}
+                </ion-item>
+                <!-- ng-if="$index % 4 === 0 && isGroupShown(factory) -->
+                <ion-scroll ng-style="{'height': isGroupClicked(factory)}">
+                    <div ng-repeat="models in factory[1] " ng-if=" isGroupShown(factory)">
+                        <div class="row responsive-md item-accordion gallery" ng-repeat="model in models" ng-if="$index % 4 === 0 && isGroupShown(factory)" ng-class="{'first_row_row' : models.indexOf(model) == 0}">
+                            <div class="list_title" ng-show="isGroupShown(factory) && models.indexOf(model) == 0">{{model.camera_name.toUpperCase()}}</div>
+                            <ion-item class="col cust_col" ng-if="$index < models.length" ng-click="playAsset(factory[0], models[$index])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index == 0}">
+                                <img ng-src="{{models[$index].image.thumb_url}}" width="100%" height="100%" />
+                                <div class="image_name" ng-if="models[$index].created_at !== undefined">
+                                    {{models[$index].created_at}}
+                                </div>
+                            </ion-item>
+                            <ion-item class="col cust_col" ng-if="$index + 1 < models.length" ng-click="playAsset(factory[0], models[$index+1])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 1 == 1}">
+                                <img ng-src="{{models[$index + 1].image.thumb_url}}" width="100%" />
+                                <div class="image_name" ng-if="models[$index + 1].created_at !== undefined">
+                                    {{models[$index + 1].created_at}}
+                                </div>
+                            </ion-item>
+                            <ion-item class="col cust_col" ng-if="$index + 2 < models.length " ng-click="playAsset(factory[0], models[$index+2])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 2 == 2}">
+                                <img ng-src="{{models[$index + 2].image.thumb_url}}" width="100%" />
+                                <div class="image_name" ng-if="models[$index + 2].created_at !== undefined">
+                                    {{models[$index + 2].created_at}}
+                                </div>
+                            </ion-item>
+                            <ion-item class="col cust_col" ng-if="$index + 3 < models.length " ng-click="playAsset(factory[0], models[$index+3])" on-hold="showCompareMenu()" ng-class="{'first_row' : $index + 3 == 3}">
+                                <img ng-src="{{models[$index + 3].image.thumb_url}}" width="100%" />
+                                <div class="image_name" ng-if="models[$index + 3].created_at !== undefined">
+                                    {{models[$index + 3].name}}
+                                </div>
+                            </ion-item>
+                        </div>
+                    </div>
+                </ion-scroll>
             </div>
-        </ion-item>
-        <ion-item class="col cust_col" ng-if="$index + 1 < factory.length && isActiveBuilding( factory[$index + 1].building_name)" on-hold="showCompareMenu()">
-            <img ng-src="{{factory[$index + 1].image}}" width="100%" />
-            <div class="image_name" ng-if="factory[$index].name !== undefined">
-                {{factory[$index].name}}
-            </div>
-        </ion-item>
-        <ion-item class="col cust_col" ng-if="$index + 2 < factory.length && isActiveBuilding( factory[$index + 2].building_name)" on-hold="showCompareMenu()">
-            <img ng-src="{{factory[$index + 2].image}}" width="100%" />
-            <div class="image_name" ng-if="factory[$index].name !== undefined">
-                {{factory[$index].name}}
-            </div>
-        </ion-item>
-        <ion-item class="col cust_col" ng-if="$index + 3 < factory.length && isActiveBuilding( factory[$index + 3].building_name)" on-hold="showCompareMenu()">
-            <img ng-src="{{factory[$index + 3].image}}" width="100%" />
-            <div class="image_name" ng-if="factory[$index].name !== undefined">
-                {{factory[$index].name}}
-            </div>
-        </ion-item>
-    </div>
-</div>
- -->
         </ion-list>
     </ion-content>
 </ion-view>

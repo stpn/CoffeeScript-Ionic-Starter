@@ -6,7 +6,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.hide();
     }
   });
-}).config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+}).config(function($stateProvider, $httpProvider, $urlRouterProvider, $ionicConfigProvider) {
+  $httpProvider.defaults.useXDomain = true;
+  delete $httpProvider.defaults.headers.common["X-Requested-With"];
+  $httpProvider.defaults.headers.common = {};
+  $httpProvider.defaults.headers.post = {};
+  $httpProvider.defaults.headers.put = {};
+  $httpProvider.defaults.headers.patch = {};
   $stateProvider.state('tab', {
     url: '/tab',
     abstract: true,
@@ -67,6 +73,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'PanoramasCtrl'
       }
     }
+  }).state('tab.live', {
+    url: '/live',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/webcams/live.html',
+        controller: 'LiveCtrl'
+      }
+    }
   }).state('tab.webcams', {
     url: '/webcams',
     views: {
@@ -83,6 +97,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'BuildingsCtrl'
       }
     }
+  }).state('tab.renderings', {
+    url: '/renderings/:id',
+    views: {
+      'tab-dash': {
+        templateUrl: 'templates/renderings/rendering.html',
+        controller: 'RenderingsCtrl'
+      }
+    }
   }).state('tab.reset', {
     url: '/reset',
     views: {
@@ -95,7 +117,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/home');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $q, $http, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $q, $http, $rootScope, $state, $log, APIService, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) {
   $scope.presentations = {};
   $scope.factories = [["Presentations"], ["Videos"], ["Floor Plans"], ["Renderings"], ["Views"]];
   $scope.snapshots = [["Webcams"]];
@@ -166,10 +188,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else {
       return "";
     }
-  };
-  $scope.openPres = function(presId) {
-    window.location = '#/tab/presentations/' + presId;
-    window.location.reload();
   };
   $scope.cancelActiveBuilding = function($event) {
     var bld_box;
@@ -285,12 +303,34 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
     return $scope.activeComparison = comparison;
   };
-  return $scope.getComparisonStroke = function(comparison) {
+  $scope.getComparisonStroke = function(comparison) {
     if (comparison === $scope.activeComparison) {
       return "#FFF";
     } else {
       return "#808080";
     }
+  };
+  $scope.playAsset = function(name, asset) {
+    var command;
+    console.log(asset, name, "NAAME");
+    if (name === "Presentations") {
+      $scope.openLoc('presentations', asset.id);
+      return;
+    } else if (name === "Views") {
+      $scope.openLoc('views', asset.id);
+      return;
+    } else {
+      command = {
+        command: "play"
+      };
+      name = name.substring(0, name.length - 1);
+    }
+    return APIService.play(asset, name, command);
+  };
+  return $scope.openLoc = function(location, modId) {
+    $state.go('tab.' + location, {
+      id: modId
+    }, {});
   };
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
@@ -299,7 +339,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.buildings = "#/tab/buildings";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.id);
-}).controller('WebcamsCtrl', function($scope, $log, Webcams, Timelapses, $state) {
+}).controller('WebcamsCtrl', function($scope, $state, $log, Webcams, Timelapses) {
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
   $scope.nowLive4 = false;
@@ -370,7 +410,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setLive4 = function() {
     $scope.nowLive4 = !$scope.nowLive4;
     $scope.resetEverything();
-    return $scope.nowLive = false;
+    $scope.nowLive = false;
+    return $state.go("tab.live", {}, {});
   };
   $scope.resetEverything = function() {
     $scope.activeWebcam = void 0;
@@ -735,6 +776,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       }
     }
   };
+}).controller('LiveCtrl', function($scope) {
+  $scope.arrow_template = "templates/webcams/arrow.html";
 }).controller('HomeCtrl', function($scope) {
   $scope.home = "HOME";
 }).controller('ResetCtrl', function($scope, $ionicHistory) {
@@ -745,12 +788,69 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $location.path(path);
   };
 }).controller('ViewsCtrl', function($scope, $stateParams, Views, ActiveCamera, $ionicHistory) {
+  var firstHeight, firstWidth, pan, posX, posY, square;
+  $scope.currentZoom = 1.0;
+  square = document.getElementById("square");
+  posX = 0;
+  posY = 0;
+  pan = document.getElementById("panorama_image");
+  firstWidth = square.getBoundingClientRect().width;
+  firstHeight = square.getBoundingClientRect().height;
   Views.get($stateParams.id).then(function(result) {
+    console.log(result);
     $scope.view = result;
     $scope.building_name = $scope.view.building_name;
     $scope.imageUrl = $scope.view.image.url;
     return console.log($scope.view, "VIEW");
   });
+  $scope.zoomIn = function(name) {
+    var toZoom;
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom <= 0.4) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom - 0.2;
+    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
+    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+  };
+  $scope.zoomOut = function(name) {
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom >= 1.0) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom + 0.2;
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+    transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+    toZoom.style.transform = transform;
+    toZoom.style.webkitTransform = toZoom.style.transform;
+    if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+      posX = -deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+      posY = -deltaHeight / 2;
+      changeY = true;
+    }
+    if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+      posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+      posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
+      changeY = true;
+    }
+    if (changeX === true || changeY === true) {
+      transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+      toZoom.style.transform = transform;
+      toZoom.style.webkitTransform = toZoom.style.transform;
+      changeX = false;
+      return changeY = false;
+    }
+  };
   $scope.getView = function() {
     return $scope.view.image;
   };
@@ -1046,6 +1146,27 @@ angular.module('starter.services', []).factory('Buildings', function() {
     }
     return result;
   };
+}).service('APIService', function($http) {
+  var server;
+  server = "http://localhost:3000";
+  this.play = function(asset, name, command) {
+    var json;
+    json = {
+      asset: {
+        type: name,
+        id: asset.id
+      },
+      command: {
+        command: "play"
+      }
+    };
+    angular.extend(json.command, command);
+    return $http.post(server + "/pgs_command", json).then((function(response) {
+      return console.log(response);
+    }), function(data) {
+      console.log(data);
+    });
+  };
 }).factory('Presentations', function($http, HelperService) {
   var models;
   models = [];
@@ -1059,7 +1180,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = HelperService.sort_models(response.data);
         return result;
       }), function(data) {
-        console.log("ERROR PRES");
+        console.log(data, "ERROR PRES");
       });
     },
     all: function() {
@@ -1075,44 +1196,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = response.data;
         return result;
       }), function(data) {
-        console.log("ERROR PRES");
+        console.log(data, "ERROR PRES");
       });
     },
-    getSlides: function(presentationId) {
-      var slides;
-      return slides = [
-        {
-          id: 1,
-          image: 'img/assets/slides/1.jpg'
-        }, {
-          id: 2,
-          image: 'img/assets/slides/2.jpg'
-        }, {
-          id: 3,
-          image: 'img/assets/slides/3.jpg'
-        }, {
-          id: 4,
-          image: 'img/assets/slides/4.jpg'
-        }, {
-          id: 5,
-          image: 'img/assets/slides/5.jpg'
-        }, {
-          id: 6,
-          image: 'img/assets/slides/6.jpg'
-        }, {
-          id: 7,
-          image: 'img/assets/slides/7.jpg'
-        }, {
-          id: 8,
-          image: 'img/assets/slides/8.jpg'
-        }, {
-          id: 9,
-          image: 'img/assets/slides/9.jpg'
-        }, {
-          id: 10,
-          image: 'img/assets/slides/10.jpg'
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
         }
-      ];
+        i++;
+      }
+      return null;
     }
   };
 }).factory('Renderings', function($http, Buildings, HelperService) {
@@ -1139,11 +1235,11 @@ angular.module('starter.services', []).factory('Buildings', function() {
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);
     },
-    get: function(chatId) {
+    getLocal: function(camId) {
       var i;
       i = 0;
       while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
+        if (models[i].id === parseInt(camId)) {
           return models[i];
         }
         i++;
@@ -1184,8 +1280,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = response.data;
         return result;
       }), function(data) {
-        console.log("ERROR View");
+        console.log(data, "ERROR View");
       });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
     },
     getWebcamName: function(panId) {
       return models[0].camera_name;
@@ -1211,11 +1318,11 @@ angular.module('starter.services', []).factory('Buildings', function() {
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);
     },
-    get: function(chatId) {
+    getLocal: function(camId) {
       var i;
       i = 0;
       while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
+        if (models[i].id === parseInt(camId)) {
           return models[i];
         }
         i++;
@@ -1236,7 +1343,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = HelperService.sort_models(response.data);
         return result;
       }), function(data) {
-        console.log("ERROR PRES");
+        console.log(data, "ERROR PRES");
       });
     },
     all: function() {
@@ -1252,8 +1359,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = response.data;
         return result;
       }), function(data) {
-        console.log("ERROR Video");
+        console.log(data, "ERROR Video");
       });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
     }
   };
 }).factory('Webcams', function($http, HelperService) {
@@ -1269,7 +1387,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
         models = response.data;
         return models;
       }), function(data) {
-        console.log("ERROR Cameras");
+        console.log(data, "ERROR Cameras");
       });
     },
     remove: function(chat) {
@@ -1323,7 +1441,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
         models = response.data;
         return models;
       }), function(data) {
-        console.log("ERROR Timelapses");
+        console.log(data, "ERROR Timelapses");
       });
     },
     getLocal: function(camId) {
@@ -1342,17 +1460,6 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     remove: function(chat) {
       models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
     }
   };
 }).service('Snapshots', function(HelperService, $http) {
@@ -1366,7 +1473,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = HelperService.sort_snapshots(response.data);
         return result;
       }), function(data) {
-        console.log("ERROR Snapshot");
+        console.log(data, "ERROR Snapshot");
       });
     },
     get: function(chatId) {
@@ -1376,8 +1483,19 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = response.data;
         return result;
       }), function(data) {
-        console.log("ERROR Snapshot");
+        console.log(data, "ERROR Snapshot");
       });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
     }
   };
 }).factory('Panoramas', function($http) {
@@ -1408,11 +1526,22 @@ angular.module('starter.services', []).factory('Buildings', function() {
         result = response.data;
         return result;
       }), function(data) {
-        console.log("ERROR Panorama");
+        console.log(data, "ERROR Panorama");
       });
     },
     getWebcamName: function(panId) {
       return models[0].camera_name;
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
     }
   };
 }).service('ActiveCamera', function() {

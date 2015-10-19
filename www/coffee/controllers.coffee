@@ -1,4 +1,4 @@
-angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $http, $rootScope,  $state,  $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) -> 
+angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $http, $rootScope,  $state,  $log, APIService, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) -> 
   $scope.presentations = {}  
   $scope.factories = [["Presentations"], ["Videos"],  ["Floor Plans"], ["Renderings"], ["Views"]]
   $scope.snapshots = [["Webcams"]]
@@ -85,14 +85,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     else
       ""
   
-  
-  $scope.openPres = (presId) ->
-    window.location = '#/tab/presentations/' + presId
-    window.location.reload()
-    return
 
-  $scope.cancelActiveBuilding = ($event) ->
-    
+  $scope.cancelActiveBuilding = ($event) ->    
     bld_box = document.getElementById('building_menu_wrap')
     bld_box = bld_box.getBoundingClientRect()
     #$log.debug($event.clientX,$event.clientY, bld_box)
@@ -107,7 +101,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
   $scope.building_is = (code, name) ->
     if code == name
-    # if name == "200 Mass"
       return true
 
   $scope.getTemplate = (name) ->
@@ -215,7 +208,26 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     else
       return "#808080"      
 
+  $scope.playAsset = (name, asset) ->
+    console.log asset, name, "NAAME"
+    if name == "Presentations"
+      $scope.openLoc('presentations', asset.id)
+      return
+    else if name == "Views"
+      $scope.openLoc('views', asset.id)
+      return
+    else
+      command = 
+        command: "play"
+      name = name.substring(0, name.length - 1);
+     APIService.play(asset, name, command)
 
+
+  $scope.openLoc = (location, modId) ->  
+    $state.go('tab.'+location, id : modId, {});
+    # window.location = '#/tab/'+location+'/' + modId
+    # window.location.reload()
+    return
 
 ).controller('titleCtrl', ($scope, $stateParams) ->
   $scope.titleTemplate = "templates/menu/title.html"
@@ -231,7 +243,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   return
 
 
-).controller('WebcamsCtrl', ($scope, $log, Webcams, Timelapses, $state) ->
+).controller('WebcamsCtrl', ($scope, $state, $log, Webcams, Timelapses) ->
   $scope.activeWebcam = undefined
   $scope.nowLive = false
   $scope.nowLive4 = false
@@ -304,6 +316,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.nowLive4 = !$scope.nowLive4
     $scope.resetEverything()
     $scope.nowLive = false
+    $state.go("tab.live",{},{})
 
   
   $scope.resetEverything = ->
@@ -727,6 +740,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
         $scope.volume.value = $scope.volume.value - 5/$scope.volume.getBoundingClientRect().width * $scope.max
 
 
+).controller('LiveCtrl', ($scope) ->
+  $scope.arrow_template = "templates/webcams/arrow.html"
+  return   
 
 ).controller('HomeCtrl', ($scope) ->
   $scope.home = "HOME"
@@ -745,14 +761,70 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
 
 ).controller 'ViewsCtrl', ($scope, $stateParams, Views, ActiveCamera, $ionicHistory) ->
+  $scope.currentZoom = 1.0
+  square = document.getElementById("square")
+  posX = 0
+  posY = 0
+  pan =  document.getElementById("panorama_image")
+  firstWidth = square.getBoundingClientRect().width
+  firstHeight = square.getBoundingClientRect().height
 
   Views.get($stateParams.id).then (result) ->
+    console.log result
     $scope.view = result
     $scope.building_name = $scope.view.building_name 
     $scope.imageUrl = $scope.view.image.url
     console.log $scope.view, "VIEW"
 
 
+  $scope.zoomIn = (name) ->
+    console.log $scope.currentZoom
+    if $scope.currentZoom <= 0.4 
+      return             
+    toZoom = document.getElementById(name)
+    $scope.currentZoom = $scope.currentZoom - 0.2
+    toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
+    toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
+
+  $scope.zoomOut = (name) ->
+    console.log $scope.currentZoom 
+    if $scope.currentZoom >= 1.0 
+      return
+    toZoom = document.getElementById(name)
+    $scope.currentZoom = $scope.currentZoom + 0.2
+    # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
+    # toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
+
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth)
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight)                          
+    transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + "scale("+$scope.currentZoom+")"
+    toZoom.style.transform = transform 
+    toZoom.style.webkitTransform = toZoom.style.transform
+    if square.getBoundingClientRect().left <= pan.getBoundingClientRect().left
+      posX =  -deltaWidth  / 2
+      changeX = true
+    if square.getBoundingClientRect().top <= pan.getBoundingClientRect().top
+      posY = -deltaHeight  / 2
+      changeY = true
+    if square.getBoundingClientRect().right >= pan.getBoundingClientRect().right
+      posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth  / 2
+      changeX = true
+    if square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom
+      posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight  / 2
+      changeY = true  
+    if changeX ==true || changeY  == true
+      transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) '+  " " + "scale("+$scope.currentZoom+")"
+      toZoom.style.transform = transform  
+      toZoom.style.webkitTransform = toZoom.style.transform              
+      # square.style.left = String(posX + "px")
+      changeX = false
+      changeY = false  
+    # if changeY  == true
+    #   #square.style.top = String(posY + "px")
+    #   transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + "scale("+$scope.currentZoom+")"
+    #   toZoom.style.transform = transform
+    #   toZoom.style.webkitTransform = toZoom.style.transform                
+    #   changeY = false  
 
   $scope.getView =  ->
     $scope.view.image

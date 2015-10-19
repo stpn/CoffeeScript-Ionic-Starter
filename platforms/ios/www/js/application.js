@@ -6,7 +6,13 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       StatusBar.hide();
     }
   });
-}).config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+}).config(function($stateProvider, $httpProvider, $urlRouterProvider, $ionicConfigProvider) {
+  $httpProvider.defaults.useXDomain = true;
+  delete $httpProvider.defaults.headers.common["X-Requested-With"];
+  $httpProvider.defaults.headers.common = {};
+  $httpProvider.defaults.headers.post = {};
+  $httpProvider.defaults.headers.put = {};
+  $httpProvider.defaults.headers.patch = {};
   $stateProvider.state('tab', {
     url: '/tab',
     abstract: true,
@@ -32,7 +38,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
     views: {
       'tab-dash': {
         templateUrl: 'templates/Videos/videoPlayer.html',
-        controller: 'VideoPlayerCtrl'
+        controller: 'VideoCtrl'
       }
     }
   }).state('tab.timelapses', {
@@ -60,11 +66,19 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
       }
     }
   }).state('tab.panoramas', {
-    url: '/panoramas/:id',
+    url: '/panoramas/:cameraId',
     views: {
       'webcams': {
         templateUrl: 'templates/panoramas/panorama.html',
         controller: 'PanoramasCtrl'
+      }
+    }
+  }).state('tab.live', {
+    url: '/live',
+    views: {
+      'webcams': {
+        templateUrl: 'templates/webcams/live.html',
+        controller: 'LiveCtrl'
       }
     }
   }).state('tab.webcams', {
@@ -83,6 +97,14 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
         controller: 'BuildingsCtrl'
       }
     }
+  }).state('tab.renderings', {
+    url: '/renderings/:id',
+    views: {
+      'tab-dash': {
+        templateUrl: 'templates/renderings/rendering.html',
+        controller: 'RenderingsCtrl'
+      }
+    }
   }).state('tab.reset', {
     url: '/reset',
     views: {
@@ -95,9 +117,19 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
   $urlRouterProvider.otherwise('/tab/home');
 });
 
-angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $rootScope, $state, $log, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings) {
+angular.module('starter.controllers', []).controller('DashCtrl', function($scope, $q, $http, $rootScope, $state, $log, APIService, Renderings, Views, Floorplans, Videos, Webcams, Presentations, ActiveBuilding, TopmenuState, Buildings, Snapshots) {
   $scope.presentations = {};
-  $scope.factories = [["Presentations", Presentations.sorted()], ["Videos", Videos.sorted()], ["Floor Plans", Floorplans.sorted()], ["Rendering", Renderings.sorted()], ["Views", Views.sorted()], ["Webcams", Webcams.sorted()]];
+  $scope.factories = [["Presentations"], ["Videos"], ["Floor Plans"], ["Renderings"], ["Views"]];
+  $scope.snapshots = [["Webcams"]];
+  angular.forEach([Presentations, Videos, Floorplans, Renderings, Views], function(factory, index) {
+    console.log(factory, index);
+    return factory.sorted().then(function(reports) {
+      return $scope.factories[index].push(reports);
+    });
+  });
+  Snapshots.sorted().then(function(reports) {
+    $scope.snapshots[0].push(reports);
+  });
   $scope.activeBuilding = ActiveBuilding;
   $scope.activeBuildingName = void 0;
   $scope.lastActiveName = void 0;
@@ -156,10 +188,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else {
       return "";
     }
-  };
-  $scope.openPres = function(presId) {
-    window.location = '#/tab/presentations/' + presId;
-    window.location.reload();
   };
   $scope.cancelActiveBuilding = function($event) {
     var bld_box;
@@ -275,12 +303,34 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
     return $scope.activeComparison = comparison;
   };
-  return $scope.getComparisonStroke = function(comparison) {
+  $scope.getComparisonStroke = function(comparison) {
     if (comparison === $scope.activeComparison) {
       return "#FFF";
     } else {
       return "#808080";
     }
+  };
+  $scope.playAsset = function(name, asset) {
+    var command;
+    console.log(asset, name, "NAAME");
+    if (name === "Presentations") {
+      $scope.openLoc('presentations', asset.id);
+      return;
+    } else if (name === "Views") {
+      $scope.openLoc('views', asset.id);
+      return;
+    } else {
+      command = {
+        command: "play"
+      };
+      name = name.substring(0, name.length - 1);
+    }
+    return APIService.play(asset, name, command);
+  };
+  return $scope.openLoc = function(location, modId) {
+    $state.go('tab.' + location, {
+      id: modId
+    }, {});
   };
 }).controller('titleCtrl', function($scope, $stateParams) {
   $scope.titleTemplate = "templates/menu/title.html";
@@ -289,15 +339,38 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.buildings = "#/tab/buildings";
 }).controller('FloorplanDetailCtrl', function($scope, $stateParams, Floorplans) {
   $scope.floorplan = Floorplans.get($stateParams.id);
-}).controller('WebcamsCtrl', function($scope, $log, Webcams) {
-  $scope.webcams = Webcams.all();
+}).controller('WebcamsCtrl', function($scope, $state, $log, Webcams, Timelapses) {
   $scope.activeWebcam = void 0;
   $scope.nowLive = false;
   $scope.nowLive4 = false;
+  $scope.activeWebcamId = void 0;
+  Webcams.all().then(function(reports) {
+    $scope.webcams = reports;
+  });
+  $scope.noPano = function() {
+    if ($scope.activeWebcam) {
+      if ($scope.activeWebcam.panoramas_count === 0) {
+        return true;
+      }
+    } else {
+      return true;
+    }
+  };
+  $scope.viewPano = function() {
+    if ($scope.activeWebcam) {
+      if ($scope.activeWebcam.panoramas_count === 0) {
+        return 1;
+      } else {
+        return $state.go('tab.panoramas', {
+          cameraId: $scope.activeWebcamId
+        });
+      }
+    }
+  };
   $scope.isActive = function(item) {
     if ($scope.activeWebcam === void 0) {
       return false;
-    } else if ($scope.activeWebcam.id === item) {
+    } else if ($scope.activeWebcam.id === item.id) {
       return true;
     } else {
       return false;
@@ -309,14 +382,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setZoom = function(val) {
     return $scope.currentZoom = val;
   };
-  $scope.setActiveWebcam = function(activeWebcamId) {
-    $scope.selected = activeWebcamId;
-    $scope.activeWebcam = Webcams.get(activeWebcamId);
-    $scope.panoramas = Webcams.getPanoramas(activeWebcamId);
-    $scope.timelapses = Webcams.getTimelapses(activeWebcamId);
+  $scope.setActiveWebcam = function(activeWebcam) {
+    $scope.activeWebcamId = activeWebcam.id;
+    $scope.activeWebcam = Webcams.getLocal($scope.activeWebcamId);
     $scope.nowLive = false;
     $scope.nowLive4 = false;
     $scope.nowPano = false;
+    Timelapses.getForCamera($scope.activeWebcamId).then(function(timelapses) {
+      return $scope.timelapses = timelapses;
+    });
     return $log.debug($scope.panoramas);
   };
   $scope.isEnabled = function(model) {
@@ -330,13 +404,20 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.setLive = function() {
     $scope.nowLive = !$scope.nowLive;
-    $scope.activeWebcam = void 0;
+    $scope.resetEverything();
     return $scope.nowLive4 = false;
   };
   $scope.setLive4 = function() {
     $scope.nowLive4 = !$scope.nowLive4;
+    $scope.resetEverything();
+    $scope.nowLive = false;
+    return $state.go("tab.live", {}, {});
+  };
+  $scope.resetEverything = function() {
     $scope.activeWebcam = void 0;
-    return $scope.nowLive = false;
+    $scope.activeWebcamId = void 0;
+    $scope.timelapses = void 0;
+    return $scope.shownGroup = null;
   };
   $scope.isLive4 = function() {
     return $scope.nowLive4;
@@ -360,12 +441,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.shownGroup === group;
   };
 }).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
-  $scope.presentation = Presentations.get($stateParams.id);
-  $scope.slides = Presentations.getSlides($stateParams.id);
-  $scope.presentation_name = $scope.presentation.name;
-  $scope.project_name = $scope.presentation.project_name;
   $scope.currentSlide = 1;
-  $scope.postSlide = function(slideIdx) {
+  Presentations.get($stateParams.id).then(function(result) {
+    $scope.presentation = result;
+    $scope.slides = $scope.presentation.slides;
+    $scope.presentation_name = $scope.presentation.name;
+    return $scope.project_name = $scope.presentation.building_name;
+  });
+  return $scope.postSlide = function(slideIdx) {
     if (slideIdx >= $scope.slides.length) {
       return $scope.currentSlide = $scope.slides.length;
     } else if (slideIdx <= 1) {
@@ -374,12 +457,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.currentSlide = slideIdx;
     }
   };
-  $scope.alertMe = function() {
-    return $log.debug("...");
-  };
 }).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
   $scope.video = Videos.get($stateParams.id);
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
   $scope.building_name = $scope.video.building_name;
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
@@ -450,8 +530,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
   var firstHeight, firstWidth, pan, posX, posY, square;
-  $scope.panorama = Panoramas.get($stateParams.id);
-  $scope.webcam_name = Panoramas.getWebcamName($stateParams.id);
   $scope.currentZoom = 1.0;
   square = document.getElementById("square");
   posX = 0;
@@ -459,6 +537,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   pan = document.getElementById("panorama_image");
   firstWidth = square.getBoundingClientRect().width;
   firstHeight = square.getBoundingClientRect().height;
+  Panoramas.get_by_camera($stateParams.cameraId).then(function(result) {
+    $scope.panorama = result;
+    $scope.webcam_name = $scope.panorama.webcam_name;
+    return $scope.image_url = $scope.panorama.image.url;
+  });
   $scope.zoomIn = function(name) {
     var toZoom;
     console.log($scope.currentZoom);
@@ -513,8 +596,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   return $scope.getCamera = function() {
     return 1;
   };
-}).controller('VideoCtrl', function($scope, $stateParams, Videos, $location) {
-  $scope.video = Videos.get($stateParams.id);
+}).controller('VideoCtrl', function($scope, $sce, $log, $stateParams, Videos, $location) {
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
@@ -522,6 +604,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.mute = false;
   $scope.max = 80;
   $scope.videoState = true;
+  Videos.get($stateParams.id).then(function(result) {
+    $scope.video = result;
+    console.log($scope.video.recording.url, "URL");
+    $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
+    return $scope.building_name = $scope.video.building_name;
+  });
+  $scope.trustSrc = function(src) {
+    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  };
+  $scope.postVideoId = function(videoId) {};
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -596,23 +688,21 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location) {
-  $scope.video = Timelapses.get($stateParams.id);
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording);
-  $scope.building_name = $scope.video.building_name;
   $scope.videoState = true;
+  $scope.video = Timelapses.getLocal($stateParams.id);
+  console.log($scope.video.recording.url, "URL");
+  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
+  $scope.building_name = $scope.video.building_name;
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
-  $scope.update = function() {
-    $scope.videoDiv.pause();
-    return $scope.videoState = true;
-  };
+  $scope.postVideoId = function(videoId) {};
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
@@ -621,6 +711,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.closeBtn = function() {
     $scope.videoDiv.pause();
     return $location.path('#/dash/');
+  };
+  $scope.update = function() {
+    return $scope.videoDiv.pause();
   };
   $scope.seekRelease = function() {
     var currentTime;
@@ -668,7 +761,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setMute = function() {
     return $scope.mute = !$scope.mute;
   };
-  $scope.progressRelease = function($event) {
+  return $scope.progressRelease = function($event) {
     if ($event.gesture.deltaX > 0) {
       if ($scope.volume.value >= 100) {
         return $scope.volume.value = 100;
@@ -683,6 +776,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       }
     }
   };
+}).controller('LiveCtrl', function($scope) {
+  $scope.arrow_template = "templates/webcams/arrow.html";
 }).controller('HomeCtrl', function($scope) {
   $scope.home = "HOME";
 }).controller('ResetCtrl', function($scope, $ionicHistory) {
@@ -693,8 +788,69 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $location.path(path);
   };
 }).controller('ViewsCtrl', function($scope, $stateParams, Views, ActiveCamera, $ionicHistory) {
-  $scope.view = Views.get($stateParams.id);
-  $scope.webcam_name = Views.getWebcamName($stateParams.id);
+  var firstHeight, firstWidth, pan, posX, posY, square;
+  $scope.currentZoom = 1.0;
+  square = document.getElementById("square");
+  posX = 0;
+  posY = 0;
+  pan = document.getElementById("panorama_image");
+  firstWidth = square.getBoundingClientRect().width;
+  firstHeight = square.getBoundingClientRect().height;
+  Views.get($stateParams.id).then(function(result) {
+    console.log(result);
+    $scope.view = result;
+    $scope.building_name = $scope.view.building_name;
+    $scope.imageUrl = $scope.view.image.url;
+    return console.log($scope.view, "VIEW");
+  });
+  $scope.zoomIn = function(name) {
+    var toZoom;
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom <= 0.4) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom - 0.2;
+    toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
+    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+  };
+  $scope.zoomOut = function(name) {
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
+    console.log($scope.currentZoom);
+    if ($scope.currentZoom >= 1.0) {
+      return;
+    }
+    toZoom = document.getElementById(name);
+    $scope.currentZoom = $scope.currentZoom + 0.2;
+    deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth);
+    deltaHeight = Math.abs(square.getBoundingClientRect().height - firstHeight);
+    transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+    toZoom.style.transform = transform;
+    toZoom.style.webkitTransform = toZoom.style.transform;
+    if (square.getBoundingClientRect().left <= pan.getBoundingClientRect().left) {
+      posX = -deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().top <= pan.getBoundingClientRect().top) {
+      posY = -deltaHeight / 2;
+      changeY = true;
+    }
+    if (square.getBoundingClientRect().right >= pan.getBoundingClientRect().right) {
+      posX = pan.offsetWidth - square.getBoundingClientRect().width - deltaWidth / 2;
+      changeX = true;
+    }
+    if (square.getBoundingClientRect().bottom >= pan.getBoundingClientRect().bottom) {
+      posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight / 2;
+      changeY = true;
+    }
+    if (changeX === true || changeY === true) {
+      transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
+      toZoom.style.transform = transform;
+      toZoom.style.webkitTransform = toZoom.style.transform;
+      changeX = false;
+      return changeY = false;
+    }
+  };
   $scope.getView = function() {
     return $scope.view.image;
   };
@@ -894,10 +1050,6 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
   };
 });
 
-var current_server;
-
-current_server = "http://localhost:3000";
-
 angular.module('starter.services', []).factory('Buildings', function() {
   var models;
   models = [
@@ -950,6 +1102,457 @@ angular.module('starter.services', []).factory('Buildings', function() {
       } else {
         return name;
       }
+    }
+  };
+}).service('HelperService', function(Buildings) {
+  this.sort_models = function(models) {
+    var hash, i, k, result, v;
+    hash = {};
+    result = [];
+    i = 0;
+    while (i < models.length) {
+      if (models[i].building_name === void 0) {
+        models[i].building_name = 'all';
+      }
+      if (hash[models[i].building_name] === void 0) {
+        hash[models[i].building_name] = [models[i]];
+      } else {
+        hash[models[i].building_name].push(models[i]);
+      }
+      i++;
+    }
+    for (k in hash) {
+      v = hash[k];
+      result.push(v);
+    }
+    return result;
+  };
+  this.sort_snapshots = function(models) {
+    var hash, i, k, result, v;
+    hash = {};
+    result = [];
+    i = 0;
+    while (i < models.length) {
+      if (hash[models[i].camera_name] === void 0) {
+        hash[models[i].camera_name] = [models[i]];
+      } else {
+        hash[models[i].camera_name].push(models[i]);
+      }
+      i++;
+    }
+    for (k in hash) {
+      v = hash[k];
+      result.push(v);
+    }
+    return result;
+  };
+}).service('APIService', function($http) {
+  var server;
+  server = "http://localhost:3000";
+  this.play = function(asset, name, command) {
+    var json;
+    json = {
+      asset: {
+        type: name,
+        id: asset.id
+      },
+      command: {
+        command: "play"
+      }
+    };
+    angular.extend(json.command, command);
+    return $http.post(server + "/pgs_command", json).then((function(response) {
+      return console.log(response);
+    }), function(data) {
+      console.log(data);
+    });
+  };
+}).factory('Presentations', function($http, HelperService) {
+  var models;
+  models = [];
+  return {
+    name: function() {
+      return "Presentation";
+    },
+    sorted: function() {
+      return $http.get('http://localhost:3000/presentations.json').then((function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR PRES");
+      });
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      return $http.get('http://localhost:3000/presentations/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR PRES");
+      });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Renderings', function($http, Buildings, HelperService) {
+  var models;
+  models = [];
+  return {
+    name: function() {
+      return "Rendering";
+    },
+    sorted: function() {
+      return $http.get('http://localhost:3000/renderings.json').then(function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      });
+    },
+    all: function() {
+      return $http.get('http://localhost:3000/admin/renderings.json').then(function(response) {
+        console.log(response);
+        models = response;
+        return models;
+      });
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Views', function($http, HelperService) {
+  var models;
+  models = [];
+  return {
+    name: function() {
+      return "View";
+    },
+    sorted: function() {
+      return $http.get('http://localhost:3000/views.json').then(function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      });
+    },
+    all: function() {
+      var j, len, model, newMod;
+      newMod = [];
+      for (j = 0, len = models.length; j < len; j++) {
+        model = models[j];
+        model.id = Math.floor((Math.random() * 10) + 1);
+        newMod.push(model);
+      }
+      return newMod;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      return $http.get('http://localhost:3000/views/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR View");
+      });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    },
+    getWebcamName: function(panId) {
+      return models[0].camera_name;
+    }
+  };
+}).factory('Floorplans', function($http, HelperService) {
+  var models;
+  models = [];
+  return {
+    name: function() {
+      return "Floorplan";
+    },
+    sorted: function() {
+      return $http.get('http://localhost:3000/floorplans.json').then(function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      });
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Videos', function($http, HelperService) {
+  var models;
+  models = [];
+  return {
+    name: function() {
+      return "Video";
+    },
+    sorted: function() {
+      return $http.get('http://localhost:3000/videos.json').then((function(response) {
+        var result;
+        result = HelperService.sort_models(response.data);
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR PRES");
+      });
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get: function(chatId) {
+      return $http.get('http://localhost:3000/videos/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR Video");
+      });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Webcams', function($http, HelperService) {
+  var models;
+  models = [];
+  return {
+    name: function() {
+      return "Webcam";
+    },
+    all: function() {
+      return $http.get('http://localhost:3000/cameras.json').then((function(response) {
+        console.log(response);
+        models = response.data;
+        return models;
+      }), function(data) {
+        console.log(data, "ERROR Cameras");
+      });
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    },
+    getPanoramas: function(chatId) {
+      return [
+        {
+          id: 1,
+          name: "Panorama1",
+          image: 'img/assets/panoramas/1.jpg'
+        }, {
+          id: 2,
+          name: "Panorama2",
+          image: 'img/assets/panoramas/2.jpg'
+        }
+      ];
+    }
+  };
+}).factory('Timelapses', function($http) {
+  var models;
+  models = [];
+  return {
+    getRecording: function(videoId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(videoId)) {
+          return models[i].recording;
+        }
+        i++;
+      }
+      return null;
+    },
+    name: function() {
+      return "Timelapse";
+    },
+    getForCamera: function(cameraId) {
+      return $http.get('http://localhost:3000/timelapses_by_camera/' + cameraId + '.json').then((function(response) {
+        models = response.data;
+        return models;
+      }), function(data) {
+        console.log(data, "ERROR Timelapses");
+      });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    }
+  };
+}).service('Snapshots', function(HelperService, $http) {
+  return {
+    name: function() {
+      return "Screenshot";
+    },
+    sorted: function() {
+      return $http.get('http://localhost:3000/snapshots.json').then((function(response) {
+        var result;
+        result = HelperService.sort_snapshots(response.data);
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR Snapshot");
+      });
+    },
+    get: function(chatId) {
+      return $http.get('http://localhost:3000/snapshots/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR Snapshot");
+      });
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).factory('Panoramas', function($http) {
+  var models;
+  models = [
+    {
+      id: 1,
+      name: "Pan1",
+      image: 'img/assets/panoramas/1.jpg',
+      building_name: '200 Massachusetts',
+      camera_name: 'Camera 1'
+    }
+  ];
+  return {
+    name: function() {
+      return "Panorama";
+    },
+    all: function() {
+      return models;
+    },
+    remove: function(chat) {
+      models.splice(models.indexOf(chat), 1);
+    },
+    get_by_camera: function(camera_id) {
+      return $http.get('http://localhost:3000/panorama_by_camera/' + String(camera_id) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR Panorama");
+      });
+    },
+    getWebcamName: function(panId) {
+      return models[0].camera_name;
+    },
+    getLocal: function(camId) {
+      var i;
+      i = 0;
+      while (i < models.length) {
+        if (models[i].id === parseInt(camId)) {
+          return models[i];
+        }
+        i++;
+      }
+      return null;
+    }
+  };
+}).service('ActiveCamera', function() {
+  var name;
+  name = void 0;
+  return {
+    setName: function(new_name) {
+      return name = new_name;
+    },
+    getName: function(new_name) {
+      return name;
     }
   };
 }).service('ActiveBuilding', function() {
@@ -1027,682 +1630,6 @@ angular.module('starter.services', []).factory('Buildings', function() {
       actives['600 Second Street'] = 'active';
       actives['201 F Street'] = 'active';
       return actives['200 F Street'] = 'active';
-    }
-  };
-}).factory('Presentations', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 2,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 3,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 4,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 5,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 6,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 7,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 8,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 9,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 10,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 11,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 12,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 13,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 14,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 15,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 16,
-      name: "Overview Presentation",
-      image: 'img/assets/presentations/1.png',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 17,
-      name: "Sustainability Presentation",
-      image: 'img/assets/presentations/2.jpg',
-      building_name: '200 Massachusetts',
-      project_name: "200 Massachusetts"
-    }, {
-      id: 18,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '250 Massachusetts',
-      project_name: "250 Massachusetts"
-    }, {
-      id: 19,
-      name: "Building Presentation",
-      image: 'img/assets/presentations/3.jpg',
-      building_name: '600 Second Street',
-      project_name: "600 Second Street"
-    }
-  ];
-  return {
-    name: function() {
-      return "Presentation";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    },
-    getSlides: function(presentationId) {
-      var slides;
-      return slides = [
-        {
-          id: 1,
-          image: 'img/assets/slides/1.jpg'
-        }, {
-          id: 2,
-          image: 'img/assets/slides/2.jpg'
-        }, {
-          id: 3,
-          image: 'img/assets/slides/3.jpg'
-        }, {
-          id: 4,
-          image: 'img/assets/slides/4.jpg'
-        }, {
-          id: 5,
-          image: 'img/assets/slides/5.jpg'
-        }, {
-          id: 6,
-          image: 'img/assets/slides/6.jpg'
-        }, {
-          id: 7,
-          image: 'img/assets/slides/7.jpg'
-        }, {
-          id: 8,
-          image: 'img/assets/slides/8.jpg'
-        }, {
-          id: 9,
-          image: 'img/assets/slides/9.jpg'
-        }, {
-          id: 10,
-          image: 'img/assets/slides/10.jpg'
-        }
-      ];
-    }
-  };
-}).factory('Renderings', function($http, Buildings) {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Rend1",
-      image: 'img/assets/renderings/1.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 2,
-      name: "Rend2",
-      image: 'img/assets/renderings/2.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 3,
-      name: "Rendering 3",
-      image: 'img/assets/renderings/3.jpg',
-      building_name: '250 Massachusetts'
-    }
-  ];
-  return {
-    name: function() {
-      return "Rendering";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    }
-  };
-}).factory('Views', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "View1",
-      image: 'img/assets/views/1.jpg',
-      building_name: '200 Massachusetts',
-      camera_name: '1'
-    }, {
-      id: 2,
-      name: "View2",
-      image: 'img/assets/views/2.jpg',
-      building_name: '200 Massachusetts',
-      camera_name: '2'
-    }, {
-      id: 3,
-      name: "View3",
-      image: 'img/assets/views/3.jpg',
-      building_name: '250 Massachusetts',
-      camera_name: '3'
-    }
-  ];
-  return {
-    name: function() {
-      return "View";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      var j, len, model, newMod;
-      newMod = [];
-      for (j = 0, len = models.length; j < len; j++) {
-        model = models[j];
-        model.id = Math.floor((Math.random() * 10) + 1);
-        newMod.push(model);
-      }
-      return newMod;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    },
-    getWebcamName: function(panId) {
-      return models[0].camera_name;
-    }
-  };
-}).factory('Floorplans', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Floorplan1",
-      image: 'img/assets/floorplans/1.svg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 2,
-      name: "Floorplan2",
-      image: 'img/assets/floorplans/1.svg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 3,
-      name: "Floorplan3",
-      image: 'img/assets/floorplans/3.svg',
-      building_name: '250 Massachusetts'
-    }
-  ];
-  return {
-    name: function() {
-      return "Floorplan";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    }
-  };
-}).factory('Videos', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Video1",
-      image: 'img/assets/views/1.jpg',
-      building_name: '200 Massachusetts',
-      recording: 'img/assets/videos/1.mp4'
-    }, {
-      id: 2,
-      name: "Video2",
-      image: 'img/assets/views/2.jpg',
-      building_name: '200 Massachusetts',
-      recording: 'img/assets/videos/2.mp4'
-    }, {
-      id: 3,
-      name: "Video3",
-      image: 'img/assets/views/3.jpg',
-      building_name: '250 Massachusetts',
-      recording: 'img/assets/videos/3.mp4'
-    }
-  ];
-  return {
-    getRecording: function(videoId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(videoId)) {
-          return models[i].recording;
-        }
-        i++;
-      }
-      return null;
-    },
-    name: function() {
-      return "Video";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    }
-  };
-}).factory('Timelapses', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Timelapse 1",
-      image: 'img/assets/views/1.jpg',
-      building_name: '200 Massachusetts',
-      recording: 'img/assets/videos/1.mp4'
-    }, {
-      id: 2,
-      name: "Timelapse 2",
-      image: 'img/assets/views/2.jpg',
-      building_name: '200 Massachusetts',
-      recording: 'img/assets/videos/2.mp4'
-    }, {
-      id: 3,
-      name: "Timelapse 3",
-      image: 'img/assets/views/3.jpg',
-      building_name: '250 Massachusetts',
-      recording: 'img/assets/videos/3.mp4'
-    }
-  ];
-  return {
-    getRecording: function(videoId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(videoId)) {
-          return models[i].recording;
-        }
-        i++;
-      }
-      return null;
-    },
-    name: function() {
-      return "Timelapse";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    }
-  };
-}).service('ActiveCamera', function() {
-  var name;
-  name = void 0;
-  return {
-    setName: function(new_name) {
-      return name = new_name;
-    },
-    getName: function(new_name) {
-      return name;
-    }
-  };
-}).factory('Webcams', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Webcam1",
-      image: 'img/assets/webcams/1.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 2,
-      name: "Webcam2",
-      image: 'img/assets/webcams/2.jpg',
-      building_name: '200 Massachusetts'
-    }, {
-      id: 3,
-      name: "Webcam3",
-      image: 'img/assets/webcams/3.jpg',
-      building_name: '250 Massachusetts'
-    }
-  ];
-  return {
-    name: function() {
-      return "Webcam";
-    },
-    sorted: function() {
-      var hash, i, k, result, v;
-      hash = {};
-      result = [];
-      i = 0;
-      while (i < models.length) {
-        if (hash[models[i].building_name] === void 0) {
-          hash[models[i].building_name] = [models[i]];
-        } else {
-          hash[models[i].building_name].push(models[i]);
-        }
-        i++;
-      }
-      for (k in hash) {
-        v = hash[k];
-        result.push(v);
-      }
-      return result;
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    },
-    getPanoramas: function(chatId) {
-      return [
-        {
-          id: 1,
-          name: "Panorama1",
-          image: 'img/assets/panoramas/1.jpg'
-        }, {
-          id: 2,
-          name: "Panorama2",
-          image: 'img/assets/panoramas/2.jpg'
-        }
-      ];
-    },
-    getTimelapses: function(chatId) {
-      return [
-        {
-          id: 1,
-          name: "Video1",
-          image: 'img/assets/webcams/1.jpg'
-        }, {
-          id: 2,
-          name: "Video2",
-          image: 'img/assets/webcams/2.jpg'
-        }
-      ];
-    }
-  };
-}).factory('Panoramas', function() {
-  var models;
-  models = [
-    {
-      id: 1,
-      name: "Pan1",
-      image: 'img/assets/panoramas/1.jpg',
-      building_name: '200 Massachusetts',
-      camera_name: 'Camera 1'
-    }
-  ];
-  return {
-    name: function() {
-      return "Panorama";
-    },
-    all: function() {
-      return models;
-    },
-    remove: function(chat) {
-      models.splice(models.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      var i;
-      i = 0;
-      while (i < models.length) {
-        if (models[i].id === parseInt(chatId)) {
-          return models[i];
-        }
-        i++;
-      }
-      return null;
-    },
-    getWebcamName: function(panId) {
-      return models[0].camera_name;
     }
   };
 }).factory('TopmenuState', function() {

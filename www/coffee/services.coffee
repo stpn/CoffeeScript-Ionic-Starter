@@ -93,6 +93,43 @@ angular.module('starter.services', []).factory('Buildings', ->
 
   return
 
+
+
+).service('APIService', ($http) ->
+
+  server = "http://localhost:3000"
+
+
+  # {:asset => {:type => "Rendering", :id => "23"},
+  #  :command =>
+  #  {:channel => "twelve",
+  #   :screens => "12",
+  #   :metadata1 => "Meta1", :metadata2 => "Meta2", :metadata3 => "Meta3", :metadata4 => "Meta4",
+  #   :loction => 'left',
+  #   :x => "1", :y => '2', :z => '3'
+  #   }
+  #  }
+
+  @play = (asset, name, command) ->
+    json =
+      asset:
+        type: name
+        id: asset.id
+      command: 
+        command: "play"
+
+    angular.extend(json.command, command)
+
+    $http.post(server+"/pgs_command", json).then ((response) ->
+      console.log response
+      ), (data) ->
+      console.log data
+      return
+
+  return
+
+
+
 ).factory('Presentations',($http, HelperService)  ->
   models = []
 
@@ -105,68 +142,35 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = HelperService.sort_models(response.data)
         result
       ), (data) ->
-        console.log "ERROR PRES"
+        console.log data, "ERROR PRES"
         return
 
     all: ->
       models
+
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
+
     get: (chatId) ->
       $http.get('http://localhost:3000/presentations/'+String(chatId)+'.json').then ((response) ->        
         console.log response
         result = response.data
         result
       ), (data) ->
-        console.log "ERROR PRES"
+        console.log data, "ERROR PRES"
         return
 
-    getSlides: (presentationId) ->
-      slides = [
-        {
-          id: 1
-          image: 'img/assets/slides/1.jpg'
-        },
-        {
-          id: 2
-          image: 'img/assets/slides/2.jpg'
-        },
-        {
-          id: 3
-          image: 'img/assets/slides/3.jpg'
-        },
-        {
-          id: 4
-          image: 'img/assets/slides/4.jpg'
-        },
-        {
-          id: 5
-          image: 'img/assets/slides/5.jpg'
-        },
-        {
-          id: 6
-          image: 'img/assets/slides/6.jpg'
-        },
-        {
-          id: 7
-          image: 'img/assets/slides/7.jpg'
-        },
-        {
-          id: 8
-          image: 'img/assets/slides/8.jpg'
-        },
-        {
-          id: 9
-          image: 'img/assets/slides/9.jpg'
-        },
-        {
-          id: 10
-          image: 'img/assets/slides/10.jpg'
-        }  
-      ]
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
 
   }
+
 ).factory('Renderings', ($http, Buildings, HelperService) ->
   models = []
 
@@ -188,10 +192,11 @@ angular.module('starter.services', []).factory('Buildings', ->
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
-    get: (chatId) ->
+
+    getLocal: (camId) ->
       i = 0
       while i < models.length
-        if models[i].id == parseInt(chatId)
+        if models[i].id == parseInt(camId)
           return models[i]
         i++
       null
@@ -223,8 +228,18 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = response.data
         result
       ), (data) ->
-        console.log "ERROR View"
+        console.log data, "ERROR View"
         return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
+
     getWebcamName: (panId) ->
       models[0].camera_name
 
@@ -246,13 +261,15 @@ angular.module('starter.services', []).factory('Buildings', ->
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
-    get: (chatId) ->
+
+    getLocal: (camId) ->
       i = 0
       while i < models.length
-        if models[i].id == parseInt(chatId)
+        if models[i].id == parseInt(camId)
           return models[i]
         i++
       null
+
 
   }
 ).factory('Videos', ($http, HelperService) ->
@@ -267,7 +284,7 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = HelperService.sort_models(response.data)
         result
       ), (data) ->
-        console.log "ERROR PRES"
+        console.log data, "ERROR PRES"
         return        
 
     all: ->
@@ -281,8 +298,17 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = response.data
         result
       ), (data) ->
-        console.log "ERROR Video"
+        console.log data, "ERROR Video"
         return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
 
   }
 
@@ -303,7 +329,7 @@ angular.module('starter.services', []).factory('Buildings', ->
         models = response.data
         models
       ), (data) ->
-        console.log "ERROR Cameras"
+        console.log data, "ERROR Cameras"
         return
 
     remove: (chat) ->
@@ -354,7 +380,7 @@ angular.module('starter.services', []).factory('Buildings', ->
         models = response.data
         models
       ), (data) ->
-        console.log "ERROR Timelapses"
+        console.log data, "ERROR Timelapses"
         return   
 
     getLocal: (camId) ->
@@ -367,16 +393,11 @@ angular.module('starter.services', []).factory('Buildings', ->
 
     all: ->
       models
+
     remove: (chat) ->
       models.splice models.indexOf(chat), 1
       return
-    get: (chatId) ->
-      i = 0
-      while i < models.length
-        if models[i].id == parseInt(chatId)
-          return models[i]
-        i++
-      null
+
 
   }
 
@@ -390,7 +411,7 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = HelperService.sort_snapshots(response.data)
         result
       ), (data) ->
-        console.log "ERROR Snapshot"
+        console.log data, "ERROR Snapshot"
         return        
 
     get: (chatId) ->
@@ -399,8 +420,17 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = response.data
         result
       ), (data) ->
-        console.log "ERROR Snapshot"
+        console.log data, "ERROR Snapshot"
         return
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
 
 
 ).factory('Panoramas', ($http) ->
@@ -428,11 +458,20 @@ angular.module('starter.services', []).factory('Buildings', ->
         result = response.data
         result
       ), (data) ->
-        console.log "ERROR Panorama"
+        console.log data, "ERROR Panorama"
         return
 
     getWebcamName: (panId) ->
       models[0].camera_name
+
+    getLocal: (camId) ->
+      i = 0
+      while i < models.length
+        if models[i].id == parseInt(camId)
+          return models[i]
+        i++
+      null
+
 
   }
 
@@ -478,6 +517,8 @@ angular.module('starter.services', []).factory('Buildings', ->
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
+
+
   }
 
 ).service('ActiveCrestron', ->
@@ -502,11 +543,7 @@ angular.module('starter.services', []).factory('Buildings', ->
     isActive: (q_name) ->
       if actives[q_name] == 'active'
         return true
-    # getActive: ->
-    #   if actives.size > 0
-    #     for k,v of actives
-    #       if actives[k] != undefined
-    #         actives[k]
+
     cancelAll: ->
       for k,v of actives
         actives[k] = undefined
