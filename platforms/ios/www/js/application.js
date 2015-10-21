@@ -909,23 +909,21 @@ Number.prototype.map = function(in_min, in_max, out_min, out_max) {
 };
 
 scaleValues = function(posY, posX, scale, img, imgname) {
-  var command, scaleToSend, xToSend, yToSend;
+  var command, h, pano_big, scaleToSend, screen, w, width_ratio, xToSend, yToSend;
+  pano_big = 11532;
+  screen = 7680;
+  width_ratio = 1.5015625;
+  w = 676;
+  h = 190;
+  scaleToSend = 1 / scale;
+  xToSend = -(posX - 46).map(0, w, -0.25, 1.25);
   yToSend = 0;
+  if (scale !== 0) {
+    xToSend = -(posX - 46).map(0, w, -(scaleToSend * 0.75 - 0.5), scaleToSend * 0.75 + 0.5);
+    yToSend = (posY - 178).map(0, h, -(scaleToSend * 0.5 - 0.5), scaleToSend * 0.5 + 0.5);
+  }
   console.log("POS TO ORIGINAL " + posX + " " + posY);
-  if (posY > Math.abs(32)) {
-    yToSend = posY.map(0, 186, 0, 3240) + 186 / 2;
-  }
-  console.log("DIM " + 11532 + " " + posY);
-  scaleToSend = parseFloat(1.0);
-  if (parseFloat(scale) > parseFloat(1.0)) {
-    scaleToSend = parseFloat(parseFloat(scale) - 1);
-  } else if (parseFloat(scale) < parseFloat(1.0)) {
-    scaleToSend = parseFloat(parseFloat(scale) + 1);
-  }
-  xToSend = 0;
-  if (posX !== 0) {
-    xToSend = posX.map(0, 676, 0, 11532) + 676 / 2;
-  }
+  console.log("CUR POS : " + posX + " " + posY);
   console.log("TOUCH OLD SCALE: ", parseFloat(scale));
   console.log("TOUCH NEW SCALE: ", parseFloat(scaleToSend));
   console.log("POS TO SEND " + xToSend + " " + yToSend);

@@ -1,31 +1,25 @@
 Number::map = (in_min, in_max, out_min, out_max) ->
   (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
-#If your number X falls between A and B, and you would like Y to fall between C and D, you can apply the following linear transform:
-#Y = (X-A)/(B-A) * (D-C) + C
 
 scaleValues = (posY, posX, scale, img, imgname) ->
   pano_big = 11532
   screen = 7680
   width_ratio =  1.5015625 
 
-  scaleToSend = parseFloat(1.0)
-  if parseFloat(scale) > parseFloat(1.0)
-    scaleToSend = parseFloat(parseFloat(scale) - 1)
-  else if  parseFloat(scale) < parseFloat(1.0)
-    scaleToSend = parseFloat(parseFloat(scale) + 1)
-  #xToSend = 0
-  #if posX != 0
-  # xToSend = -(posX - 46).map(0,676,0, 11532) #+ 676/2 #+11532*scale/6  
-  xToSend = -(posX - 46).map(0,676,-0.2,1.2) #+ 676/2 #+11532*scale/6  
+  w = 676
+  h = 190
 
+  scaleToSend = 1/scale
+
+  xToSend = -(posX - 46).map(0, w , -0.25 ,1.25   ) #+ 676/2 #+11532*scale/6 
+  yToSend = 0#(posY - 178).map(0,h ,-scaleToSend*0.5, 1)          
+  if scale != 0  
+    xToSend = -(posX - 46).map(0, w , -(scaleToSend*0.75-0.5), (scaleToSend * 0.75 + 0.5) ) 
+    yToSend = (posY - 178).map(0,h ,-(scaleToSend*0.5 - 0.5), scaleToSend*0.5 +0.5)
 
   #yToSend = 0
   console.log "POS TO ORIGINAL "+ posX + " " + posY
-  #if posY > Math.abs(32)
-  #yToSend = -(posY - 178).map(0,186,0, 3240)# + 186/2  #+3240*scale/6           
-  yToSend = (posY - 178).map(0,186,0, 1)# + 186/2  #+3240*scale/6           
-
-
+  console.log "CUR POS : "+  posX + " " + posY
   console.log "TOUCH OLD SCALE: ", parseFloat(scale)              
   console.log "TOUCH NEW SCALE: ", parseFloat(scaleToSend)
   console.log "POS TO SEND "+ xToSend + " " + yToSend

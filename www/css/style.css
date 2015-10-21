@@ -19037,7 +19037,7 @@ progress::-webkit-progress-value {
 .square {
   position: absolute;
   width: 451px;
-  height: 186px;
+  height: 190px;
   border: solid 3px;
   border-color: white;
   background: rgba(255, 255, 255, 0.01);
@@ -19144,7 +19144,7 @@ progress::-webkit-progress-value {
   font-size: 22px; }
 
 #panorama_view {
-  height: 186px;
+  height: 190px;
   width: 676px;
   margin-top: 14px;
   overflow: hidden; }
@@ -19159,7 +19159,7 @@ progress::-webkit-progress-value {
 .square {
   position: absolute;
   width: 451px;
-  height: 186px;
+  height: 190px;
   border: solid 3px;
   border-color: white;
   background: rgba(255, 255, 255, 0.01);
