@@ -148,12 +148,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       $scope.bld_style = "margin-top: 50px"
       
 
-  $scope.showCompareMenu = () ->    
+  $scope.showCompareMenu = (name) ->    
+    if name == "Presentations" || name == "Videos" || name == "Views"
+      return
     if $scope.comparisonState == false
       $scope.comparisonState = true
       $scope.buldingTabName = "COMPARISON MODE"
-    # else 
-    #   $scope.activeBuilding.tabName = $scope.activeBuilding.name
       bld = document.getElementById('building_wrap')
       menu = document.getElementById('ionTopMenu')
       pane = document.getElementsByTagName('ion-content')[0]
@@ -161,13 +161,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       $scope.comparisonState = false
       $scope.buldingTabName = $scope.activeBuildingName
 
+
     if menu.offsetHeight == 24 
       menu.style.height = '250px' 
- #     pane.style.top = '350px'
     else 
       menu.style.height =  '24px' 
-#      pane.style.top = '85px'
-
     if menu.style.height == "24px"
       $scope.bld_style = "margin-top: -200px"
     else
@@ -216,10 +214,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     else if name == "Views"
       $scope.openLoc('views', asset.id)
       return
+    else if name == "Videos"
+      $scope.openLoc('videos', asset.id)
+      return      
     else
       command = 
-        command: "play"
-      name = name.substring(0, name.length - 1);
+        command: "play"      
      APIService.play(asset, name, command)
 
 
@@ -311,12 +311,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.nowLive = !$scope.nowLive
     $scope.resetEverything()
     $scope.nowLive4 = false
+    $state.go("tab.live",{},{})
 
   $scope.setLive4 = ->
     $scope.nowLive4 = !$scope.nowLive4
     $scope.resetEverything()
     $scope.nowLive = false
-    $state.go("tab.live",{},{})
 
   
   $scope.resetEverything = ->
@@ -473,6 +473,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   #$scope.webcam_name = Panoramas.getWebcamName($stateParams.id)
   #console.log $scope.panorama.image
   $scope.currentZoom = 1.0
+  $scope.factoryName = "Panoramas"
   square = document.getElementById("square")
   posX = 0
   posY = 0
@@ -484,7 +485,23 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.panorama = result
     $scope.webcam_name = $scope.panorama.webcam_name
     $scope.image_url = $scope.panorama.image.url
+    img = new Image()
+    img.src = $scope.panorama.image.url
+    $scope.dimensions = {}
+    $scope.dimensions.width = img.width
+    $scope.dimensions.height = img.height
 
+
+  changeScale = () ->
+    scaleToSend = parseFloat(1.0)
+    if parseFloat($scope.currentZoom) > parseFloat(1.0)
+      scaleToSend = parseFloat(parseFloat($scope.currentZoom) - 1)
+    else if  parseFloat($scope.currentZoom) < parseFloat(1.0)
+      scaleToSend = parseFloat(parseFloat($scope.currentZoom) + 1)
+    
+    console.log "NEW SCALE: ", parseFloat(scaleToSend)
+    console.log "OLD SCALE: ", parseFloat($scope.currentZoom)
+    scaleToSend    
 
   $scope.zoomIn = (name) ->
     console.log $scope.currentZoom
@@ -495,10 +512,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
     toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
 
+    changeScale()
+
   $scope.zoomOut = (name) ->
     console.log $scope.currentZoom 
     if $scope.currentZoom >= 1.0 
       return
+    else if $scope.currentZoom <= 0.3
+      return
+
     toZoom = document.getElementById(name)
     $scope.currentZoom = $scope.currentZoom + 0.2
     # toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
@@ -535,8 +557,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     #   toZoom.style.webkitTransform = toZoom.style.transform                
     #   changeY = false  
 
-
-
+    changeScale()
 
   $scope.getPanorama =  ->
     $scope.panorama.image
@@ -768,13 +789,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   pan =  document.getElementById("panorama_image")
   firstWidth = square.getBoundingClientRect().width
   firstHeight = square.getBoundingClientRect().height
+  $scope.factoryName = "Views"
 
   Views.get($stateParams.id).then (result) ->
-    console.log result
+    
     $scope.view = result
     $scope.building_name = $scope.view.building_name 
     $scope.imageUrl = $scope.view.image.url
-    console.log $scope.view, "VIEW"
+    
 
 
   $scope.zoomIn = (name) ->
@@ -785,6 +807,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.currentZoom = $scope.currentZoom - 0.2
     toZoom.style.transfrom = "scale("+$scope.currentZoom+")"
     toZoom.style.webkitTransform= "scale("+$scope.currentZoom+")"
+
+    scaleToSend = 1
+    if parseFloat($scope.currentZoom) > 1
+      scaleToSend = parseFloat($scope.currentZoom) - 1
+    else if  parseFloat($scope.currentZoom) > 1
+      scaleToSend = parseFloat($scope.currentZoom) + 1
+    
+    console.log "NEW SCALE: ", parseFloat(scaleToSend)
+    console.log "OLD SCALE: ", parseFloat($scope.currentZoom)
+
 
   $scope.zoomOut = (name) ->
     console.log $scope.currentZoom 
@@ -825,6 +857,17 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     #   toZoom.style.transform = transform
     #   toZoom.style.webkitTransform = toZoom.style.transform                
     #   changeY = false  
+
+    scaleToSend = 1
+    if parseFloat($scope.currentZoom) > 1
+      scaleToSend = parseFloat($scope.currentZoom) - 1
+    else if  parseFloat($scope.currentZoom) > 1
+      scaleToSend = parseFloat($scope.currentZoom) + 1
+    
+    console.log "NEW SCALE: ", parseFloat(scaleToSend)
+    console.log "OLD SCALE: ", parseFloat($scope.currentZoom)
+
+
 
   $scope.getView =  ->
     $scope.view.image

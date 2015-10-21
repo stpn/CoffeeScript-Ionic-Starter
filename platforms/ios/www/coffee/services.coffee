@@ -1,3 +1,6 @@
+#SERVER="localhost:3000"
+SERVER="192.168.1.21"
+
 angular.module('starter.services', []).factory('Buildings', ->
   models = [
     {
@@ -62,7 +65,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       if models[i].building_name == undefined
         models[i].building_name = 'all'
       # if models[i].image
-      #   models[i].image.url = "http://localhost:3000/"+models[i].image.url
+      #   models[i].image.url = "http://'+SERVER+'/"+models[i].image.url
       if hash[models[i].building_name] == undefined
         hash[models[i].building_name] = [models[i]]
       else
@@ -97,8 +100,6 @@ angular.module('starter.services', []).factory('Buildings', ->
 
 ).service('APIService', ($http) ->
 
-  server = "http://localhost:3000"
-
 
   # {:asset => {:type => "Rendering", :id => "23"},
   #  :command =>
@@ -110,6 +111,26 @@ angular.module('starter.services', []).factory('Buildings', ->
   #   }
   #  }
 
+  @panorama = (asset, name, command) ->
+    name = name.substring(0, name.length - 1)
+    json =
+      asset:
+        type: name
+        id: asset.id
+      command: 
+        command: "pano"
+
+    angular.extend(json.command, command)
+    console.log "SENDING -> ", JSON.stringify(json)
+    $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
+      console.log response
+      ), (data) ->
+      console.log data
+      return
+
+  return
+
+
   @play = (asset, name, command) ->
     json =
       asset:
@@ -120,7 +141,7 @@ angular.module('starter.services', []).factory('Buildings', ->
 
     angular.extend(json.command, command)
 
-    $http.post(server+"/pgs_command", json).then ((response) ->
+    $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
       console.log response
       ), (data) ->
       console.log data
@@ -138,7 +159,7 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Presentation"
 
     sorted: ->
-      $http.get('http://localhost:3000/presentations.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/presentations.json').then ((response) ->        
         result = HelperService.sort_models(response.data)
         result
       ), (data) ->
@@ -153,7 +174,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       return
 
     get: (chatId) ->
-      $http.get('http://localhost:3000/presentations/'+String(chatId)+'.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/presentations/'+String(chatId)+'.json').then ((response) ->        
         console.log response
         result = response.data
         result
@@ -179,12 +200,12 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Rendering"
 
     sorted: ->
-      $http.get('http://localhost:3000/renderings.json').then (response) ->        
+      $http.get('http://'+SERVER+'/renderings.json').then (response) ->        
         result = HelperService.sort_models(response.data)
         result
 
     all: ->
-      $http.get('http://localhost:3000/admin/renderings.json').then (response) ->
+      $http.get('http://'+SERVER+'/renderings.json').then (response) ->
         console.log response
         models = response
         models
@@ -209,7 +230,7 @@ angular.module('starter.services', []).factory('Buildings', ->
      "View"  
 
     sorted: ->
-      $http.get('http://localhost:3000/views.json').then (response) ->        
+      $http.get('http://'+SERVER+'/views.json').then (response) ->        
         result = HelperService.sort_models(response.data)
         result
 
@@ -223,7 +244,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       models.splice models.indexOf(chat), 1
       return
     get: (chatId) ->
-      $http.get('http://localhost:3000/views/'+String(chatId)+'.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/views/'+String(chatId)+'.json').then ((response) ->        
         # console.log response
         result = response.data
         result
@@ -252,7 +273,7 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Floorplan"  
 
     sorted: ->
-      $http.get('http://localhost:3000/floorplans.json').then (response) ->        
+      $http.get('http://'+SERVER+'/floorplans.json').then (response) ->        
         result = HelperService.sort_models(response.data)
         result
 
@@ -280,7 +301,7 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Video"
 
     sorted: ->
-      $http.get('http://localhost:3000/videos.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/videos.json').then ((response) ->        
         result = HelperService.sort_models(response.data)
         result
       ), (data) ->
@@ -293,7 +314,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       models.splice models.indexOf(chat), 1
       return
     get: (chatId) ->
-      $http.get('http://localhost:3000/videos/'+String(chatId)+'.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/videos/'+String(chatId)+'.json').then ((response) ->        
         console.log response
         result = response.data
         result
@@ -319,12 +340,12 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Webcam"        
 
     # sorted: ->
-    #   $http.get('http://localhost:3000/cameras.json').then (response) ->        
+    #   $http.get('http://'+SERVER+'/cameras.json').then (response) ->        
     #     result = HelperService.sort_models(response.data)
     #     result
 
     all: ->
-      $http.get('http://localhost:3000/cameras.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/cameras.json').then ((response) ->        
         console.log response
         models = response.data
         models
@@ -376,7 +397,7 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Timelapse"
 
     getForCamera: (cameraId) ->
-      $http.get('http://localhost:3000/timelapses_by_camera/'+cameraId+'.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/timelapses_by_camera/'+cameraId+'.json').then ((response) ->        
         models = response.data
         models
       ), (data) ->
@@ -407,7 +428,7 @@ angular.module('starter.services', []).factory('Buildings', ->
      "Screenshot" 
 
     sorted: ->
-      $http.get('http://localhost:3000/snapshots.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/snapshots.json').then ((response) ->        
         result = HelperService.sort_snapshots(response.data)
         result
       ), (data) ->
@@ -415,7 +436,7 @@ angular.module('starter.services', []).factory('Buildings', ->
         return        
 
     get: (chatId) ->
-      $http.get('http://localhost:3000/snapshots/'+String(chatId)+'.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/snapshots/'+String(chatId)+'.json').then ((response) ->        
         console.log response
         result = response.data
         result
@@ -453,7 +474,7 @@ angular.module('starter.services', []).factory('Buildings', ->
       return
 
     get_by_camera: (camera_id) ->
-      $http.get('http://localhost:3000/panorama_by_camera/'+String(camera_id)+'.json').then ((response) ->        
+      $http.get('http://'+SERVER+'/panorama_by_camera/'+String(camera_id)+'.json').then ((response) ->        
         console.log response
         result = response.data
         result

@@ -1,5 +1,41 @@
 Number::map = (in_min, in_max, out_min, out_max) ->
   (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
+#If your number X falls between A and B, and you would like Y to fall between C and D, you can apply the following linear transform:
+#Y = (X-A)/(B-A) * (D-C) + C
+
+scaleValues = (posY, posX, scale, img, imgname) ->
+  pano_big = 11532
+  screen = 7680
+  width_ratio =  1.5015625 
+
+  scaleToSend = parseFloat(1.0)
+  if parseFloat(scale) > parseFloat(1.0)
+    scaleToSend = parseFloat(parseFloat(scale) - 1)
+  else if  parseFloat(scale) < parseFloat(1.0)
+    scaleToSend = parseFloat(parseFloat(scale) + 1)
+  #xToSend = 0
+  #if posX != 0
+  # xToSend = -(posX - 46).map(0,676,0, 11532) #+ 676/2 #+11532*scale/6  
+  xToSend = -(posX - 46).map(0,676,-0.2,1.2) #+ 676/2 #+11532*scale/6  
+
+
+  #yToSend = 0
+  console.log "POS TO ORIGINAL "+ posX + " " + posY
+  #if posY > Math.abs(32)
+  #yToSend = -(posY - 178).map(0,186,0, 3240)# + 186/2  #+3240*scale/6           
+  yToSend = (posY - 178).map(0,186,0, 1)# + 186/2  #+3240*scale/6           
+
+
+  console.log "TOUCH OLD SCALE: ", parseFloat(scale)              
+  console.log "TOUCH NEW SCALE: ", parseFloat(scaleToSend)
+  console.log "POS TO SEND "+ xToSend + " " + yToSend
+
+  command = 
+    x: xToSend
+    y: yToSend
+    z: scaleToSend
+
+  command
 
 
 angular.module('starter.filters', []).filter 'buildingFilter', [ ->
@@ -42,15 +78,19 @@ angular.module('starter.directives',[]).directive 'backImg', ->
     return
 
 
-angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
+angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APIService) ->
   {
     restrict: 'E'
+    scope: 
+      image: '='          
+      imgname: '='
+      dimensions: '='
     link: ($scope, $element, attrs) ->
       if $element[0].classList[0] != "square"
         return      
       $timeout ->        
         pan = document.getElementById("panorama_image")
-        
+        console.log $scope.image, $scope.imgname
         square = $element[0]
         firstWidth = square.getBoundingClientRect().width
         firstHeight = square.getBoundingClientRect().height
@@ -83,7 +123,13 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
         deltaHeight = 0
         deltaWidth = 0
         scaleChange = false
-        ionic.onGesture 'touch drag dragend transform', ((e) ->
+
+        cur_dim =
+          width: 676
+          height: 186
+        orig_dim = $scope.dimensions
+
+        ionic.onGesture 'touch drag dragend transform release', ((e) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
 
@@ -173,10 +219,88 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout) ->
               #   e.target.style.webkitTransform = e.target.style.transform                
                 changeY = false     
 
+              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname)
+              APIService.panorama($scope.image, $scope.imgname, command)      
+   
+
             when 'dragend'
               lastPosX = posX
               lastPosY = posY
               lastScale = scale
+                
+              # console.log ("^^^^ DRAGGING ")
+
+              # xToSend = -posX.map(0,cur_dim.width,0, $scope.dimensions.width)+$scope.dimensions.width/6
+              # yToSend = -posY.map(0,cur_dim.height,0, $scope.dimensions.height)#+$scope.dimensions.height/           
+
+              # scaleToSend = parseFloat(1.0)
+              # if parseFloat(scale) > parseFloat(1.0)
+              #   scaleToSend = parseFloat(parseFloat(scale) - 1)
+              # else if  parseFloat(scale) < parseFloat(1.0)
+              #   scaleToSend = parseFloat(parseFloat(scale) + 1)
+              
+              
+              # console.log "OLD DRAG SCALE: ", parseFloat(scale)              
+              # console.log "NEW DRAG SCALE: ", parseFloat(scaleToSend)
+
+
+              # command = 
+              #   x: xToSend
+              #   y: yToSend
+              #   z: scaleToSend
+              # APIService.panorama($scope.image, $scope.imgname, command)              
+
+            when 'release'
+              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname)
+              APIService.panorama($scope.image, $scope.imgname, command)      
+
+              # yToSend = -posY.map(0,186,0, 3240)#+3240/6           
+
+              # console.log "DIM "+ $scope.dimensions.width + " " + posY
+
+              
+              # scaleToSend = parseFloat(1.0)
+              # if parseFloat(scale) > parseFloat(1.0)
+              #   scaleToSend = parseFloat(parseFloat(scale) - 1)
+              # else if  parseFloat(scale) < parseFloat(1.0)
+              #   scaleToSend = parseFloat(parseFloat(scale) + 1)
+
+              # #WORKS NOW
+              # xToSend = -posX.map(0,676,0, 11532)+11532*Math.abs(scaleToSend)/6
+              
+              # console.log "POS TO SEND "+ xToSend + " " + yToSend
+              # console.log "TOUCH OLD SCALE: ", parseFloat(scale)              
+              # console.log "TOUCH NEW SCALE: ", parseFloat(scaleToSend)
+
+
+              # command = 
+              #   x: xToSend
+              #   y: yToSend
+              #   z: scaleToSend
+              # APIService.panorama($scope.image, $scope.imgname, command)   
+
+
+              
+              # xToSend = -posX.map(0,cur_dim.width,0, $scope.dimensions.width)+$scope.dimensions.width/6
+              # yToSend = -posY.map(0,cur_dim.height,0, $scope.dimensions.height)+$scope.dimensions.height/6           
+
+
+              # scaleToSend = parseFloat(1.0)
+              # if parseFloat(scale) > parseFloat(1.0)
+              #   scaleToSend = parseFloat(parseFloat(scale) - 1)
+              # else if  parseFloat(scale) < parseFloat(1.0)
+              #   scaleToSend = parseFloat(parseFloat(scale) + 1)
+              
+              
+              # console.log "OLD SCALE: ", parseFloat(scale)              
+              # console.log "NEW SCALE: ", parseFloat(scaleToSend)
+
+
+              # command = 
+              #   x: xToSend
+              #   y: yToSend
+              #   z: scaleToSend
+              # APIService.panorama($scope.image, $scope.imgname, command)
           #   lastMaxX = 0
           #   lastMinX = 0
           #   lastMaxY = 0

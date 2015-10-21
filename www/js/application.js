@@ -248,8 +248,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.bld_style = "margin-top: 50px";
     }
   };
-  $scope.showCompareMenu = function() {
+  $scope.showCompareMenu = function(name) {
     var bld, menu, pane;
+    if (name === "Presentations" || name === "Videos" || name === "Views") {
+      return;
+    }
     if ($scope.comparisonState === false) {
       $scope.comparisonState = true;
       $scope.buldingTabName = "COMPARISON MODE";
@@ -319,11 +322,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     } else if (name === "Views") {
       $scope.openLoc('views', asset.id);
       return;
+    } else if (name === "Videos") {
+      $scope.openLoc('videos', asset.id);
+      return;
     } else {
       command = {
         command: "play"
       };
-      name = name.substring(0, name.length - 1);
     }
     return APIService.play(asset, name, command);
   };
@@ -405,13 +410,13 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.setLive = function() {
     $scope.nowLive = !$scope.nowLive;
     $scope.resetEverything();
-    return $scope.nowLive4 = false;
+    $scope.nowLive4 = false;
+    return $state.go("tab.live", {}, {});
   };
   $scope.setLive4 = function() {
     $scope.nowLive4 = !$scope.nowLive4;
     $scope.resetEverything();
-    $scope.nowLive = false;
-    return $state.go("tab.live", {}, {});
+    return $scope.nowLive = false;
   };
   $scope.resetEverything = function() {
     $scope.activeWebcam = void 0;
@@ -529,8 +534,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
-  var firstHeight, firstWidth, pan, posX, posY, square;
+  var changeScale, firstHeight, firstWidth, pan, posX, posY, square;
   $scope.currentZoom = 1.0;
+  $scope.factoryName = "Panoramas";
   square = document.getElementById("square");
   posX = 0;
   posY = 0;
@@ -538,10 +544,28 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   firstWidth = square.getBoundingClientRect().width;
   firstHeight = square.getBoundingClientRect().height;
   Panoramas.get_by_camera($stateParams.cameraId).then(function(result) {
+    var img;
     $scope.panorama = result;
     $scope.webcam_name = $scope.panorama.webcam_name;
-    return $scope.image_url = $scope.panorama.image.url;
+    $scope.image_url = $scope.panorama.image.url;
+    img = new Image();
+    img.src = $scope.panorama.image.url;
+    $scope.dimensions = {};
+    $scope.dimensions.width = img.width;
+    return $scope.dimensions.height = img.height;
   });
+  changeScale = function() {
+    var scaleToSend;
+    scaleToSend = parseFloat(1.0);
+    if (parseFloat($scope.currentZoom) > parseFloat(1.0)) {
+      scaleToSend = parseFloat(parseFloat($scope.currentZoom) - 1);
+    } else if (parseFloat($scope.currentZoom) < parseFloat(1.0)) {
+      scaleToSend = parseFloat(parseFloat($scope.currentZoom) + 1);
+    }
+    console.log("NEW SCALE: ", parseFloat(scaleToSend));
+    console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
+    return scaleToSend;
+  };
   $scope.zoomIn = function(name) {
     var toZoom;
     console.log($scope.currentZoom);
@@ -551,12 +575,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     toZoom = document.getElementById(name);
     $scope.currentZoom = $scope.currentZoom - 0.2;
     toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
-    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+    toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+    return changeScale();
   };
   $scope.zoomOut = function(name) {
     var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
+      return;
+    } else if ($scope.currentZoom <= 0.3) {
       return;
     }
     toZoom = document.getElementById(name);
@@ -587,8 +614,9 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       toZoom.style.transform = transform;
       toZoom.style.webkitTransform = toZoom.style.transform;
       changeX = false;
-      return changeY = false;
+      changeY = false;
     }
+    return changeScale();
   };
   $scope.getPanorama = function() {
     return $scope.panorama.image;
@@ -796,15 +824,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   pan = document.getElementById("panorama_image");
   firstWidth = square.getBoundingClientRect().width;
   firstHeight = square.getBoundingClientRect().height;
+  $scope.factoryName = "Views";
   Views.get($stateParams.id).then(function(result) {
-    console.log(result);
     $scope.view = result;
     $scope.building_name = $scope.view.building_name;
-    $scope.imageUrl = $scope.view.image.url;
-    return console.log($scope.view, "VIEW");
+    return $scope.imageUrl = $scope.view.image.url;
   });
   $scope.zoomIn = function(name) {
-    var toZoom;
+    var scaleToSend, toZoom;
     console.log($scope.currentZoom);
     if ($scope.currentZoom <= 0.4) {
       return;
@@ -812,10 +839,18 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     toZoom = document.getElementById(name);
     $scope.currentZoom = $scope.currentZoom - 0.2;
     toZoom.style.transfrom = "scale(" + $scope.currentZoom + ")";
-    return toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+    toZoom.style.webkitTransform = "scale(" + $scope.currentZoom + ")";
+    scaleToSend = 1;
+    if (parseFloat($scope.currentZoom) > 1) {
+      scaleToSend = parseFloat($scope.currentZoom) - 1;
+    } else if (parseFloat($scope.currentZoom) > 1) {
+      scaleToSend = parseFloat($scope.currentZoom) + 1;
+    }
+    console.log("NEW SCALE: ", parseFloat(scaleToSend));
+    return console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
   };
   $scope.zoomOut = function(name) {
-    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
+    var changeX, changeY, deltaHeight, deltaWidth, scaleToSend, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
@@ -848,8 +883,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       toZoom.style.transform = transform;
       toZoom.style.webkitTransform = toZoom.style.transform;
       changeX = false;
-      return changeY = false;
+      changeY = false;
     }
+    scaleToSend = 1;
+    if (parseFloat($scope.currentZoom) > 1) {
+      scaleToSend = parseFloat($scope.currentZoom) - 1;
+    } else if (parseFloat($scope.currentZoom) > 1) {
+      scaleToSend = parseFloat($scope.currentZoom) + 1;
+    }
+    console.log("NEW SCALE: ", parseFloat(scaleToSend));
+    return console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
   };
   $scope.getView = function() {
     return $scope.view.image;
@@ -859,8 +902,35 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
 });
 
+var scaleValues;
+
 Number.prototype.map = function(in_min, in_max, out_min, out_max) {
   return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+};
+
+scaleValues = function(posY, posX, scale, img, imgname) {
+  var command, pano_big, scaleToSend, screen, width_ratio, xToSend, yToSend;
+  pano_big = 11532;
+  screen = 7680;
+  width_ratio = 1.5015625;
+  scaleToSend = parseFloat(1.0);
+  if (parseFloat(scale) > parseFloat(1.0)) {
+    scaleToSend = parseFloat(parseFloat(scale) - 1);
+  } else if (parseFloat(scale) < parseFloat(1.0)) {
+    scaleToSend = parseFloat(parseFloat(scale) + 1);
+  }
+  xToSend = -(posX - 46).map(0, 676, -0.2, 1.2);
+  console.log("POS TO ORIGINAL " + posX + " " + posY);
+  yToSend = (posY - 178).map(0, 186, 0, 1);
+  console.log("TOUCH OLD SCALE: ", parseFloat(scale));
+  console.log("TOUCH NEW SCALE: ", parseFloat(scaleToSend));
+  console.log("POS TO SEND " + xToSend + " " + yToSend);
+  command = {
+    x: xToSend,
+    y: yToSend,
+    z: scaleToSend
+  };
+  return command;
 };
 
 angular.module('starter.filters', []).filter('buildingFilter', [
@@ -910,16 +980,22 @@ angular.module('starter.directives', []).directive('backImg', function() {
   };
 });
 
-angular.module('starter.directives', []).directive('ionPpinch', function($timeout) {
+angular.module('starter.directives', []).directive('ionPpinch', function($timeout, APIService) {
   return {
     restrict: 'E',
+    scope: {
+      image: '=',
+      imgname: '=',
+      dimensions: '='
+    },
     link: function($scope, $element, attrs) {
       if ($element[0].classList[0] !== "square") {
         return;
       }
       return $timeout(function() {
-        var bottomYLimit, bufferX, bufferY, changeX, changeY, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, pan, pass, posX, posY, rightXLimit, rotation, scale, scaleChange, square, topYLimit;
+        var bottomYLimit, bufferX, bufferY, changeX, changeY, cur_dim, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, orig_dim, pan, pass, posX, posY, rightXLimit, rotation, scale, scaleChange, square, topYLimit;
         pan = document.getElementById("panorama_image");
+        console.log($scope.image, $scope.imgname);
         square = $element[0];
         firstWidth = square.getBoundingClientRect().width;
         firstHeight = square.getBoundingClientRect().height;
@@ -951,8 +1027,13 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         deltaHeight = 0;
         deltaWidth = 0;
         scaleChange = false;
-        return ionic.onGesture('touch drag dragend transform', (function(e) {
-          var LastMinX, match, scalRgxp, transform;
+        cur_dim = {
+          width: 676,
+          height: 186
+        };
+        orig_dim = $scope.dimensions;
+        return ionic.onGesture('touch drag dragend transform release', (function(e) {
+          var LastMinX, command, match, scalRgxp, transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
           scalRgxp = /scale\((\d{1,}\.\d{1,})\)/;
@@ -1036,19 +1117,27 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
                 e.target.style.transform = transform;
                 e.target.style.webkitTransform = e.target.style.transform;
                 changeX = false;
-                return changeY = false;
+                changeY = false;
               }
-              break;
+              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname);
+              return APIService.panorama($scope.image, $scope.imgname, command);
             case 'dragend':
               lastPosX = posX;
               lastPosY = posY;
               return lastScale = scale;
+            case 'release':
+              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname);
+              return APIService.panorama($scope.image, $scope.imgname, command);
           }
         }), $element[0]);
       });
     }
   };
 });
+
+var SERVER;
+
+SERVER = "192.168.1.21";
 
 angular.module('starter.services', []).factory('Buildings', function() {
   var models;
@@ -1147,8 +1236,27 @@ angular.module('starter.services', []).factory('Buildings', function() {
     return result;
   };
 }).service('APIService', function($http) {
-  var server;
-  server = "http://localhost:3000";
+  this.panorama = function(asset, name, command) {
+    var json;
+    name = name.substring(0, name.length - 1);
+    json = {
+      asset: {
+        type: name,
+        id: asset.id
+      },
+      command: {
+        command: "pano"
+      }
+    };
+    angular.extend(json.command, command);
+    console.log("SENDING -> ", JSON.stringify(json));
+    return $http.post('http://' + SERVER + "/pgs_command", json).then((function(response) {
+      return console.log(response);
+    }), function(data) {
+      console.log(data);
+    });
+  };
+  return;
   this.play = function(asset, name, command) {
     var json;
     json = {
@@ -1161,7 +1269,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       }
     };
     angular.extend(json.command, command);
-    return $http.post(server + "/pgs_command", json).then((function(response) {
+    return $http.post('http://' + SERVER + "/pgs_command", json).then((function(response) {
       return console.log(response);
     }), function(data) {
       console.log(data);
@@ -1175,7 +1283,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Presentation";
     },
     sorted: function() {
-      return $http.get('http://localhost:3000/presentations.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/presentations.json').then((function(response) {
         var result;
         result = HelperService.sort_models(response.data);
         return result;
@@ -1190,7 +1298,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get: function(chatId) {
-      return $http.get('http://localhost:3000/presentations/' + String(chatId) + '.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/presentations/' + String(chatId) + '.json').then((function(response) {
         var result;
         console.log(response);
         result = response.data;
@@ -1219,14 +1327,14 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Rendering";
     },
     sorted: function() {
-      return $http.get('http://localhost:3000/renderings.json').then(function(response) {
+      return $http.get('http://' + SERVER + '/renderings.json').then(function(response) {
         var result;
         result = HelperService.sort_models(response.data);
         return result;
       });
     },
     all: function() {
-      return $http.get('http://localhost:3000/admin/renderings.json').then(function(response) {
+      return $http.get('http://' + SERVER + '/renderings.json').then(function(response) {
         console.log(response);
         models = response;
         return models;
@@ -1255,7 +1363,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "View";
     },
     sorted: function() {
-      return $http.get('http://localhost:3000/views.json').then(function(response) {
+      return $http.get('http://' + SERVER + '/views.json').then(function(response) {
         var result;
         result = HelperService.sort_models(response.data);
         return result;
@@ -1275,7 +1383,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get: function(chatId) {
-      return $http.get('http://localhost:3000/views/' + String(chatId) + '.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/views/' + String(chatId) + '.json').then((function(response) {
         var result;
         result = response.data;
         return result;
@@ -1306,7 +1414,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Floorplan";
     },
     sorted: function() {
-      return $http.get('http://localhost:3000/floorplans.json').then(function(response) {
+      return $http.get('http://' + SERVER + '/floorplans.json').then(function(response) {
         var result;
         result = HelperService.sort_models(response.data);
         return result;
@@ -1338,7 +1446,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Video";
     },
     sorted: function() {
-      return $http.get('http://localhost:3000/videos.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/videos.json').then((function(response) {
         var result;
         result = HelperService.sort_models(response.data);
         return result;
@@ -1353,7 +1461,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get: function(chatId) {
-      return $http.get('http://localhost:3000/videos/' + String(chatId) + '.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/videos/' + String(chatId) + '.json').then((function(response) {
         var result;
         console.log(response);
         result = response.data;
@@ -1382,7 +1490,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Webcam";
     },
     all: function() {
-      return $http.get('http://localhost:3000/cameras.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/cameras.json').then((function(response) {
         console.log(response);
         models = response.data;
         return models;
@@ -1437,7 +1545,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Timelapse";
     },
     getForCamera: function(cameraId) {
-      return $http.get('http://localhost:3000/timelapses_by_camera/' + cameraId + '.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/timelapses_by_camera/' + cameraId + '.json').then((function(response) {
         models = response.data;
         return models;
       }), function(data) {
@@ -1468,7 +1576,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       return "Screenshot";
     },
     sorted: function() {
-      return $http.get('http://localhost:3000/snapshots.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/snapshots.json').then((function(response) {
         var result;
         result = HelperService.sort_snapshots(response.data);
         return result;
@@ -1477,7 +1585,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       });
     },
     get: function(chatId) {
-      return $http.get('http://localhost:3000/snapshots/' + String(chatId) + '.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/snapshots/' + String(chatId) + '.json').then((function(response) {
         var result;
         console.log(response);
         result = response.data;
@@ -1520,7 +1628,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
       models.splice(models.indexOf(chat), 1);
     },
     get_by_camera: function(camera_id) {
-      return $http.get('http://localhost:3000/panorama_by_camera/' + String(camera_id) + '.json').then((function(response) {
+      return $http.get('http://' + SERVER + '/panorama_by_camera/' + String(camera_id) + '.json').then((function(response) {
         var result;
         console.log(response);
         result = response.data;
