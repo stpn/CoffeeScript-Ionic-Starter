@@ -450,40 +450,51 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
   };
-}).controller('PresentationCtrl', function($scope, $log, $stateParams, $interval, Presentations) {
+}).controller('PresentationCtrl', function($scope, $log, $stateParams, $timeout, $interval, Presentations, APIService) {
   var promise;
   promise = void 0;
-  $scope.play = false;
+  $scope.play = true;
+  $scope.videoPlaying = false;
   $scope.currentSlide = 1;
   Presentations.get($stateParams.id).then(function(result) {
     $scope.presentation = result;
     $scope.slides = $scope.presentation.slides;
     $scope.presentation_name = $scope.presentation.name;
     $scope.project_name = $scope.presentation.building_name;
-    return $scope.slide = $scope.presentation.slides[0];
+    $scope.slide = $scope.presentation.slides[0];
+    return $scope.postSlide(1);
   });
+  $scope.playFirstSlide = function() {
+    if ($scope.slides[0].slideable_type === "Video") {
+      return $scope.playVideoSlide();
+    } else {
+      $scope.start_playing();
+      return $scope.playImageSlide();
+    }
+  };
   $scope.playVideoSlide = function() {
     var slideable;
-    $scope.stopPlaying();
     slideable = {
       id: $scope.slide.slideable_id
     };
     APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "play");
+    $scope.videoPlaying = true;
     return $timeout((function() {
+      $scope.videoPlaying = false;
       $scope.start_playing();
     }), $scope.slide.image.duration * 1000 + 1000);
   };
   $scope.playImageSlide = function() {
     var slideable;
-    $scope.stopPlaying();
+    $scope.stop_playing();
     slideable = {
       id: $scope.slide.slideable_id
     };
     return APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "play");
   };
   $scope.postSlide = function(slideIdx) {
-    if (slideIdx >= $scope.slides.length) {
-      $scope.currentSlide = $scope.slides.length;
+    if (slideIdx > $scope.slides.length) {
+      $scope.currentSlide = 1;
     } else if (slideIdx <= 1) {
       $scope.currentSlide = 1;
     } else {
@@ -491,6 +502,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
     $scope.slide = $scope.presentation.slides[$scope.currentSlide - 1];
     if ($scope.slide.slideable_type === "Video") {
+      $scope.stop_playing();
       return $scope.playVideoSlide();
     } else {
       return $scope.playImageSlide();
@@ -507,6 +519,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.stop_playing = function() {
+    var slideable;
+    if ($scope.slide.slideable_type === "Video" && $scope.videoPlaying === true) {
+      console.log($scope.slide);
+      slideable = {
+        id: $scope.slide.slideable_id
+      };
+      APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "pause");
+      $scope.videoPlaying = false;
+    }
     return $interval.cancel(promise);
   };
   $scope.advanceSlide = function() {

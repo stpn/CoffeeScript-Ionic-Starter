@@ -356,11 +356,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   return
 
 
-).controller('PresentationCtrl', ($scope,$log, $stateParams, $interval, Presentations) ->
+).controller('PresentationCtrl', ($scope,$log, $stateParams, $timeout, $interval, Presentations, APIService) ->
   #$scope.presentation = Presentations.get($stateParams.id)
   #$scope.slides = Presentations.getSlides($stateParams.id)
   promise = undefined
-  $scope.play = false
+  $scope.play = true
+  $scope.videoPlaying = false
   
   $scope.currentSlide = 1
 
@@ -371,35 +372,48 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.presentation_name = $scope.presentation.name
     $scope.project_name = $scope.presentation.building_name
     $scope.slide = $scope.presentation.slides[0]
+    $scope.postSlide(1)
+    
+    
+
+  $scope.playFirstSlide = () ->
+    if $scope.slides[0].slideable_type == "Video"
+      $scope.playVideoSlide()
+    else
+      $scope.start_playing()
+      $scope.playImageSlide()
+      
 
 
   $scope.playVideoSlide = () ->
-    $scope.stopPlaying()
     slideable = 
       id: $scope.slide.slideable_id
-    APIService.control(slideable, $scope.slide.slideable_type+"s", {}, "play")    
+    APIService.control(slideable, $scope.slide.slideable_type+"s", {}, "play")  
+    $scope.videoPlaying = true  
 #    console.log 'playing Video'    
     $timeout (->
+      $scope.videoPlaying = false
       $scope.start_playing()
       return
     ), $scope.slide.image.duration * 1000 + 1000    
 
   $scope.playImageSlide = () ->
-    $scope.stopPlaying()
+    $scope.stop_playing()
     slideable = 
       id: $scope.slide.slideable_id
     APIService.control(slideable, $scope.slide.slideable_type+"s", {}, "play")    
 #    console.log 'playing Video'    
 
   $scope.postSlide = (slideIdx) ->
-    if slideIdx >= $scope.slides.length 
-      $scope.currentSlide = $scope.slides.length  
+    if slideIdx > $scope.slides.length 
+      $scope.currentSlide = 1  
     else if slideIdx <= 1
       $scope.currentSlide = 1
     else
       $scope.currentSlide = slideIdx
     $scope.slide = $scope.presentation.slides[$scope.currentSlide - 1]
     if $scope.slide.slideable_type == "Video"
+      $scope.stop_playing()
       $scope.playVideoSlide()
     else
       $scope.playImageSlide()
@@ -414,6 +428,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       console.log "STOPPED"
 
   $scope.stop_playing = () ->
+    if $scope.slide.slideable_type == "Video" && $scope.videoPlaying == true
+      console.log $scope.slide
+      slideable = 
+        id: $scope.slide.slideable_id      
+      APIService.control(slideable, $scope.slide.slideable_type+"s", {}, "pause")
+      $scope.videoPlaying = false
     $interval.cancel(promise)
 
   $scope.advanceSlide = () ->
