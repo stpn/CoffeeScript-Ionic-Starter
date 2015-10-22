@@ -314,23 +314,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.playAsset = function(name, asset) {
-    var command;
     console.log(asset, name, "NAAME");
     if (name === "Presentations") {
       $scope.openLoc('presentations', asset.id);
-      return;
     } else if (name === "Views") {
       $scope.openLoc('views', asset.id);
-      return;
     } else if (name === "Videos") {
       $scope.openLoc('videos', asset.id);
-      return;
     } else {
-      command = {
-        command: "play"
-      };
+      return APIService.control(asset, name, {}, "play");
     }
-    return APIService.play(asset, name, command);
   };
   return $scope.openLoc = function(location, modId) {
     $state.go('tab.' + location, {
@@ -445,36 +438,73 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
   };
-}).controller('PresentationCtrl', function($scope, $log, $stateParams, Presentations) {
+}).controller('PresentationCtrl', function($scope, $log, $stateParams, $interval, Presentations) {
+  var promise;
+  promise = void 0;
+  $scope.play = false;
   $scope.currentSlide = 1;
   Presentations.get($stateParams.id).then(function(result) {
     $scope.presentation = result;
     $scope.slides = $scope.presentation.slides;
     $scope.presentation_name = $scope.presentation.name;
-    return $scope.project_name = $scope.presentation.building_name;
+    $scope.project_name = $scope.presentation.building_name;
+    return $scope.slide = $scope.presentation.slides[0];
   });
-  return $scope.postSlide = function(slideIdx) {
+  $scope.playVideoSlide = function() {
+    var slideable;
+    $scope.stopPlaying();
+    slideable = {
+      id: $scope.slide.slideable_id
+    };
+    APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "play");
+    return $timeout((function() {
+      $scope.start_playing();
+    }), $scope.slide.image.duration * 1000 + 1000);
+  };
+  $scope.playImageSlide = function() {
+    var slideable;
+    $scope.stopPlaying();
+    slideable = {
+      id: $scope.slide.slideable_id
+    };
+    return APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "play");
+  };
+  $scope.postSlide = function(slideIdx) {
     if (slideIdx >= $scope.slides.length) {
-      return $scope.currentSlide = $scope.slides.length;
+      $scope.currentSlide = $scope.slides.length;
     } else if (slideIdx <= 1) {
-      return $scope.currentSlide = 1;
+      $scope.currentSlide = 1;
     } else {
-      return $scope.currentSlide = slideIdx;
+      $scope.currentSlide = slideIdx;
+    }
+    $scope.slide = $scope.presentation.slides[$scope.currentSlide - 1];
+    if ($scope.slide.slideable_type === "Video") {
+      return $scope.playVideoSlide();
+    } else {
+      return $scope.playImageSlide();
     }
   };
-}).controller('VideoPlayerCtrl', function($scope, $sce, $log, $stateParams, Videos) {
-  $scope.video = Videos.get($stateParams.id);
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
-  $scope.building_name = $scope.video.building_name;
-  $scope.trustSrc = function(src) {
-    return $scope.videos = $sce.getTrustedResourceUrl(src);
+  $scope.start_playing = function() {
+    $scope.play = !$scope.play;
+    if ($scope.play) {
+      promise = $interval($scope.advanceSlide, 5000);
+      return console.log("STARTED");
+    } else {
+      $scope.stop_playing();
+      return console.log("STOPPED");
+    }
   };
-  $scope.postVideoId = function(videoId) {
-    return $log.debug("....  " + videoId);
+  $scope.stop_playing = function() {
+    return $interval.cancel(promise);
   };
-  $scope.alertMe = function() {
-    return $log.debug("...");
+  $scope.advanceSlide = function() {
+    if ($scope.play) {
+      return $scope.postSlide($scope.currentSlide + 1);
+    }
   };
+  return $scope.$on('$destroy', function() {
+    $interval.cancel(promise);
+  });
 }).controller('BuildingsCtrl', function($scope, Buildings, $log, ActiveCrestron) {
   $scope.buildings = Buildings.all();
   $scope.templatePath = "templates/menu/building_menu.html";
@@ -624,42 +654,51 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   return $scope.getCamera = function() {
     return 1;
   };
-}).controller('VideoCtrl', function($scope, $sce, $log, $stateParams, Videos, $location) {
+}).controller('VideoCtrl', function($scope, $sce, $log, $state, $stateParams, Videos, $location, APIService) {
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
+  $scope.viedeo;
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
   $scope.videoState = true;
   Videos.get($stateParams.id).then(function(result) {
     $scope.video = result;
-    console.log($scope.video.recording.url, "URL");
     $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
-    return $scope.building_name = $scope.video.building_name;
+    $scope.videoDiv.innerHTML = '<source src="' + $scope.recording + '"type="video/mp4"/>';
+    $scope.building_name = $scope.video.building_name;
+    return APIService.control($scope.video, "Videos", {}, "play");
   });
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
-  $scope.postVideoId = function(videoId) {};
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    if (!value) {
+      value = 0;
+    }
     $scope.seekBar.value = value;
   });
   $scope.closeBtn = function() {
     $scope.videoDiv.pause();
-    return $location.path('#/dash/');
+    APIService.control($scope.video, "Videos", {}, "stop");
+    return $state.go('tab.dash', {}, {});
   };
   $scope.update = function() {
     return $scope.videoDiv.pause();
   };
   $scope.seekRelease = function() {
-    var currentTime;
+    var command, currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
     $scope.videoDiv.currentTime = currentTime;
+    command = {
+      seekto: currentTime
+    };
+    APIService.control($scope.video, "Videos", command, "cue");
     if ($scope.videoState) {
-      return $scope.videoDiv.play();
+      return $scope.videoDiv.play(false);
     }
   };
   $scope.volumeUp = function() {
@@ -677,20 +716,40 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.videoBack = function() {
-    return $scope.videoDiv.currentTime = 0;
+    var command;
+    $scope.videoDiv.currentTime = 0;
+    command = {
+      seekto: $scope.videoDiv.currentTime
+    };
+    return APIService.control($scope.video, "Videos", command, "cue");
   };
   $scope.videoBw = function() {
-    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+    var command;
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+    command = {
+      seekto: $scope.videoDiv.currentTime
+    };
+    return APIService.control($scope.video, "Videos", command, "cue");
   };
   $scope.videoFw = function() {
-    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+    var command;
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+    command = {
+      seekto: $scope.videoDiv.currentTime
+    };
+    return APIService.control($scope.video, "Videos", command, "cue");
   };
-  $scope.videoPlay = function() {
+  $scope.videoPlay = function(remote_also) {
+    if (remote_also == null) {
+      remote_also = true;
+    }
     if ($scope.videoDiv.paused) {
       $scope.videoDiv.play();
+      APIService.control($scope.video, "Videos", {}, "unpause");
       return $scope.videoState = true;
     } else {
       $scope.videoDiv.pause();
+      APIService.control($scope.video, "Videos", {}, "pause");
       return $scope.videoState = false;
     }
   };
@@ -909,10 +968,7 @@ Number.prototype.map = function(in_min, in_max, out_min, out_max) {
 };
 
 scaleValues = function(posY, posX, scale, img, imgname) {
-  var command, h, pano_big, scaleToSend, screen, w, width_ratio, xToSend, yToSend;
-  pano_big = 11532;
-  screen = 7680;
-  width_ratio = 1.5015625;
+  var command, h, scaleToSend, w, xToSend, yToSend;
   w = 676;
   h = 190;
   scaleToSend = 1 / scale;
@@ -922,11 +978,6 @@ scaleValues = function(posY, posX, scale, img, imgname) {
     xToSend = -(posX - 46).map(0, w, -(scaleToSend * 0.75 - 0.5), scaleToSend * 0.75 + 0.5);
     yToSend = (posY - 178).map(0, h, -(scaleToSend * 0.5 - 0.5), scaleToSend * 0.5 + 0.5);
   }
-  console.log("POS TO ORIGINAL " + posX + " " + posY);
-  console.log("CUR POS : " + posX + " " + posY);
-  console.log("TOUCH OLD SCALE: ", parseFloat(scale));
-  console.log("TOUCH NEW SCALE: ", parseFloat(scaleToSend));
-  console.log("POS TO SEND " + xToSend + " " + yToSend);
   command = {
     x: xToSend,
     y: yToSend,
@@ -995,7 +1046,7 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         return;
       }
       return $timeout(function() {
-        var bottomYLimit, bufferX, bufferY, changeX, changeY, cur_dim, deltaHeight, deltaWidth, dragReady, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, last_rotation, leftXLimit, max, oldScale, oldWidth, orig_dim, pan, pass, posX, posY, rightXLimit, rotation, scale, scaleChange, square, topYLimit;
+        var bottomYLimit, changeX, changeY, cur_dim, deltaHeight, deltaWidth, firstHeight, firstWidth, lastMaxX, lastMaxY, lastMinX, lastMinY, lastPosX, lastPosY, lastScale, leftXLimit, max, oldScale, oldWidth, orig_dim, pan, posX, posY, rightXLimit, scale, square, topYLimit;
         pan = document.getElementById("panorama_image");
         console.log($scope.image, $scope.imgname);
         square = $element[0];
@@ -1005,13 +1056,8 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         posY = 0;
         lastPosX = 0;
         lastPosY = 0;
-        bufferX = 0;
-        bufferY = 0;
         scale = 1;
         lastScale = void 0;
-        rotation = 0;
-        last_rotation = void 0;
-        dragReady = 0;
         leftXLimit = 44;
         rightXLimit = 720;
         topYLimit = 204;
@@ -1023,18 +1069,16 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
         max = 200;
         oldScale = 0;
         oldWidth = 0;
-        pass = false;
         changeX = false;
         changeY = false;
         deltaHeight = 0;
         deltaWidth = 0;
-        scaleChange = false;
         cur_dim = {
           width: 676,
           height: 186
         };
         orig_dim = $scope.dimensions;
-        return ionic.onGesture('touch drag dragend transform release', (function(e) {
+        return ionic.onGesture('touch drag dragend transform release transformend', (function(e) {
           var LastMinX, command, match, scalRgxp, transform;
           e.gesture.srcEvent.preventDefault();
           e.gesture.preventDefault();
@@ -1087,9 +1131,6 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
               break;
             case 'transform':
               scale = e.gesture.scale * lastScale;
-              if (scale !== lastScale) {
-                scaleChange = true;
-              }
               if (scale > 1) {
                 scale = 1;
               }
@@ -1119,17 +1160,19 @@ angular.module('starter.directives', []).directive('ionPpinch', function($timeou
                 e.target.style.transform = transform;
                 e.target.style.webkitTransform = e.target.style.transform;
                 changeX = false;
-                changeY = false;
+                return changeY = false;
               }
-              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname);
-              return APIService.panorama($scope.image, $scope.imgname, command);
+              break;
             case 'dragend':
               lastPosX = posX;
               lastPosY = posY;
               return lastScale = scale;
             case 'release':
               command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname);
-              return APIService.panorama($scope.image, $scope.imgname, command);
+              return APIService.control($scope.image, $scope.imgname, command, "pano");
+            case 'transformend':
+              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname);
+              return APIService.control($scope.image, $scope.imgname, command, "pano");
           }
         }), $element[0]);
       });
@@ -1238,7 +1281,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
     return result;
   };
 }).service('APIService', function($http) {
-  this.panorama = function(asset, name, command) {
+  this.make_command = function(asset, name, command, command_name) {
     var json;
     name = name.substring(0, name.length - 1);
     json = {
@@ -1247,30 +1290,16 @@ angular.module('starter.services', []).factory('Buildings', function() {
         id: asset.id
       },
       command: {
-        command: "pano"
+        command: command_name
       }
     };
     angular.extend(json.command, command);
-    console.log("SENDING -> ", JSON.stringify(json));
-    return $http.post('http://' + SERVER + "/pgs_command", json).then((function(response) {
-      return console.log(response);
-    }), function(data) {
-      console.log(data);
-    });
+    return json;
   };
-  return;
-  this.play = function(asset, name, command) {
+  this.control = function(asset, name, command, command_name) {
     var json;
-    json = {
-      asset: {
-        type: name,
-        id: asset.id
-      },
-      command: {
-        command: "play"
-      }
-    };
-    angular.extend(json.command, command);
+    json = this.make_command(asset, name, command, command_name);
+    console.log("SENDING -> " + JSON.stringify(json));
     return $http.post('http://' + SERVER + "/pgs_command", json).then((function(response) {
       return console.log(response);
     }), function(data) {
@@ -1302,7 +1331,7 @@ angular.module('starter.services', []).factory('Buildings', function() {
     get: function(chatId) {
       return $http.get('http://' + SERVER + '/presentations/' + String(chatId) + '.json').then((function(response) {
         var result;
-        console.log(response);
+        console.log(response.data);
         result = response.data;
         return result;
       }), function(data) {
@@ -1545,6 +1574,16 @@ angular.module('starter.services', []).factory('Buildings', function() {
     },
     name: function() {
       return "Timelapse";
+    },
+    get: function(chatId) {
+      return $http.get('http://' + SERVER + '/timelapses/' + String(chatId) + '.json').then((function(response) {
+        var result;
+        console.log(response);
+        result = response.data;
+        return result;
+      }), function(data) {
+        console.log(data, "ERROR Video");
+      });
     },
     getForCamera: function(cameraId) {
       return $http.get('http://' + SERVER + '/timelapses_by_camera/' + cameraId + '.json').then((function(response) {

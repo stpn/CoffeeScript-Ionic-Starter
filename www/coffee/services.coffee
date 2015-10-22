@@ -100,47 +100,61 @@ angular.module('starter.services', []).factory('Buildings', ->
 
 ).service('APIService', ($http) ->
 
-
-  # {:asset => {:type => "Rendering", :id => "23"},
-  #  :command =>
-  #  {:channel => "twelve",
-  #   :screens => "12",
-  #   :metadata1 => "Meta1", :metadata2 => "Meta2", :metadata3 => "Meta3", :metadata4 => "Meta4",
-  #   :loction => 'left',
-  #   :x => "1", :y => '2', :z => '3'
-  #   }
-  #  }
-
-  @panorama = (asset, name, command) ->
+  @make_command = (asset, name, command, command_name) ->
     name = name.substring(0, name.length - 1)
     json =
       asset:
         type: name
         id: asset.id
       command: 
-        command: "pano"
+        command: command_name
 
-    angular.extend(json.command, command)
-    console.log "SENDING -> ", JSON.stringify(json)
-    $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
-      console.log response
-      ), (data) ->
-      console.log data
-      return
-
-  return
+    angular.extend(json.command, command)    
+    json 
 
 
-  @play = (asset, name, command) ->
-    json =
-      asset:
-        type: name
-        id: asset.id
-      command: 
-        command: "play"
+  # @cue = (asset, name) ->
+  #   json = this.make_command(asset, name, command, "cue")
 
-    angular.extend(json.command, command)
+  #   $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
+  #     console.log response
+  #     ), (data) ->
+  #     console.log data
+  #     return
 
+
+  # @panorama = (asset, name, command) ->
+  #   json = this.make_command(asset, name, command, "pano")
+
+  #   console.log "SENDING -> ", JSON.stringify(json)
+  #   $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
+  #     console.log response
+  #     ), (data) ->
+  #     console.log data
+  #     return
+
+  # @stop = (asset, name, command) ->
+  #   json = this.make_command(asset, name, command, "stop")
+
+  #   $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
+  #     console.log response
+  #     ), (data) ->
+  #     console.log data
+  #     return
+
+
+  # @play = (asset, name, command) ->
+  #   json = this.make_command(asset, name, command, "play")
+
+  #   $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
+  #     console.log response
+  #     ), (data) ->
+  #     console.log data
+  #     return
+
+  @control = (asset, name, command, command_name) ->
+    json = this.make_command(asset, name, command, command_name)
+    console.log "SENDING -> "+JSON.stringify(json)
     $http.post('http://'+SERVER+"/pgs_command", json).then ((response) ->
       console.log response
       ), (data) ->
@@ -175,7 +189,7 @@ angular.module('starter.services', []).factory('Buildings', ->
 
     get: (chatId) ->
       $http.get('http://'+SERVER+'/presentations/'+String(chatId)+'.json').then ((response) ->        
-        console.log response
+        console.log response.data
         result = response.data
         result
       ), (data) ->
@@ -395,6 +409,15 @@ angular.module('starter.services', []).factory('Buildings', ->
 
     name: ->
      "Timelapse"
+
+    get: (chatId) ->
+      $http.get('http://'+SERVER+'/timelapses/'+String(chatId)+'.json').then ((response) ->        
+        console.log response
+        result = response.data
+        result
+      ), (data) ->
+        console.log data, "ERROR Video"
+        return     
 
     getForCamera: (cameraId) ->
       $http.get('http://'+SERVER+'/timelapses_by_camera/'+cameraId+'.json').then ((response) ->        

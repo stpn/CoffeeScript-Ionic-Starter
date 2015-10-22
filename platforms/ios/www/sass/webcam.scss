@@ -87,7 +87,7 @@
         position: absolute;
         right: 12px;
         top: 10px;
-        font-size: 25px;
+        //font-size: $close_button_size;
         .ion-close::before {
             color: #808080;
         }
@@ -99,6 +99,15 @@
     margin-top: 10px;
     margin-left: auto;
     margin-right: auto;
+    .cust_col{
+        min-width: 153px !important;
+        img{
+           min-width: 140px !important;
+        }
+    }
+    .row{
+        padding-left: 0px !important;
+    }
     .item {
         color: white;
         width: 501px !important;

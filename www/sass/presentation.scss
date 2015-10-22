@@ -18,6 +18,9 @@
         background-color: black !important;
         margin-left: 0px;
         min-height: 743px;
+        .row{
+            margin-left: 5px !important;
+        }
         .item {
             background-color: black !important;
         }
@@ -46,9 +49,10 @@
     }
     .close_button {
         position: absolute;
+
     right: 40px;
     top: 30px;
-        font-size: 25px;
+        //font-size: $close_button_size;
         .ion-close::before {
             color: #808080;
         }

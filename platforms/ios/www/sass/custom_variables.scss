@@ -32,6 +32,7 @@ $corner-bevel: 30;
 $positive: white !default;
 
 
+$close_button_size: 40px;
 
 @mixin corner-bottom-both-bevel($kolor) {
     border-color: $kolor transparent transparent transparent;

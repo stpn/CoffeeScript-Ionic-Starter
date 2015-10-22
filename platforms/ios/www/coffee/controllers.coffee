@@ -41,9 +41,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   $scope.accordionHeight = "0px"
 
   $scope.showOverlay = false
-  
-
-
+ 
 
   $scope.isComparison = () ->    
     $scope.comparisonState
@@ -218,9 +216,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       $scope.openLoc('videos', asset.id)
       return      
     else
-      command = 
-        command: "play"      
-     APIService.play(asset, name, command)
+      APIService.control(asset, name, {}, "play")
 
 
   $scope.openLoc = (location, modId) ->  
@@ -349,18 +345,40 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   return
 
 
-).controller('PresentationCtrl', ($scope,$log, $stateParams, Presentations) ->
+).controller('PresentationCtrl', ($scope,$log, $stateParams, $interval, Presentations) ->
   #$scope.presentation = Presentations.get($stateParams.id)
   #$scope.slides = Presentations.getSlides($stateParams.id)
-  
+  promise = undefined
+  $scope.play = false
   
   $scope.currentSlide = 1
+
   
   Presentations.get($stateParams.id).then (result) ->
     $scope.presentation = result
     $scope.slides = $scope.presentation.slides
     $scope.presentation_name = $scope.presentation.name
     $scope.project_name = $scope.presentation.building_name
+    $scope.slide = $scope.presentation.slides[0]
+
+
+  $scope.playVideoSlide = () ->
+    $scope.stopPlaying()
+    slideable = 
+      id: $scope.slide.slideable_id
+    APIService.control(slideable, $scope.slide.slideable_type+"s", {}, "play")    
+#    console.log 'playing Video'    
+    $timeout (->
+      $scope.start_playing()
+      return
+    ), $scope.slide.image.duration * 1000 + 1000    
+
+  $scope.playImageSlide = () ->
+    $scope.stopPlaying()
+    slideable = 
+      id: $scope.slide.slideable_id
+    APIService.control(slideable, $scope.slide.slideable_type+"s", {}, "play")    
+#    console.log 'playing Video'    
 
   $scope.postSlide = (slideIdx) ->
     if slideIdx >= $scope.slides.length 
@@ -369,27 +387,51 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       $scope.currentSlide = 1
     else
       $scope.currentSlide = slideIdx
+    $scope.slide = $scope.presentation.slides[$scope.currentSlide - 1]
+    if $scope.slide.slideable_type == "Video"
+      $scope.playVideoSlide()
+    else
+      $scope.playImageSlide()
+
+  $scope.start_playing = () ->
+    $scope.play = !$scope.play
+    if $scope.play      
+      promise = $interval($scope.advanceSlide, 5000)
+      console.log "STARTED"
+    else 
+      $scope.stop_playing()
+      console.log "STOPPED"
+
+  $scope.stop_playing = () ->
+    $interval.cancel(promise)
+
+  $scope.advanceSlide = () ->
+    if $scope.play
+      $scope.postSlide($scope.currentSlide + 1)
       
+  $scope.$on '$destroy', ->
+    $interval.cancel(promise)
+    return
 
 
 
-).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
-  $scope.video = Videos.get($stateParams.id)
-  #$log.debug($scope.video.recording);
+# ).controller('VideoPlayerCtrl', ($scope, $sce, $log, $stateParams, Videos) ->
+#   $scope.video = Videos.get($stateParams.id)
+#   #$log.debug($scope.video.recording);
 
-  $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
+#   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
 
-  $scope.building_name = $scope.video.building_name 
+#   $scope.building_name = $scope.video.building_name 
   
-  $scope.trustSrc = (src) ->
-    $scope.videos = $sce.getTrustedResourceUrl(src);
+#   $scope.trustSrc = (src) ->
+#     $scope.videos = $sce.getTrustedResourceUrl(src);
 
-  $scope.postVideoId = (videoId) ->
-    $log.debug("....  "+ videoId)
+#   $scope.postVideoId = (videoId) ->
+#     $log.debug("....  "+ videoId)
   
-  $scope.alertMe = ()->
-    $log.debug("...")    
-  return
+#   $scope.alertMe = ()->
+#     $log.debug("...")    
+#   return
 
 
 ).controller('BuildingsCtrl', ($scope, Buildings, $log, ActiveCrestron) ->
@@ -565,10 +607,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   $scope.getCamera =  ->
     1
 
-).controller('VideoCtrl', ($scope, $sce, $log,  $stateParams, Videos, $location) ->
+).controller('VideoCtrl', ($scope, $sce, $log, $state, $stateParams, Videos, $location, APIService) ->
   $scope.videoDiv = document.getElementById('video')
   $scope.seekBar = document.getElementById('seekbar')
   $scope.volume = document.getElementById('volume')
+  $scope.viedeo
   $scope.skipValue = 0
   $scope.mute = false
   $scope.max = 80
@@ -576,36 +619,45 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
   Videos.get($stateParams.id).then (result) ->
     $scope.video = result
-    console.log $scope.video.recording.url, "URL"
+    #console.log $scope.video.recording.url, "URL"
     $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
-    $scope.building_name = $scope.video.building_name 
+    
+    $scope.videoDiv.innerHTML = '<source src="'+$scope.recording+'"type="video/mp4"/>'   
 
-
+    $scope.building_name = $scope.video.building_name     
+    #$scope.videoPlay(false)
+    APIService.control($scope.video, "Videos", {}, "play")
   
   $scope.trustSrc = (src) ->
     $scope.videos = $sce.getTrustedResourceUrl(src);
 
-  $scope.postVideoId = (videoId) ->  
-
   $scope.videoDiv.addEventListener 'timeupdate', ->
-    # console.log 'test'
+    #console.log $scope.videoDiv.currentTime, $scope.videoDiv.duration
     # never calls
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
-    #console.log value
+    if !value
+      value = 0
     $scope.seekBar.value = value
     return
+  
   $scope.closeBtn =() ->
     $scope.videoDiv.pause()
-    $location.path('#/dash/')
+    APIService.control($scope.video, "Videos", {}, "stop")
+    $state.go('tab.dash', {}, {});
 
   $scope.update = ->
     $scope.videoDiv.pause()
 
   $scope.seekRelease = ->
-    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
-    $scope.videoDiv.currentTime = currentTime;
+    currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration)
+    #console.log currentTime, " CURRENT TIME"
+    $scope.videoDiv.currentTime = currentTime
+    command = 
+      seekto: currentTime
+    APIService.control($scope.video, "Videos", command, "cue")
+
     if $scope.videoState
-      $scope.videoDiv.play()
+      $scope.videoDiv.play(false)
 
   $scope.volumeUp = ->
     #console.log 'UP'
@@ -624,20 +676,35 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
   $scope.videoBack =  ->
     $scope.videoDiv.currentTime = 0
+    command = 
+      seekto: $scope.videoDiv.currentTime
+    APIService.control($scope.video, "Videos", command, "cue")    
+
 
   $scope.videoBw =  ->
     $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5
+    command = 
+      seekto: $scope.videoDiv.currentTime
+    APIService.control($scope.video, "Videos", command, "cue")
+
 
   $scope.videoFw =  ->
     $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5
+    command = 
+      seekto: $scope.videoDiv.currentTime
+    APIService.control($scope.video, "Videos", command, "cue")
 
-  $scope.videoPlay =  ->
-    if $scope.videoDiv.paused
+
+  $scope.videoPlay = (remote_also = true)  ->
+    if $scope.videoDiv.paused 
       $scope.videoDiv.play()
+      APIService.control($scope.video, "Videos", {}, "unpause")
       $scope.videoState = true
     else
       $scope.videoDiv.pause()
+      APIService.control($scope.video, "Videos", {}, "pause")
       $scope.videoState = false
+
 
   $scope.isMute = ->
     $scope.mute
@@ -657,6 +724,25 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
         $scope.volume.value = 0
       else
         $scope.volume.value = $scope.volume.value - 5/$scope.volume.getBoundingClientRect().width * $scope.max
+
+
+  # $scope.$on '$destroy', ->
+  #   APIService.control($scope.video, "Videos", {}, "stop")
+  #   return
+ 
+  # Timelapses.get($stateParams.id).then (result) ->
+  #   $scope.video = result
+  #   console.log $scope.video.recording.url, "URL"
+  #   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
+  #   $scope.building_name = $scope.video.building_name 
+
+
+
+  # $scope.video = Timelapses.getLocal($stateParams.id)
+  # console.log $scope.video.recording.url, "URL"
+  # $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
+  # $scope.building_name = $scope.video.building_name 
+
 
 
   return

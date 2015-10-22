@@ -2,27 +2,24 @@ Number::map = (in_min, in_max, out_min, out_max) ->
   (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 scaleValues = (posY, posX, scale, img, imgname) ->
-  pano_big = 11532
-  screen = 7680
-  width_ratio =  1.5015625 
 
   w = 676
   h = 190
 
   scaleToSend = 1/scale
 
-  xToSend = -(posX - 46).map(0, w , -0.25 ,1.25   ) #+ 676/2 #+11532*scale/6 
-  yToSend = 0#(posY - 178).map(0,h ,-scaleToSend*0.5, 1)          
+  xToSend = -(posX - 46).map(0, w , -0.25 ,1.25   )
+  yToSend = 0
   if scale != 0  
     xToSend = -(posX - 46).map(0, w , -(scaleToSend*0.75-0.5), (scaleToSend * 0.75 + 0.5) ) 
     yToSend = (posY - 178).map(0,h ,-(scaleToSend*0.5 - 0.5), scaleToSend*0.5 +0.5)
 
-  #yToSend = 0
-  console.log "POS TO ORIGINAL "+ posX + " " + posY
-  console.log "CUR POS : "+  posX + " " + posY
-  console.log "TOUCH OLD SCALE: ", parseFloat(scale)              
-  console.log "TOUCH NEW SCALE: ", parseFloat(scaleToSend)
-  console.log "POS TO SEND "+ xToSend + " " + yToSend
+
+  # console.log "POS TO ORIGINAL "+ posX + " " + posY
+  # console.log "CUR POS : "+  posX + " " + posY
+  # console.log "TOUCH OLD SCALE: ", parseFloat(scale)              
+  # console.log "TOUCH NEW SCALE: ", parseFloat(scaleToSend)
+  # console.log "POS TO SEND "+ xToSend + " " + yToSend
 
   command = 
     x: xToSend
@@ -93,13 +90,8 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APISer
         posY = 0
         lastPosX = 0
         lastPosY = 0
-        bufferX = 0
-        bufferY = 0
         scale = 1
         lastScale = undefined
-        rotation = 0
-        last_rotation = undefined
-        dragReady = 0
         leftXLimit = 44
         rightXLimit = 720
         topYLimit = 204
@@ -111,19 +103,17 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APISer
         max = 200
         oldScale = 0
         oldWidth = 0
-        pass = false
         changeX = false
         changeY = false
         deltaHeight = 0
         deltaWidth = 0
-        scaleChange = false
 
         cur_dim =
           width: 676
           height: 186
         orig_dim = $scope.dimensions
 
-        ionic.onGesture 'touch drag dragend transform release', ((e) ->
+        ionic.onGesture 'touch drag dragend transform release transformend', ((e) ->
           e.gesture.srcEvent.preventDefault()
           e.gesture.preventDefault()
 
@@ -169,18 +159,11 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APISer
                 e.target.style.webkitTransform = e.target.style.transform              
                 # square.style.left = String(posX + "px")
                 changeX = false
-              # if changeY  == true
-              #   #square.style.top = String(posY + "px")
-              #   transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + match[0]
-              #   e.target.style.transform = transform
-              #   e.target.style.webkitTransform = e.target.style.transform                
                 changeY = false                              
 
             when 'transform'
 
               scale = e.gesture.scale * lastScale
-              if scale  != lastScale
-                scaleChange = true
               if scale > 1 
                 scale = 1
               deltaWidth = Math.abs(square.getBoundingClientRect().width - firstWidth)
@@ -204,108 +187,23 @@ angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APISer
                 transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) '+  " " + 'scale(' + scale + ')'
                 e.target.style.transform = transform  
                 e.target.style.webkitTransform = e.target.style.transform              
-                # square.style.left = String(posX + "px")
                 changeX = false
-              # if changeY  == true
-              #   #square.style.top = String(posY + "px")
-              #   transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' +  " " + 'scale(' + scale + ')'
-              #   e.target.style.transform = transform
-              #   e.target.style.webkitTransform = e.target.style.transform                
                 changeY = false     
 
-              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname)
-              APIService.panorama($scope.image, $scope.imgname, command)      
-   
 
             when 'dragend'
               lastPosX = posX
               lastPosY = posY
               lastScale = scale
                 
-              # console.log ("^^^^ DRAGGING ")
-
-              # xToSend = -posX.map(0,cur_dim.width,0, $scope.dimensions.width)+$scope.dimensions.width/6
-              # yToSend = -posY.map(0,cur_dim.height,0, $scope.dimensions.height)#+$scope.dimensions.height/           
-
-              # scaleToSend = parseFloat(1.0)
-              # if parseFloat(scale) > parseFloat(1.0)
-              #   scaleToSend = parseFloat(parseFloat(scale) - 1)
-              # else if  parseFloat(scale) < parseFloat(1.0)
-              #   scaleToSend = parseFloat(parseFloat(scale) + 1)
-              
-              
-              # console.log "OLD DRAG SCALE: ", parseFloat(scale)              
-              # console.log "NEW DRAG SCALE: ", parseFloat(scaleToSend)
-
-
-              # command = 
-              #   x: xToSend
-              #   y: yToSend
-              #   z: scaleToSend
-              # APIService.panorama($scope.image, $scope.imgname, command)              
-
             when 'release'
               command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname)
-              APIService.panorama($scope.image, $scope.imgname, command)      
+              APIService.control($scope.image, $scope.imgname, command, "pano")      
 
-              # yToSend = -posY.map(0,186,0, 3240)#+3240/6           
+            when 'transformend'
+              command = scaleValues(square.getBoundingClientRect().top, square.getBoundingClientRect().left, scale, $scope.image, $scope.imgname)
+              APIService.control($scope.image, $scope.imgname, command, "pano")      
 
-              # console.log "DIM "+ $scope.dimensions.width + " " + posY
-
-              
-              # scaleToSend = parseFloat(1.0)
-              # if parseFloat(scale) > parseFloat(1.0)
-              #   scaleToSend = parseFloat(parseFloat(scale) - 1)
-              # else if  parseFloat(scale) < parseFloat(1.0)
-              #   scaleToSend = parseFloat(parseFloat(scale) + 1)
-
-              # #WORKS NOW
-              # xToSend = -posX.map(0,676,0, 11532)+11532*Math.abs(scaleToSend)/6
-              
-              # console.log "POS TO SEND "+ xToSend + " " + yToSend
-              # console.log "TOUCH OLD SCALE: ", parseFloat(scale)              
-              # console.log "TOUCH NEW SCALE: ", parseFloat(scaleToSend)
-
-
-              # command = 
-              #   x: xToSend
-              #   y: yToSend
-              #   z: scaleToSend
-              # APIService.panorama($scope.image, $scope.imgname, command)   
-
-
-              
-              # xToSend = -posX.map(0,cur_dim.width,0, $scope.dimensions.width)+$scope.dimensions.width/6
-              # yToSend = -posY.map(0,cur_dim.height,0, $scope.dimensions.height)+$scope.dimensions.height/6           
-
-
-              # scaleToSend = parseFloat(1.0)
-              # if parseFloat(scale) > parseFloat(1.0)
-              #   scaleToSend = parseFloat(parseFloat(scale) - 1)
-              # else if  parseFloat(scale) < parseFloat(1.0)
-              #   scaleToSend = parseFloat(parseFloat(scale) + 1)
-              
-              
-              # console.log "OLD SCALE: ", parseFloat(scale)              
-              # console.log "NEW SCALE: ", parseFloat(scaleToSend)
-
-
-              # command = 
-              #   x: xToSend
-              #   y: yToSend
-              #   z: scaleToSend
-              # APIService.panorama($scope.image, $scope.imgname, command)
-          #   lastMaxX = 0
-          #   lastMinX = 0
-          #   lastMaxY = 0
-          #   lastMinY = 0   
-
-
-          # if scaleChange  
-          #   transform = transform + 'scale(' + scale + ')'  #+ 'rotate(' + rotation + 'deg) '
-          #   e.target.style.transform = transform# +  " " + match[0]
-          #   e.target.style.webkitTransform = e.target.style.transform #+ " " + match[0]
-          #   scaleChange = false
 
         ), $element[0]
       #   return

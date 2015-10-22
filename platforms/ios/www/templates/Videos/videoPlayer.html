@@ -10,6 +10,7 @@
     <div id="video_container">
 
         <a class="close_button" ui-sref="tab.dash">
+        <!-- ng-click="closeBtn()" -->
             <i class="ion-close"></i>
         </a>
 
@@ -17,8 +18,8 @@
             <div id="presentation_title">{{building_name | uppercase}}</div>
             <div id="presentation_subtitle">{{video.name}}</div>
         </div>
-        <ion-content overflow-scroll="true">
-            <video preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px" id="video" autoplay="true">
+        <ion-content overflow-scroll="true" id="replacevideoplayer">
+            <video preload="metadata" webkit-playsinline="webkit-playsinline" class="videoPlayer" width="696px" height="391px" id="video" autoplay="true" id="vid">
                 <source ng-src={{recording}} type="video/mp4" />
             </video>
         </ion-content>

@@ -12,6 +12,9 @@
 
 .row {
     padding: 0px 30px !important;
+    ion-item:first-of-type{
+        margin-left:  -6px !important;
+    }
 }
 
 .animate-if {
@@ -36,6 +39,7 @@
         // -moz-transition: max-height 0.5s;
         // transition: max-height 0.5s;
         // transition: all .5s !important;
+
     }
 }
 
@@ -76,9 +80,9 @@
     min-height: 300px;
 }
 
-.col {
-    padding: 0px !important;
-}
+// .col {
+//     padding: 0px !important;
+// }
 
 $col_height: 165px;
 
@@ -97,6 +101,7 @@ $col_height: 165px;
     transition: max-height 0.5s;
     background: none !important;
     border: none !important;
+    margin-left: 22px !important;
     img {
         max-height: 92px;
     }

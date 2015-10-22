@@ -9355,9 +9355,6 @@ a.button {
   min-width: 300px;
   min-height: 300px; }
 
-.col {
-  padding: 0px !important; }
-
 .cust_col {
   -webkit-box-flex: 0;
   -webkit-flex: 0 0 165px !important;
@@ -9426,8 +9423,7 @@ a.button {
   .presenation_container .close_button {
     position: absolute;
     right: 40px;
-    top: 30px;
-    font-size: 25px; }
+    top: 30px; }
     .presenation_container .close_button .ion-close::before {
       color: #808080; }
 
@@ -18677,6 +18673,9 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+.close_button {
+  font-size: 40px; }
+
 #home_tab {
   display: none; }
 
@@ -18896,8 +18895,7 @@ ion-top-menu .item {
 #home_view .close_button {
   position: absolute;
   right: 40px;
-  top: 30px;
-  font-size: 25px; }
+  top: 30px; }
   #home_view .close_button .ion-close::before {
     color: #808080; }
 
@@ -18927,8 +18925,7 @@ ion-top-menu .item {
   #video_container .close_button {
     position: absolute;
     right: 36px;
-    top: 30px;
-    font-size: 25px; }
+    top: 30px; }
     #video_container .close_button .ion-close::before {
       color: #808080; }
   #video_container .presentation_titles {
@@ -19102,8 +19099,7 @@ progress::-webkit-progress-value {
   #webcam_content .close_button {
     position: absolute;
     right: 12px;
-    top: 10px;
-    font-size: 25px; }
+    top: 10px; }
     #webcam_content .close_button .ion-close::before {
       color: #808080; }
 
@@ -19112,6 +19108,12 @@ progress::-webkit-progress-value {
   margin-top: 10px;
   margin-left: auto;
   margin-right: auto; }
+  #webcam_assets .cust_col {
+    min-width: 153px !important; }
+    #webcam_assets .cust_col img {
+      min-width: 140px !important; }
+  #webcam_assets .row {
+    padding-left: 0px !important; }
   #webcam_assets .item {
     color: white;
     width: 501px !important; }
