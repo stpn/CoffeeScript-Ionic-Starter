@@ -86,7 +86,7 @@
     .close_button {
         position: absolute;
         right: 12px;
-        top: 10px;
+        top: -3px;
         //font-size: $close_button_size;
         .ion-close::before {
             color: #808080;
@@ -111,6 +111,7 @@
     .item {
         color: white;
         width: 501px !important;
+        margin: -1px !important;
     }
     .scroll {
         margin-top: 10px;

@@ -31,11 +31,12 @@ scaleValues = (posY, posX, scale, img, imgname) ->
 
 angular.module('starter.filters', []).filter 'buildingFilter', [ ->
   (models, activeBuilding) ->
+  
     if !angular.isUndefined(models) and !angular.isUndefined(activeBuilding) and activeBuilding.length > 0
       tempClients = []
       angular.forEach models, (model) ->
-        if angular.equals(model.building_name, activeBuilding)
-          console.log(activeBuilding, model.building_name)
+        if angular.equals(model.building_name, activeBuilding) || angular.equals(activeBuilding, "all")
+          #console.log(activeBuilding, model.building_name)
           tempClients.push model
       tempClients
     else
@@ -67,6 +68,22 @@ angular.module('starter.directives',[]).directive 'backImg', ->
         'background-size': 'cover'
       return
     return
+
+angular.module('starter.directives',[]).directive 'zoomOut', ->
+  {
+    restrict: 'E'
+    template: '<div class ="zoom_out" ng-click=clickFunc() >
+                -
+            </div>'
+    link: (scope) ->
+
+      scope.clickFunc = ->
+        alert 'Hello, world!'
+        return
+
+      return
+
+  }
 
 
 angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APIService) ->

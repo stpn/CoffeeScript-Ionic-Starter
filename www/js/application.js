@@ -152,13 +152,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return $scope.comparisonState;
   };
   $scope.isActiveBuilding = function(name) {
-    if ($scope.activeBuildingName === void 0) {
+    if ($scope.activeBuildingName === void 0 || $scope.activeBuildingName === 'all') {
       return true;
     }
     return $scope.activeBuildingName === name;
   };
   $scope.toggleGroup = function(group) {
     var menu;
+    console.log($scope.activeBuildingName + " << ACTIVE BUILDING");
     menu = document.getElementById('ionTopMenu');
     if (menu.style.height === '250px') {
       $scope.toggleTopMenu();
@@ -597,7 +598,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
-  var changeScale, firstHeight, firstWidth, pan, posX, posY, square;
+  var changeScale, deltaHeight, deltaWidth, firstHeight, firstWidth, pan, posX, posY, square;
   $scope.currentZoom = 1.0;
   $scope.factoryName = "Panoramas";
   square = document.getElementById("square");
@@ -606,6 +607,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   pan = document.getElementById("panorama_image");
   firstWidth = square.getBoundingClientRect().width;
   firstHeight = square.getBoundingClientRect().height;
+  deltaHeight = 0;
+  deltaWidth = 0;
   Panoramas.get_by_camera($stateParams.cameraId).then(function(result) {
     var img;
     $scope.panorama = result;
@@ -642,7 +645,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return changeScale();
   };
   $scope.zoomOut = function(name) {
-    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
+    var changeX, changeY, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
@@ -673,9 +676,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       changeY = true;
     }
     if (changeX === true || changeY === true) {
+      console.log('CHANGING: ' + posX + " " + posY);
       transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
       toZoom.style.transform = transform;
       toZoom.style.webkitTransform = toZoom.style.transform;
+      angular.element(toZoom).trigger("transformend");
       changeX = false;
       changeY = false;
     }
@@ -819,7 +824,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.video = Timelapses.getLocal($stateParams.id);
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
   $scope.building_name = $scope.video.camera_name;
-  APIService.control($scope.video, "Videos", {}, "play");
+  APIService.control($scope.video, "Timelapses", {}, "play");
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
@@ -970,7 +975,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
   };
   $scope.zoomOut = function(name) {
-    var changeX, changeY, deltaHeight, deltaWidth, scaleToSend, toZoom, transform;
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
@@ -1003,16 +1008,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       toZoom.style.transform = transform;
       toZoom.style.webkitTransform = toZoom.style.transform;
       changeX = false;
-      changeY = false;
+      return changeY = false;
     }
-    scaleToSend = 1;
-    if (parseFloat($scope.currentZoom) > 1) {
-      scaleToSend = parseFloat($scope.currentZoom) - 1;
-    } else if (parseFloat($scope.currentZoom) > 1) {
-      scaleToSend = parseFloat($scope.currentZoom) + 1;
-    }
-    console.log("NEW SCALE: ", parseFloat(scaleToSend));
-    return console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
   };
   $scope.getView = function() {
     return $scope.view.image;
@@ -1054,8 +1051,7 @@ angular.module('starter.filters', []).filter('buildingFilter', [
       if (!angular.isUndefined(models) && !angular.isUndefined(activeBuilding) && activeBuilding.length > 0) {
         tempClients = [];
         angular.forEach(models, function(model) {
-          if (angular.equals(model.building_name, activeBuilding)) {
-            console.log(activeBuilding, model.building_name);
+          if (angular.equals(model.building_name, activeBuilding) || angular.equals(activeBuilding, "all")) {
             return tempClients.push(model);
           }
         });
@@ -1091,6 +1087,18 @@ angular.module('starter.directives', []).directive('backImg', function() {
         'background-size': 'cover'
       });
     });
+  };
+});
+
+angular.module('starter.directives', []).directive('zoomOut', function() {
+  return {
+    restrict: 'E',
+    template: '<div class ="zoom_out" ng-click=clickFunc() > - </div>',
+    link: function(scope) {
+      scope.clickFunc = function() {
+        alert('Hello, world!');
+      };
+    }
   };
 });
 

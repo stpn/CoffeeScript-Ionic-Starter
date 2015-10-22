@@ -9317,6 +9317,8 @@ a.button {
 
 .row {
   padding: 0px 30px !important; }
+  .row ion-item:first-of-type {
+    margin-left: -6px !important; }
 
 .animate-if {
   background: white;
@@ -9370,6 +9372,7 @@ a.button {
   transition: max-height 0.5s;
   background: none !important;
   border: none !important;
+  margin-left: 22px !important;
   background: none !important;
   border: none !important; }
   .cust_col img {
@@ -9400,6 +9403,8 @@ a.button {
     background-color: black !important;
     margin-left: 0px;
     min-height: 743px; }
+    .presenation_container .presentation_gal .row {
+      margin-left: 5px !important; }
     .presenation_container .presentation_gal .item {
       background-color: black !important; }
     .presenation_container .presentation_gal .col_slide {
@@ -19099,7 +19104,7 @@ progress::-webkit-progress-value {
   #webcam_content .close_button {
     position: absolute;
     right: 12px;
-    top: 10px; }
+    top: -3px; }
     #webcam_content .close_button .ion-close::before {
       color: #808080; }
 
@@ -19116,7 +19121,8 @@ progress::-webkit-progress-value {
     padding-left: 0px !important; }
   #webcam_assets .item {
     color: white;
-    width: 501px !important; }
+    width: 501px !important;
+    margin: -1px !important; }
   #webcam_assets .scroll {
     margin-top: 10px;
     max-width: 500px !important;

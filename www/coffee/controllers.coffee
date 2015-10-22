@@ -49,11 +49,12 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.comparisonState
 
   $scope.isActiveBuilding =(name) ->
-    if $scope.activeBuildingName == undefined
+    if $scope.activeBuildingName == undefined || $scope.activeBuildingName == 'all'
       return true
     $scope.activeBuildingName == name
 
   $scope.toggleGroup = (group) ->
+    console.log $scope.activeBuildingName + " << ACTIVE BUILDING"
     menu = document.getElementById('ionTopMenu')
     if menu.style.height == '250px'
       $scope.toggleTopMenu()    
@@ -554,6 +555,10 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   firstWidth = square.getBoundingClientRect().width
   firstHeight = square.getBoundingClientRect().height
 
+  deltaHeight = 0
+  deltaWidth = 0
+
+
   Panoramas.get_by_camera($stateParams.cameraId).then (result) ->
     $scope.panorama = result
     $scope.webcam_name = $scope.panorama.webcam_name
@@ -617,9 +622,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
       posY = pan.offsetHeight - square.getBoundingClientRect().height - deltaHeight  / 2
       changeY = true  
     if changeX ==true || changeY  == true
+      console.log 'CHANGING: '+ posX +  " " + posY
       transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) '+  " " + "scale("+$scope.currentZoom+")"
       toZoom.style.transform = transform  
-      toZoom.style.webkitTransform = toZoom.style.transform              
+      toZoom.style.webkitTransform = toZoom.style.transform      
+      angular.element(toZoom).trigger("transformend")        
       # square.style.left = String(posX + "px")
       changeX = false
       changeY = false  
@@ -803,7 +810,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
   $scope.video = Timelapses.getLocal($stateParams.id)  
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url)
   $scope.building_name = $scope.video.camera_name 
-  APIService.control($scope.video, "Videos", {}, "play")
+  APIService.control($scope.video, "Timelapses", {}, "play")
 
   
   $scope.trustSrc = (src) ->
@@ -1037,7 +1044,6 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     $scope.view = result
     $scope.building_name = $scope.view.building_name 
     $scope.imageUrl = $scope.view.image.url
-    
 
 
   $scope.zoomIn = (name) ->
@@ -1060,6 +1066,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
 
 
   $scope.zoomOut = (name) ->
+
     console.log $scope.currentZoom 
     if $scope.currentZoom >= 1.0 
       return
@@ -1099,14 +1106,14 @@ angular.module('starter.controllers', []).controller('DashCtrl', ($scope, $q, $h
     #   toZoom.style.webkitTransform = toZoom.style.transform                
     #   changeY = false  
 
-    scaleToSend = 1
-    if parseFloat($scope.currentZoom) > 1
-      scaleToSend = parseFloat($scope.currentZoom) - 1
-    else if  parseFloat($scope.currentZoom) > 1
-      scaleToSend = parseFloat($scope.currentZoom) + 1
+    # scaleToSend = 1
+    # if parseFloat($scope.currentZoom) > 1
+    #   scaleToSend = parseFloat($scope.currentZoom) - 1
+    # else if  parseFloat($scope.currentZoom) > 1
+    #   scaleToSend = parseFloat($scope.currentZoom) + 1
     
-    console.log "NEW SCALE: ", parseFloat(scaleToSend)
-    console.log "OLD SCALE: ", parseFloat($scope.currentZoom)
+    # console.log "NEW SCALE: ", parseFloat(scaleToSend)
+    # console.log "OLD SCALE: ", parseFloat($scope.currentZoom)
 
 
 

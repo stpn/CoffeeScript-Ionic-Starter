@@ -68,6 +68,22 @@ angular.module('starter.directives',[]).directive 'backImg', ->
       return
     return
 
+angular.module('starter.directives',[]).directive 'zoomOut', ->
+  {
+    restrict: 'E'
+    template: '<div class ="zoom_out" ng-click=clickFunc() >
+                -
+            </div>'
+    link: (scope) ->
+
+      scope.clickFunc = ->
+        alert 'Hello, world!'
+        return
+
+      return
+
+  }
+
 
 angular.module('starter.directives',[]).directive 'ionPpinch', ($timeout, APIService) ->
   {

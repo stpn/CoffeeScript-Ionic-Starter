@@ -147,6 +147,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.clicker_padding = $scope.clicker_default;
   $scope.accordionHeight = "0px";
   $scope.showOverlay = false;
+  $scope.assetToCompare = void 0;
   $scope.isComparison = function() {
     return $scope.comparisonState;
   };
@@ -158,6 +159,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   };
   $scope.toggleGroup = function(group) {
     var menu;
+    console.log($scope.activeBuildingName + " << ACTIVE BUILDING");
     menu = document.getElementById('ionTopMenu');
     if (menu.style.height === '250px') {
       $scope.toggleTopMenu();
@@ -248,12 +250,16 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       return $scope.bld_style = "margin-top: 50px";
     }
   };
-  $scope.showCompareMenu = function(name) {
+  $scope.showCompareMenu = function(name, asset) {
     var bld, menu, pane;
     if (name === "Presentations" || name === "Videos" || name === "Views") {
       return;
     }
     if ($scope.comparisonState === false) {
+      $scope.assetToCompare = {
+        asset: asset,
+        name: name
+      };
       $scope.comparisonState = true;
       $scope.buldingTabName = "COMPARISON MODE";
       bld = document.getElementById('building_wrap');
@@ -301,10 +307,20 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.setActiveComparison = function(comparison) {
+    var command;
     if (comparison === $scope.activeComparison) {
       comparison = void 0;
     }
-    return $scope.activeComparison = comparison;
+    $scope.activeComparison = comparison;
+    if (comparison !== "center") {
+      command = {
+        location: comparison
+      };
+      APIService.control($scope.assetToCompare.asset, $scope.assetToCompare.name, command, "compare");
+    } else {
+      $scope.playAsset($scope.assetToCompare.name, $scope.assetToCompare.asset);
+    }
+    return $scope.toggleTopMenu();
   };
   $scope.getComparisonStroke = function(comparison) {
     if (comparison === $scope.activeComparison) {
@@ -314,11 +330,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.playAsset = function(name, asset) {
-    console.log(asset, name, "NAAME");
     if (name === "Presentations") {
       $scope.openLoc('presentations', asset.id);
-    } else if (name === "Views") {
-      $scope.openLoc('views', asset.id);
     } else if (name === "Videos") {
       $scope.openLoc('videos', asset.id);
     } else {
@@ -438,40 +451,51 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   $scope.isGroupShown = function(group) {
     return $scope.shownGroup === group;
   };
-}).controller('PresentationCtrl', function($scope, $log, $stateParams, $interval, Presentations) {
+}).controller('PresentationCtrl', function($scope, $log, $stateParams, $timeout, $interval, Presentations, APIService) {
   var promise;
   promise = void 0;
-  $scope.play = false;
+  $scope.play = true;
+  $scope.videoPlaying = false;
   $scope.currentSlide = 1;
   Presentations.get($stateParams.id).then(function(result) {
     $scope.presentation = result;
     $scope.slides = $scope.presentation.slides;
     $scope.presentation_name = $scope.presentation.name;
     $scope.project_name = $scope.presentation.building_name;
-    return $scope.slide = $scope.presentation.slides[0];
+    $scope.slide = $scope.presentation.slides[0];
+    return $scope.postSlide(1);
   });
+  $scope.playFirstSlide = function() {
+    if ($scope.slides[0].slideable_type === "Video") {
+      return $scope.playVideoSlide();
+    } else {
+      $scope.start_playing();
+      return $scope.playImageSlide();
+    }
+  };
   $scope.playVideoSlide = function() {
     var slideable;
-    $scope.stopPlaying();
     slideable = {
       id: $scope.slide.slideable_id
     };
     APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "play");
+    $scope.videoPlaying = true;
     return $timeout((function() {
+      $scope.videoPlaying = false;
       $scope.start_playing();
     }), $scope.slide.image.duration * 1000 + 1000);
   };
   $scope.playImageSlide = function() {
     var slideable;
-    $scope.stopPlaying();
+    $scope.stop_playing();
     slideable = {
       id: $scope.slide.slideable_id
     };
     return APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "play");
   };
   $scope.postSlide = function(slideIdx) {
-    if (slideIdx >= $scope.slides.length) {
-      $scope.currentSlide = $scope.slides.length;
+    if (slideIdx > $scope.slides.length) {
+      $scope.currentSlide = 1;
     } else if (slideIdx <= 1) {
       $scope.currentSlide = 1;
     } else {
@@ -479,6 +503,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
     $scope.slide = $scope.presentation.slides[$scope.currentSlide - 1];
     if ($scope.slide.slideable_type === "Video") {
+      $scope.stop_playing();
       return $scope.playVideoSlide();
     } else {
       return $scope.playImageSlide();
@@ -495,6 +520,15 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.stop_playing = function() {
+    var slideable;
+    if ($scope.slide.slideable_type === "Video" && $scope.videoPlaying === true) {
+      console.log($scope.slide);
+      slideable = {
+        id: $scope.slide.slideable_id
+      };
+      APIService.control(slideable, $scope.slide.slideable_type + "s", {}, "pause");
+      $scope.videoPlaying = false;
+    }
     return $interval.cancel(promise);
   };
   $scope.advanceSlide = function() {
@@ -564,7 +598,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
 }).controller('PanoramasCtrl', function($scope, $stateParams, Panoramas, ActiveCamera, $ionicHistory) {
-  var changeScale, firstHeight, firstWidth, pan, posX, posY, square;
+  var changeScale, deltaHeight, deltaWidth, firstHeight, firstWidth, pan, posX, posY, square;
   $scope.currentZoom = 1.0;
   $scope.factoryName = "Panoramas";
   square = document.getElementById("square");
@@ -573,6 +607,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
   pan = document.getElementById("panorama_image");
   firstWidth = square.getBoundingClientRect().width;
   firstHeight = square.getBoundingClientRect().height;
+  deltaHeight = 0;
+  deltaWidth = 0;
   Panoramas.get_by_camera($stateParams.cameraId).then(function(result) {
     var img;
     $scope.panorama = result;
@@ -609,7 +645,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return changeScale();
   };
   $scope.zoomOut = function(name) {
-    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
+    var changeX, changeY, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
@@ -640,9 +676,11 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       changeY = true;
     }
     if (changeX === true || changeY === true) {
+      console.log('CHANGING: ' + posX + " " + posY);
       transform = 'translate3d(' + posX + 'px,' + posY + 'px, 0) ' + " " + "scale(" + $scope.currentZoom + ")";
       toZoom.style.transform = transform;
       toZoom.style.webkitTransform = toZoom.style.transform;
+      angular.element(toZoom).trigger("transformend");
       changeX = false;
       changeY = false;
     }
@@ -774,40 +812,48 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       }
     }
   };
-}).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location) {
+}).controller('TimelapsesCtrl', function($scope, $sce, $log, $stateParams, Timelapses, $location, APIService) {
   $scope.videoDiv = document.getElementById('video');
   $scope.seekBar = document.getElementById('seekbar');
   $scope.volume = document.getElementById('volume');
+  $scope.viedeo;
   $scope.skipValue = 0;
   $scope.mute = false;
   $scope.max = 80;
   $scope.videoState = true;
   $scope.video = Timelapses.getLocal($stateParams.id);
-  console.log($scope.video.recording.url, "URL");
   $scope.recording = $sce.trustAsResourceUrl($scope.video.recording.url);
-  $scope.building_name = $scope.video.building_name;
+  $scope.building_name = $scope.video.camera_name;
+  APIService.control($scope.video, "Timelapses", {}, "play");
   $scope.trustSrc = function(src) {
     return $scope.videos = $sce.getTrustedResourceUrl(src);
   };
-  $scope.postVideoId = function(videoId) {};
   $scope.videoDiv.addEventListener('timeupdate', function() {
     var value;
     value = (100 / $scope.videoDiv.duration) * $scope.videoDiv.currentTime;
+    if (!value) {
+      value = 0;
+    }
     $scope.seekBar.value = value;
   });
   $scope.closeBtn = function() {
     $scope.videoDiv.pause();
-    return $location.path('#/dash/');
+    APIService.control($scope.video, "Videos", {}, "stop");
+    return $state.go('tab.dash', {}, {});
   };
   $scope.update = function() {
     return $scope.videoDiv.pause();
   };
   $scope.seekRelease = function() {
-    var currentTime;
+    var command, currentTime;
     currentTime = $scope.seekBar.value / (100 / $scope.videoDiv.duration);
     $scope.videoDiv.currentTime = currentTime;
+    command = {
+      seekto: currentTime
+    };
+    APIService.control($scope.video, "Videos", command, "cue");
     if ($scope.videoState) {
-      return $scope.videoDiv.play();
+      return $scope.videoDiv.play(false);
     }
   };
   $scope.volumeUp = function() {
@@ -825,20 +871,40 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     }
   };
   $scope.videoBack = function() {
-    return $scope.videoDiv.currentTime = 0;
+    var command;
+    $scope.videoDiv.currentTime = 0;
+    command = {
+      seekto: $scope.videoDiv.currentTime
+    };
+    return APIService.control($scope.video, "Timelapses", command, "cue");
   };
   $scope.videoBw = function() {
-    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+    var command;
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime - 5;
+    command = {
+      seekto: $scope.videoDiv.currentTime
+    };
+    return APIService.control($scope.video, "Timelapses", command, "cue");
   };
   $scope.videoFw = function() {
-    return $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+    var command;
+    $scope.videoDiv.currentTime = $scope.videoDiv.currentTime + 5;
+    command = {
+      seekto: $scope.videoDiv.currentTime
+    };
+    return APIService.control($scope.video, "Timelapses", command, "cue");
   };
-  $scope.videoPlay = function() {
+  $scope.videoPlay = function(remote_also) {
+    if (remote_also == null) {
+      remote_also = true;
+    }
     if ($scope.videoDiv.paused) {
       $scope.videoDiv.play();
+      APIService.control($scope.video, "Timelapses", {}, "unpause");
       return $scope.videoState = true;
     } else {
       $scope.videoDiv.pause();
+      APIService.control($scope.video, "Timelapses", {}, "pause");
       return $scope.videoState = false;
     }
   };
@@ -909,7 +975,7 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
     return console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
   };
   $scope.zoomOut = function(name) {
-    var changeX, changeY, deltaHeight, deltaWidth, scaleToSend, toZoom, transform;
+    var changeX, changeY, deltaHeight, deltaWidth, toZoom, transform;
     console.log($scope.currentZoom);
     if ($scope.currentZoom >= 1.0) {
       return;
@@ -942,16 +1008,8 @@ angular.module('starter.controllers', []).controller('DashCtrl', function($scope
       toZoom.style.transform = transform;
       toZoom.style.webkitTransform = toZoom.style.transform;
       changeX = false;
-      changeY = false;
+      return changeY = false;
     }
-    scaleToSend = 1;
-    if (parseFloat($scope.currentZoom) > 1) {
-      scaleToSend = parseFloat($scope.currentZoom) - 1;
-    } else if (parseFloat($scope.currentZoom) > 1) {
-      scaleToSend = parseFloat($scope.currentZoom) + 1;
-    }
-    console.log("NEW SCALE: ", parseFloat(scaleToSend));
-    return console.log("OLD SCALE: ", parseFloat($scope.currentZoom));
   };
   $scope.getView = function() {
     return $scope.view.image;
@@ -1030,6 +1088,18 @@ angular.module('starter.directives', []).directive('backImg', function() {
         'background-size': 'cover'
       });
     });
+  };
+});
+
+angular.module('starter.directives', []).directive('zoomOut', function() {
+  return {
+    restrict: 'E',
+    template: '<div class ="zoom_out" ng-click=clickFunc() > - </div>',
+    link: function(scope) {
+      scope.clickFunc = function() {
+        alert('Hello, world!');
+      };
+    }
   };
 });
 
